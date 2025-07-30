@@ -3,7 +3,13 @@ import { User } from "@/types/user";
 
 
 
-const initialState = {
+interface AuthState {
+      isAuthenticated : boolean,
+      user : User | null
+}
+
+
+const initialState : AuthState = {
       isAuthenticated : false,
       user : null
 }
@@ -13,10 +19,12 @@ const AuthSlice = createSlice({
       initialState,
       reducers : {
             setAuth(state,action:PayloadAction<User>){
-
+                  state.isAuthenticated = true,
+                  state.user = action.payload
             },
             clearAuth(state){
-                  
+                  state.isAuthenticated = false,
+                  state.user = null
             }
       },
 });
