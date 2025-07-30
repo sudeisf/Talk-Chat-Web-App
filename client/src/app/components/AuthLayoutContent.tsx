@@ -25,7 +25,7 @@ export default function AuthLayoutContent ({children,pageType}:AuthLayoutProps){
             <div className="flex justify-between p-4">
                         <h1 className="bg-gradient-to-r from-orange-200 font-sans to-red-700 bg-clip-text text-transparent text-xl">Talkit</h1>
                         <div className="flex space-x-0.5 text-md">
-                        <p className="font-sans">Already have an account?</p><Link href="/login" className="font-sans underline">Sign </Link>
+                        <p className="font-sans">Already have an account?</p><Link href="/login" className="font-sans underline">Sign in </Link>
                   </div>
                   </div>
             
