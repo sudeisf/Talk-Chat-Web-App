@@ -17,13 +17,7 @@ class RegisterUserSerilizer(serializers.ModelSerializer):
             'email',
             'firstName',  
             'lastName',  
-            'birth_date',
             'password',
-            'gender',
-            'phone_number',
-            'profile_image',
-            'created_at',
-            'updated_at',
         ]
         extra_kwargs = {   
                   "password": {"write_only": True}

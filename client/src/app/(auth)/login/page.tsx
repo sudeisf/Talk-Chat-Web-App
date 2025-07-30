@@ -14,10 +14,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {z} from "zod";
 import {useForm} from "react-hook-form"
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import AuthLayoutContent from "@/app/components/AuthLayoutContent";
 
 const formSchema = z.object({
       email : z.email(),
-      password : z.string().min(6,{message :"your password should be at leaset 6 charachters"})
+      password : z.string().min(8,{message :"your password should be at leaset 8 charachters"})
 })
 export default function Login(){
       const form = useForm<z.infer<typeof formSchema>>({
@@ -33,7 +35,8 @@ export default function Login(){
       }
 
       return (
-            <div className="  mx-auto">
+            <AuthLayoutContent pageType="Login" >
+            <div className="  mx-auto mt-20">
                   <div className="flex flex-col items-center">
                         <h1 className="font-sans font-medium text-2xl text-shadow-2xs">Welcome back to Talkit</h1>
                         <p className="font-sans text-gray-500 text-md">Please enter your details to sign in your details</p>
@@ -65,12 +68,13 @@ export default function Login(){
                                     )}
                          />
 
-                         <Button type="submit" className="w-full bg-gradient-to-r from-orange-600 text-white font-sans to-red-700 py-5 text-md ">Sign in</Button>
-                        <Link href={"/forgot-passwprd"} className="font-sans font-medium underline w-fit mx-auto">
+                         <Button type="submit" className="w-full bg-gradient-to-r from-orange-600 text-white font-sans to-red-700 py-5 text-sm ">Sign in <ArrowRight/></Button>
+                        <Link href={"/forgot-password"} className="font-sans font-medium underline w-fit mx-auto">
                               Forget password?
                         </Link>
                      </form>
                   </Form>
             </div>
+            </AuthLayoutContent>
       )
 }
