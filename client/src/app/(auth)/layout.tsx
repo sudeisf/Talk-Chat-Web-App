@@ -15,7 +15,7 @@ export default function AuthLayout({
 
 
   return (
-    <div className="flex w-ful min-h-screen bg-black ">
+    <div className="flex w-ful min-h-screen bg-background">
          <div className="bg-gradient-to-tr flex flex-col justify-end-safe items-center from-black via-gray-900 to-orange-900/80 w-[45%] rounded-lg m-2 p-4">
        <div>
        <h2 className="text-white text-4xl font-bold">TalkIt</h2>
