@@ -7,9 +7,8 @@ export interface LoginCredentials {
       email : string,
       password : string
     }
-export interface RegisterData { 
+export interface RegisterCredentials { 
       email : string;
       username: string;
       password: string;
-      confirmPassword : string
      }

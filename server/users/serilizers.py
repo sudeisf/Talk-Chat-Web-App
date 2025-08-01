@@ -14,9 +14,7 @@ class RegisterUserSerilizer(serializers.ModelSerializer):
         fields = [
             'id',
             'username',
-            'email',
-            'firstName',  
-            'lastName',  
+            'email',  
             'password',
         ]
         extra_kwargs = {   
