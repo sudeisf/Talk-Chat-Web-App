@@ -20,6 +20,7 @@ import { useLoginMutation } from "@/query/authMutation";
 import { SpinnerInfinity } from "spinners-react";
 import { parseDjangoError } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import GoogleLoginButton from "@/app/components/GoogleLoginButton";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -83,6 +84,17 @@ export default function Login() {
               Please enter your details to sign in
             </p>
           </div>
+
+          <div className="w-fit mx-auto py-2 mt-2">
+          <GoogleLoginButton/>
+          </div>
+
+          <div className="flex items-center my-4 max-w-[380px] mx-auto">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-gray-500 text-md font-sans">Or sign in with</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
           {globalError && (
             <div className="text-red-600 text-sm font-medium capitalize  form-sans text-center mt-4">
               {globalError}

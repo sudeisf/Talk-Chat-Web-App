@@ -7,13 +7,21 @@ from .serilizers import (
       )
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import login , logout
+from django.contrib.auth import login , logout , get_user_model
 import random
 from .models import Otp
 from .services import send_OTP_To_Email
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from django.conf import settings
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class RegisterView(APIView):
@@ -103,3 +111,130 @@ class NewPasswordChangeView(APIView):
           
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@method_decorator(csrf_exempt, name="dispatch")
+class GoogleLoginAPIView(APIView):
+    """
+    Handles Google OAuth2 authentication
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        # Extract token from request
+        id_token_str = request.data.get("id_token")
+        if not id_token_str:
+            return Response(
+                {"error": "Missing id_token"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Verify token
+            idinfo = id_token.verify_oauth2_token(
+                id_token_str,
+                google_requests.Request(),
+                settings.GOOGLE_CLIENT_ID  # From Django settings
+            )
+
+            # Validate issuer
+            if idinfo.get("iss") not in ["accounts.google.com", "https://accounts.google.com"]:
+                return Response(
+                    {"error": "Invalid issuer"}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Extract user data
+            email = idinfo.get("email")
+            if not email:
+                return Response(
+                    {"error": "Email not provided by Google"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            google_sub = idinfo.get("sub")
+            first_name = idinfo.get("given_name", "")
+            last_name = idinfo.get("family_name", "")
+
+            User = get_user_model()
+
+            # User lookup or creation logic
+            user, created = self.get_or_create_user(
+                email=email,
+                google_sub=google_sub,
+                first_name=first_name,
+                last_name=last_name
+            )
+
+            # Login user
+            login(request, user)
+
+            return Response({
+                "status": "success",
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                },
+                "created": created
+            })
+
+        except ValueError as e:
+            # Invalid token
+            return Response(
+                {"error": "Invalid token", "details": str(e)},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        except Exception as e:
+            # Other errors
+            return Response(
+                {"error": "Authentication failed", "details": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def get_or_create_user(self, email, google_sub, first_name, last_name):
+        """Helper method to handle user lookup/creation"""
+        User = get_user_model()
+        
+        # Try to find existing user by google_id
+        user = User.objects.filter(google_id=google_sub).first()
+        if user:
+            return user, False
+
+        # Try to find by email to link accounts
+        user = User.objects.filter(email=email).first()
+        if user:
+            # Link Google account to existing user
+            user.google_id = google_sub
+            user.is_google_account = True
+            if not user.first_name:
+                user.first_name = first_name
+            if not user.last_name:
+                user.last_name = last_name
+            user.save()
+            return user, False
+
+        # Create new user
+        username = self.generate_unique_username(email)
+        return User.objects.create_user(
+            username=username,
+            email=email,
+            google_id=google_sub,
+            is_google_account=True,
+            first_name=first_name,
+            last_name=last_name,
+        ), True
+
+    def generate_unique_username(self, email):
+        """Generate unique username from email"""
+        base_username = email.split('@')[0]
+        username = base_username
+        User = get_user_model()
+        
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+            
+        return username

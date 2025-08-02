@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     'users'
 ]
 
+
+
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -69,26 +73,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 AUTH_USER_MODEL = 'users.User'
+
+
+
+# If you're using CSRF cookies
+# CORS Settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 
-# Important for credentials
+# Required for cookies/session
 CORS_ALLOW_CREDENTIALS = True
 
-# If you're using CSRF cookies
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+# Security settings (development)
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True  # False if not using HTTPS locally
+CSRF_COOKIE_SECURE = True     
 
-
-# Required for session/auth cookies to work cross-origin
-SESSION_COOKIE_SAMESITE = 'Lax'  # or 'None' if using HTTPS
-CSRF_COOKIE_SAMESITE = 'Lax'     # or 'None' if using HTTPS
-SESSION_COOKIE_SECURE = True     # Set to True in production (HTTPS only)
-CSRF_COOKIE_SECURE = True        # Set to True in production (HTTPS only)
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')

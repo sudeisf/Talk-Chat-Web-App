@@ -28,6 +28,10 @@ class User(AbstractUser):
       gender = models.CharField(max_length=200, choices=Gender.choices,blank=True , null=True)
       phone_number = models.CharField(max_length=20,null=True,blank=True)
       profile_image =  CloudinaryField('image', null=True, blank=True)
+
+      google_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
+      is_google_account = models.BooleanField(default=False)
+      
       created_at = models.DateTimeField(auto_now_add=True)
       updated_at = models.DateTimeField(auto_now=True)
 

@@ -5,6 +5,8 @@ import "./globals.css";
 import ReduxProvider from "@/providers/ReduxProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "sonner";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import GoogleProvider from "@/providers/GoogleProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,8 +33,10 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ReduxProvider>
           <QueryProvider>
+          <GoogleProvider>
             {children}
             <Toaster/>
+            </GoogleProvider>
             </QueryProvider>
         </ReduxProvider>
       </body>
