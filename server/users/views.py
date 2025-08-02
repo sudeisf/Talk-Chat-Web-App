@@ -36,7 +36,11 @@ class LoginView(APIView):
                   user = serializer.validated_data["user"]
                   login(request,user)
                   return Response({
-                        "user" : serializer.data
+                        "user" : user.id,
+                        "email" : user.email,
+                        "username" : user.username,
+                        "firstName" : user.firstName,
+                        "lastName" : user.lastName
                   },status=status.HTTP_200_OK)
             return Response(serializer.errors, status=400)
 

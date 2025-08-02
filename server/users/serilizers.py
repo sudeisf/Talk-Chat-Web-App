@@ -39,8 +39,10 @@ class LoginSerializer(serializers.Serializer):
         )
         if not user:
             raise serializers.ValidationError("invalid credentials")
-        data["user"] = user
-        return data
+       
+        return {
+             "user" : user
+        }
 
 class EmailVerifySerilizer(serializers.Serializer):
     email = serializers.EmailField(required=True)
