@@ -2,6 +2,7 @@ import { User } from "./user";
 export interface AuthState {
       isAuthenticated: boolean;
       user: User | null;
+      email: string | null;   
 }
 export interface LoginCredentials { 
       email : string,
@@ -12,3 +13,6 @@ export interface RegisterCredentials {
       username: string;
       password: string;
      }
+export interface VerifyEmailCredentials {
+      email : string
+}

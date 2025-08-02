@@ -7,7 +7,8 @@ import { AuthState } from "@/types/auth";
 
 const initialState : AuthState = {
       isAuthenticated : false,
-      user : null
+      user : null,
+      email : null
 }
 
 const AuthSlice = createSlice({
@@ -21,6 +22,9 @@ const AuthSlice = createSlice({
             clearAuth(state){
                   state.isAuthenticated = false,
                   state.user = null
+            },
+            setEmail(state,action){
+                  state.email = action.payload
             }
       },
 });

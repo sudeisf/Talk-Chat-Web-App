@@ -1,6 +1,6 @@
 // Pseudo-code
 import API from './axiosInstance';
-import { LoginCredentials, RegisterCredentials } from '@/types/auth';
+import { LoginCredentials, RegisterCredentials , VerifyEmailCredentials} from '@/types/auth';
 
 export const loginUser = async (credentials: LoginCredentials) => {
   const response = await API.post('/users/auth/login/', credentials);
@@ -8,6 +8,11 @@ export const loginUser = async (credentials: LoginCredentials) => {
 };
 export const registerUser = async (credentials: RegisterCredentials) => {
   const response = await API.post('/users/auth/register/', credentials);
+  return response.data;
+};
+
+export const VerifyEmail = async (credentials: VerifyEmailCredentials) => {
+  const response = await API.post('/users/auth/email/', credentials);
   return response.data;
 };
 export const getCurrentUser = async () => {

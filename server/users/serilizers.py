@@ -49,7 +49,7 @@ class EmailVerifySerilizer(serializers.Serializer):
 
     def validate(self, attrs):
         if not User.objects.filter(email=attrs["email"]).exists():
-            raise serializers.ValidationError("Email is not registered")
+            raise serializers.ValidationError("There is no email with this account.")
         return attrs
 
 

@@ -77,7 +77,7 @@ class EmailVerificationView(APIView):
                         {"message" : "OTP sent successfuly."}
                         , status=status.HTTP_200_OK
                   )
-            return Response({"error" : "not valid"}, status=500)
+            return Response(serializer.errors, status=500)
             
 @method_decorator(csrf_exempt, name='dispatch')            
 class OTPVerifyVIew(APIView):
