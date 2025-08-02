@@ -113,9 +113,9 @@ class OtpVerifySerializer(serializers.Serializer):
             }
     
 class reset_password_serializer(serializers.Serializer):
-    email = serializers.EmailField()
-    new_password = serializers.CharField()
-    confirm_password = serializers.CharField()
+    email = serializers.EmailField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
 
     def validate_email(self, email):
         if not User.objects.filter(email=email).exists():

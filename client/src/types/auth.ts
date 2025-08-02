@@ -20,3 +20,8 @@ export interface VerifyOTPCredentials {
       email? : string | null;
       code :  number
 }
+export interface NewPasswordCredentials {
+      email: string | null;
+      new_password : string;
+      confirm_password : string;
+}

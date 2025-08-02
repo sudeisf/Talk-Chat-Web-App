@@ -26,7 +26,7 @@ const AuthSlice = createSlice({
             setEmail(state,action){
                   state.email = action.payload
             },
-            clearEmail(state,action) {
+            clearEmail(state) {
                   state.email = null
             }
       },

@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useRouter } from "next/navigation";
 import { LoginCredentials , RegisterCredentials, VerifyEmailCredentials, VerifyOTPCredentials} from "@/types/auth";
-import { loginUser, registerUser, VerifyEmail, verifyOTP } from "@/lib/api/authApi";
+import { loginUser, registerUser, resetPassword, VerifyEmail, verifyOTP } from "@/lib/api/authApi";
 import {action} from '@/redux/slice/authSlice'
 import { error } from "console";
 import { parseDjangoError } from "@/lib/utils";
@@ -49,5 +49,20 @@ export const useVerifyOTPMutation =()=>{
       return useMutation({
             mutationKey : ["verifyOTP"],
             mutationFn : async ({code} :{code : number}) => verifyOTP({email, code})
+      })
+}
+
+export const useResetPasswordMutation = () =>{
+      const email = useAppSelector(state => state.auth.email);
+      const router = useRouter();
+      return useMutation({
+            mutationKey : ["resetPassword"],
+            mutationFn : async ({new_password, confirm_password} :{ new_password: string, confirm_password : string}) => resetPassword(
+                  {
+                        email, 
+                        new_password,
+                        confirm_password
+                  }
+            )
       })
 }

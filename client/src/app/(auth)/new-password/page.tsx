@@ -16,12 +16,26 @@ import {useForm} from "react-hook-form"
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import AuthLayoutContent from "@/app/components/AuthLayoutContent";
+import { useState } from "react";
+import { useResetPasswordMutation } from "@/query/authMutation";
+import { error } from "console";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { parseDjangoError } from "@/lib/utils";
+import { SpinnerInfinity } from "spinners-react";
+import { useAppDispatch } from "@/redux/hooks";
+import { action } from "@/redux/slice/authSlice";
 
 const formSchema = z.object({
       password : z.string().min(8,{message :"your password should be at leaset 8 charachters"}),
       confirPassword : z.string().min(8,{message :"your password should be at leaset 8 charachters"})
 })
 export default function NewPassword(){
+      const [globalError, setGlobalError] = useState<string | null>(null); 
+      const [isRedirecting, setIsRedirecting] = useState(false);
+      const resetPassword = useResetPasswordMutation();
+      const dispatch = useAppDispatch()
+      const router = useRouter();
       const form = useForm<z.infer<typeof formSchema>>({
             resolver : zodResolver(formSchema),
             defaultValues:{
@@ -30,13 +44,65 @@ export default function NewPassword(){
             }
       });
 
-      function onSubmit(values : z.infer<typeof formSchema>){     ``
+      function onSubmit(values : z.infer<typeof formSchema>){     
             console.log(values);
+            const data =  {
+                  new_password : values.password,
+                  confirm_password : values.confirPassword
+            }
+            resetPassword.mutate(
+                  data,{
+                        onSuccess : (data) =>{
+                              dispatch(action.clearEmail())
+                              toast.success(data.message, {
+                                    style: {
+                                      background: 'linear-gradient(to right, #f12711, #f5af19)',
+                                      color: '#fff',
+                                      fontWeight: 'bold',
+                                      fontSize: '16px',
+                                      borderRadius: '8px',
+                                      padding: '12px 16px',
+                                    },
+                                    position: 'top-right',
+                                  });
+                              setIsRedirecting(true)
+                              router.replace("/login")
+                        },onError : (error) => {
+                              const err = parseDjangoError(error);
+                                    if (err.global && err.global.length > 0) {
+                                          setGlobalError(err.global.join(", "));
+                                    }
+                              
+                                    if (err.fieldErrors) {
+                                          Object.entries(err.fieldErrors).forEach(([field, messages]) => {
+                                          form.setError(field as keyof typeof values, {
+                                                type: "server",
+                                                message: messages.join(", "),
+                                                });
+                                          });
+                              }  
+                        }
+                  }
+            )
       }
 
       return (
         <>
-           <div className="flex justify-center p-4">
+           {
+            resetPassword.isPending || isRedirecting ? (
+                  <div className="flex items-center justify-center h-[80vh]">
+                  <SpinnerInfinity
+                        thickness={100}
+                        secondaryColor="#f0f0f0"
+                        color="#EA580C"
+                        size={90}
+                  />
+                  </div>
+            ) :
+            (
+
+                  <div>
+                  <div className="flex justify-center p-4">
                         <h1 className="bg-gradient-to-r from-orange-200 font-sans to-red-700 bg-clip-text text-transparent text-4xl">Talkit</h1>
                         </div>
             <div className="  mx-auto mt-10">
@@ -44,6 +110,11 @@ export default function NewPassword(){
                         <h1 className="font-sans font-medium text-2xl text-shadow-2xs">You can add your new password</h1>
                         <p className="font-sans text-gray-500 text-md">Please make sure the passwords match</p>
                   </div>
+                  {globalError && (
+                              <div className="text-red-600 text-sm font-medium   form-sans text-center mt-4">
+                              {globalError}
+                              </div>
+                        )}
                   <Form {...form}>
                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-[380px] mx-auto mt-4 flex flex-col justify-center">
                      <FormField
@@ -76,6 +147,9 @@ export default function NewPassword(){
                      </form>
                   </Form>
             </div>
+            </div>
+            )
+           }
             </>
       )
 }
