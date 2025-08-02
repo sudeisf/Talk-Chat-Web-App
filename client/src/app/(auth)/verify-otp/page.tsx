@@ -16,6 +16,11 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/comp
 import Link from "next/link";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAppDispatch } from "@/redux/hooks";
+import { useVerifyOTPMutation } from "@/query/authMutation";
+import { toast } from "sonner";
+import { parseDjangoError } from "@/lib/utils";
+import { SpinnerInfinity } from "spinners-react";
 
 const formSchema = z.object({
   otp: z.string()
@@ -25,8 +30,11 @@ const formSchema = z.object({
 });
 
 export default function OtpPage() {
+  const [globalError, setGlobalError] = useState<string | null>(null); 
 
   const router = useRouter();
+  const disapatch = useAppDispatch();
+  const verfiyOTP = useVerifyOTPMutation();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,17 +46,65 @@ export default function OtpPage() {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+          const code = Number(values.otp);
+          verfiyOTP.mutate(
+            {code},{
+              onSuccess: (data)=>{
+                toast.success(data.message, {
+                    style: {
+                      background: 'linear-gradient(to right, #f12711, #f5af19)',
+                      WebkitBackgroundClip: 'text',
+                      fontWeight: 'bold',
+                      fontSize: '16px',
+                    },
+                    position : 'top-right'
+                  });
+              router.replace("/new-password")
+              },
+              onError : (error) =>{
+                const err = parseDjangoError(error);
+                if (err.global && err.global.length > 0) {
+                  setGlobalError(err.global.join(", "));
+                }
+        
+                if (err.fieldErrors) {
+                  Object.entries(err.fieldErrors).forEach(([field, messages]) => {
+                    form.setError(field as keyof typeof values, {
+                      type: "server",
+                      message: messages.join(", "),
+                    });
+                  });
+                }  
+              }
+            }
+          )
 
-      console.log(values)
   }
 
   return (
     <>
-       <div className="flex justify-between p-4">
+       {
+        verfiyOTP.isPending ? (
+          <div className="flex items-center justify-center h-[80vh]">
+          <SpinnerInfinity
+                thickness={100}
+                secondaryColor="#f0f0f0"
+                color="#EA580C"
+                size={90}
+          />
+          </div>
+        ) : (
+          <div>
+          <div className="flex justify-between p-4">
                         <h1 className="bg-gradient-to-r from-orange-200 font-sans to-red-700 bg-clip-text text-transparent text-xl">Talkit</h1>
                               <div className="flex space-x-0.5 text-md">
                               </div>
                         </div>
+                        {globalError && (
+                              <div className="text-red-600 text-sm font-medium   form-sans text-center mt-4">
+                              {globalError}
+                              </div>
+                        )}
       <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md mx-auto p-2 md:p-10 font-inter">
         <div className="flex flex-col space-y-2.5 mb-10 md:mb-5 mt-10 md:mt-0 text-center ">
@@ -108,7 +164,8 @@ export default function OtpPage() {
         </div>
       </form>
     </Form>
- 
+</div>
+)}
     </>
   )
 }

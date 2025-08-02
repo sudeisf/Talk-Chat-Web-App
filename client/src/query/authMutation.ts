@@ -1,10 +1,10 @@
 
 
 import { useMutation } from "@tanstack/react-query";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useRouter } from "next/navigation";
-import { LoginCredentials , RegisterCredentials, VerifyEmailCredentials} from "@/types/auth";
-import { loginUser, registerUser, VerifyEmail } from "@/lib/api/authApi";
+import { LoginCredentials , RegisterCredentials, VerifyEmailCredentials, VerifyOTPCredentials} from "@/types/auth";
+import { loginUser, registerUser, VerifyEmail, verifyOTP } from "@/lib/api/authApi";
 import {action} from '@/redux/slice/authSlice'
 import { error } from "console";
 import { parseDjangoError } from "@/lib/utils";
@@ -38,7 +38,16 @@ export const useVerifyEmailMutation = () => {
       const dispatch = useAppDispatch();
       const router = useRouter();
       return useMutation({
-            mutationKey: ["register"],
+            mutationKey: ["verifyEmail"],
             mutationFn : (credentials :VerifyEmailCredentials ) =>VerifyEmail(credentials),
+      })
+}
+
+export const useVerifyOTPMutation =()=>{
+      const email = useAppSelector(state => state.auth.email);
+      const router = useRouter();
+      return useMutation({
+            mutationKey : ["verifyOTP"],
+            mutationFn : async ({code} :{code : number}) => verifyOTP({email, code})
       })
 }

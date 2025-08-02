@@ -16,3 +16,7 @@ export interface RegisterCredentials {
 export interface VerifyEmailCredentials {
       email : string
 }
+export interface VerifyOTPCredentials {
+      email? : string | null;
+      code :  number
+}
