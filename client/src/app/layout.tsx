@@ -1,22 +1,12 @@
 // app/layout.tsx (server component, default layout entrypoint)
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/providers/ReduxProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "sonner";
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import GoogleProvider from "@/providers/GoogleProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -30,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={` font-sans antialiased`}>
         <ReduxProvider>
           <QueryProvider>
           <GoogleProvider>

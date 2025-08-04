@@ -17,6 +17,7 @@ from drf_yasg.utils import swagger_auto_schema
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from django.conf import settings
+import requests
 
 import os
 from dotenv import load_dotenv
@@ -114,14 +115,9 @@ class NewPasswordChangeView(APIView):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class GoogleLoginAPIView(APIView):
-    """
-    Handles Google OAuth2 authentication
-    """
-    authentication_classes = []
-    permission_classes = []
-
+    permission_classes =[]
+    authentication_classes =[]
     def post(self, request):
-        # Extract token from request
         id_token_str = request.data.get("id_token")
         if not id_token_str:
             return Response(
@@ -130,11 +126,10 @@ class GoogleLoginAPIView(APIView):
             )
 
         try:
-            # Verify token
             idinfo = id_token.verify_oauth2_token(
                 id_token_str,
                 google_requests.Request(),
-                settings.GOOGLE_CLIENT_ID  # From Django settings
+                settings.GOOGLE_CLIENT_ID 
             )
 
             # Validate issuer
@@ -157,8 +152,6 @@ class GoogleLoginAPIView(APIView):
             last_name = idinfo.get("family_name", "")
 
             User = get_user_model()
-
-            # User lookup or creation logic
             user, created = self.get_or_create_user(
                 email=email,
                 google_sub=google_sub,
@@ -166,7 +159,7 @@ class GoogleLoginAPIView(APIView):
                 last_name=last_name
             )
 
-            # Login user
+
             login(request, user)
 
             return Response({
@@ -181,31 +174,25 @@ class GoogleLoginAPIView(APIView):
             })
 
         except ValueError as e:
-            # Invalid token
+         
             return Response(
                 {"error": "Invalid token", "details": str(e)},
                 status=status.HTTP_401_UNAUTHORIZED
             )
         except Exception as e:
-            # Other errors
             return Response(
                 {"error": "Authentication failed", "details": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     def get_or_create_user(self, email, google_sub, first_name, last_name):
-        """Helper method to handle user lookup/creation"""
         User = get_user_model()
-        
-        # Try to find existing user by google_id
         user = User.objects.filter(google_id=google_sub).first()
         if user:
             return user, False
 
-        # Try to find by email to link accounts
         user = User.objects.filter(email=email).first()
         if user:
-            # Link Google account to existing user
             user.google_id = google_sub
             user.is_google_account = True
             if not user.first_name:
@@ -215,19 +202,18 @@ class GoogleLoginAPIView(APIView):
             user.save()
             return user, False
 
-        # Create new user
+      
         username = self.generate_unique_username(email)
         return User.objects.create_user(
             username=username,
             email=email,
             google_id=google_sub,
             is_google_account=True,
-            first_name=first_name,
-            last_name=last_name,
+            firstName=first_name,
+            lasName=last_name,
         ), True
 
     def generate_unique_username(self, email):
-        """Generate unique username from email"""
         base_username = email.split('@')[0]
         username = base_username
         User = get_user_model()
@@ -238,3 +224,70 @@ class GoogleLoginAPIView(APIView):
             counter += 1
             
         return username
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GithubLoginAPIView(APIView):
+     permission_classes =[]
+     authentication_classes =[]
+     def post(self,request):
+        code = request.data.get("code")
+        if not code:
+            return Response({"error": "Missing GitHub code"}, status=400)
+        
+        token_response = requests.post(
+             "https://github.com/login/oauth/access_token",
+             headers={"Accept" : "application/json"},
+             data={
+                "client_id": os.environ["GITHUB_CLIENT_ID"],
+                "client_secret": os.environ["GITHUB_CLIENT_SECRET"],
+                "code": code,
+             }
+        )
+
+        token_data = token_response.json()
+        access_token = token_data.get("access_token")
+        if not access_token:
+             return Response({"error": "GitHub token exchange failed"}, status=400)
+        
+        user_response = requests.get(
+            "https://api.github.com/user",
+            headers={"Authorization": f"token {access_token}"}
+        )
+        user_data = user_response.json()
+
+        email_res = requests.get(
+            "https://api.github.com/user/emails",
+            headers={"Authorization": f"token {access_token}"}
+        )
+        emails = email_res.json()
+        email = next((e["email"] for e in emails if e.get("primary") and e.get("verified")), None)
+
+        if not email:
+            return Response({"error": "Could not fetch verified GitHub email"}, status=400)
+
+        github_id = str(user_data["id"])
+        username = user_data.get("login", email.split("@")[0])
+
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=email)
+            if not user.github_id:
+                user.github_id = github_id
+                user.is_github_account = True
+                user.save()
+        except User.DoesNotExist:
+            user = User.objects.create(
+                email=email,
+                username=username,
+                github_id=github_id,
+                is_github_account=True
+            )
+        login(request, user)
+
+        return Response({
+                        "user" : user.id,
+                        "email" : user.email,
+                        "username" : user.username,
+                        "firstName" : user.firstName,
+                        "lastName" : user.lastName
+        },status=status.HTTP_200_OK)

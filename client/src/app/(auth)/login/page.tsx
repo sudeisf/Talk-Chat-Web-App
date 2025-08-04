@@ -21,6 +21,7 @@ import { SpinnerInfinity } from "spinners-react";
 import { parseDjangoError } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import GoogleLoginButton from "@/app/components/GoogleLoginButton";
+import GitHubLoginButton from "@/components/GitHubLoginButton";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -85,8 +86,9 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="w-fit mx-auto py-2 mt-2">
+          <div className="w-fit mx-auto mt-2 space-y-4">
           <GoogleLoginButton/>
+          <GitHubLoginButton/>
           </div>
 
           <div className="flex items-center my-4 max-w-[380px] mx-auto">

@@ -29,8 +29,10 @@ class User(AbstractUser):
       phone_number = models.CharField(max_length=20,null=True,blank=True)
       profile_image =  CloudinaryField('image', null=True, blank=True)
 
-      google_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
+      google_id = models.CharField(max_length=255, null=True, blank=True)
+      github_id = models.CharField(max_length=255, null=True, blank=True)
       is_google_account = models.BooleanField(default=False)
+      is_github_account = models.BooleanField(default=False)
       
       created_at = models.DateTimeField(auto_now_add=True)
       updated_at = models.DateTimeField(auto_now=True)
