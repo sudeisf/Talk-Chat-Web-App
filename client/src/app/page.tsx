@@ -63,8 +63,8 @@ export default function Home() {
         <p className="text-2xl bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent text-shadow-xs">Talktit</p>
 
         <div className="flex"> 
-        <Button onClick={()=>router.push("/login")} variant={"ghost"} className="text-md">Sign in</Button>
-        <Button onClick={()=>router.push("/register")} className="rounded-sm text-md shadow-xs bg-gradient-to-r from-orange-400 via-red-500/70 to-red-500  text-white px-6">Sign up</Button>
+        <Button onClick={()=>router.push("/register")} variant={"ghost"} className="text-md">Sign up</Button>
+        <Button onClick={()=>router.push("/login")} className="rounded-sm text-md shadow-xs bg-gradient-to-r from-orange-400 via-red-500/70 to-red-500  text-white px-6">Sign in</Button>
         </div>
       </nav>
       <main>
@@ -78,14 +78,14 @@ export default function Home() {
   
   {/* Main heading */}
   <div className="mx-auto text-center">
-    <h1 className="inline-block text-orange-700 bg-red-500/5 text-lg md:text-xl py-2 px-6 rounded-full animate-bounce">
+    <h1 className="inline-block text-orange-500  bg-red-500/5 text-lg md:text-sm py-2 px-6 rounded-full animate-bounce">
       Ask smarter. Learn faster. Never get stuck again.
     </h1>
   </div>
 
   {/* Content section */}
   <div className="max-w-6xl mx-auto space-y-8 px-4">
-    <p className="text-3xl md:text-4xl font-medium text-center font-pt text-[#060518] leading-tight">
+    <p className="text-3xl md:text-4xl font-medium text-center font-rubik  text-[#060518] leading-tight">
       Whether you're debugging a tricky function, confused by async behavior, or just need a second brain - this platform connects you with real people, in real time.
     </p>
     
