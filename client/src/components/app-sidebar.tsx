@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings , Bookmark ,CircleQuestionMark } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings , Bookmark ,CircleQuestionMark, LogOut, Ghost } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Sidebar,
@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Button } from "./ui/button"
 
 const items = [
   {
@@ -33,11 +34,7 @@ const items = [
     url: "#",
     icon: Bookmark,
   },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
+
 ]
 
 export function AppSidebar() {
@@ -46,16 +43,16 @@ export function AppSidebar() {
       <SidebarContent className="bg-white flex flex-col h-full justify-between">
         <SidebarGroup>
         <div>
-          <h1 className="text-xl font-pt p-4 bg-gradient-to-r from-orange-500 via-red-400 to-orange-400 bg-clip-text text-transparent">Talkit</h1>
+          <h1 className="text-xl font-pt p-4 bg-gradient-to-r from-orange-500 via-red-400 to-orange-400 bg-clip-text text-transparent  px-5 rounded-full">Talkit</h1>
         </div>
           <SidebarGroupContent>
-            <SidebarMenu className="p-4">
+            <SidebarMenu className="p-4 space-y-2">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton className="font-pt space-x-2" asChild>
                     <a href={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span className="font-normal">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -63,15 +60,13 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarFooter className="flex flex-row items-center p-2">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 className="capitalize font-pt">sudies fedlu</h1>
-          <p className="font-pt text-gray-500 text-sm">sudiesfed@gmail.com</p>
-        </div>
+        <SidebarFooter className="p-4">
+              <Button variant={"ghost"} className="text-left w-fit">
+                <Settings/>
+                Settings
+              </Button>
+              <Button variant={"ghost"} className="text-left w-fit"><LogOut/> logout</Button>
+
         </SidebarFooter>
       </SidebarContent>
     </Sidebar>

@@ -5,6 +5,7 @@ import ReduxProvider from "@/providers/ReduxProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "sonner";
 import GoogleProvider from "@/providers/GoogleProvider";
+import PrelineScriptWrapper from '@/components/PrelineScriptWrapper';
 
 
 
@@ -25,6 +26,7 @@ export default function RootLayout({
           <QueryProvider>
           <GoogleProvider>
             {children}
+            <PrelineScriptWrapper />
             <Toaster/>
             </GoogleProvider>
             </QueryProvider>
