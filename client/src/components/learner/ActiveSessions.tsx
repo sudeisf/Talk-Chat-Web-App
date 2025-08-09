@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 interface AskedTopic {           // "2025-08-07"
@@ -79,6 +80,8 @@ export default function AskedTopicsTimeline() {
                     </span>
                   ))}
                 </div>
+                <button className='flex items-center gap-1 mt-2 text-sm text-blue-600 font-medium decoration-2 hover:underline focus:outline-none focus:underline font-sans dark:text-blue-500'>Continue Sessions <ArrowRight className='w-4 h-4'/></button>
+
               </div>
             </div>
           ))}
@@ -110,7 +113,6 @@ export default function AskedTopicsTimeline() {
         </button>
       </div>
 
-      {/* Optional older topics shown when expanded */}
       {isOpen && (
         <div className="mt-4">
           <h3 className="text-xs font-medium uppercase text-gray-500 dark:text-neutral-400">
@@ -123,7 +125,7 @@ export default function AskedTopicsTimeline() {
               </div>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
+              <h3 className="text-sm font-medium text-gray-800 dark:text-white">
                 Using Prisma with PostgreSQL
               </h3>
               <p className="text-xs text-gray-500">4:15 PM</p>

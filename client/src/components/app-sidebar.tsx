@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings , Bookmark ,CircleQuestionMark, LogOut, Ghost } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Bookmark ,CircleQuestionMark, LogOut, Ghost, Bell } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Sidebar,
@@ -16,7 +16,7 @@ import { Button } from "./ui/button"
 const items = [
   {
     title: "Dashboard",
-    url: "#",
+    url: "/learner-dashboard",
     icon: Home,
   },
   {
@@ -30,8 +30,13 @@ const items = [
     icon: Inbox,
   },
   {
+    title: "Notifications",
+    url: "/notifications",
+    icon: Bell,
+  },
+  {
     title: "Bookmarks",
-    url: "#",
+    url: "/bookmarks",
     icon: Bookmark,
   },
 
@@ -61,12 +66,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarFooter className="p-4">
-              <Button variant={"ghost"} className="text-left w-fit">
-                <Settings/>
-                Settings
-              </Button>
               <Button variant={"ghost"} className="text-left w-fit"><LogOut/> logout</Button>
-
         </SidebarFooter>
       </SidebarContent>
     </Sidebar>
