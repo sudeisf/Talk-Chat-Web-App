@@ -14,16 +14,16 @@ export function AppNavbar() {
   const { unreadCount } = useNotifications()
 
   return (
-    <header className="sticky top-0 z-30 flex h-16  items-center justify-between  bg-white px-4  dark:bg-gray-950">
+    <header className="sticky top-0 z-30 flex h-14  items-center justify-between  bg-white px-4  dark:bg-gray-950">
       <div className="flex items-center gap-2">
         <SidebarTrigger>
           <Button variant="ghost" size="icon">
             <Menu className="h-8 w-8" />
           </Button>
         </SidebarTrigger>
-        <div className="flex flex-col px-5 ">
+        <div className="flex flex-col px-5 border-l">
         <h1 className="text-md font-sans font-medium text-gray-600 dark:text-white">Greetings,sudeis!</h1>
-        <p className="text-sm font-sans text-gray-500">7 May,2025</p>
+        <p className="text-xs font-sans text-gray-500">7 May,2025</p>
         </div>
       </div>
 

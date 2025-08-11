@@ -13,7 +13,7 @@ export default function DashBoard(){
 
 
       return (
-            <div className="w-full min-h-screen bg-white p-4">
+            <div className="w-full max-w-6xl mx-auto min-h-screen bg-white p-4">
                   <GreetingCard/>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
                   <SummaryCard percentage="6.45" title="Total Sessions" value={124} icon={<MessageSquare size={20} />} />
