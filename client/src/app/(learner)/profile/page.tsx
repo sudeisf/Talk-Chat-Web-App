@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { User, Edit, Camera, MapPin, Mail, Phone, BookOpen, Target, Clock, Search, Bookmark, MoreVertical } from "lucide-react"
+import { User, Edit, Camera, MapPin, Mail, Phone, BookOpen, Target, Clock, Search, Bookmark, MoreVertical, Plus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { toast } from "sonner"
+import AskedTopicsTimeline from "@/components/learner/ActiveSessions"
 
 interface UserProfile {
   id: string
@@ -43,6 +44,18 @@ interface Badge {
   color: string
   earnedDate: string
 }
+
+const availableTechnologies = [
+  "JavaScript", "React", "Vue.js", "Angular", "Node.js", "Python", "Java", "C++", "C#", "PHP",
+  "Ruby", "Go", "Rust", "Swift", "Kotlin", "TypeScript", "Dart", "Flutter", "React Native",
+  "Next.js", "Nuxt.js", "Express.js", "Django", "Flask", "Spring Boot", "Laravel", "ASP.NET",
+  "MongoDB", "PostgreSQL", "MySQL", "Redis", "GraphQL", "REST API", "Docker", "Kubernetes",
+  "AWS", "Azure", "Google Cloud", "Firebase", "Data Structures", "Algorithms", "Machine Learning",
+  "Artificial Intelligence", "Data Science", "DevOps", "CI/CD", "Git", "Linux", "Blockchain",
+  "Web3", "Cybersecurity", "UI/UX Design", "Figma", "Adobe XD", "Sketch", "HTML", "CSS", "SASS",
+  "Bootstrap", "Tailwind CSS", "Material-UI", "Ant Design", "Chakra UI", "Redux", "Zustand",
+  "MobX", "Jest", "Cypress", "Selenium", "JUnit", "PyTest", "Mocha", "Chai", "ESLint", "Prettier"
+]
 
 const mockUserProfile: UserProfile = {
   id: "1",
@@ -116,7 +129,11 @@ export default function ProfilePage() {
   const nextLevelExp = 1500
   const progressToNextLevel = Math.round((profile.experience / nextLevelExp) * 100)
 
- 
+  const filteredTechnologies = availableTechnologies.filter(tech =>
+    tech.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !selectedSubjects.includes(tech)
+  )
+
   const addSubject = (subject: string) => {
     if (subject && !selectedSubjects.includes(subject)) {
       setSelectedSubjects([...selectedSubjects, subject])
@@ -536,9 +553,268 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Skills Section */}
+            <Card className="shadow-lg rounded-xl border-0 bg-white/95 backdrop-blur-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    Skills & Technologies
+                  </CardTitle>
+                  {isEditing && (
+                    <Button
+                      onClick={() => setShowSubjectsModal(true)}
+                      variant="outline"
+                      size="sm"
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Skills
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Skills by Category */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Programming Languages */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Programming Languages
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.subjects.filter(skill => 
+                          ['JavaScript', 'Python', 'Java', 'C++', 'C#', 'PHP', 'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin', 'TypeScript', 'Dart'].includes(skill)
+                        ).map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Frameworks & Libraries */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Frameworks & Libraries
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.subjects.filter(skill => 
+                          ['React', 'Vue.js', 'Angular', 'Node.js', 'Next.js', 'Nuxt.js', 'Express.js', 'Django', 'Flask', 'Spring Boot', 'Laravel', 'ASP.NET', 'Flutter', 'React Native'].includes(skill)
+                        ).map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Databases & Tools */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        Databases & Tools
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.subjects.filter(skill => 
+                          ['MongoDB', 'PostgreSQL', 'MySQL', 'Redis', 'GraphQL', 'REST API', 'Docker', 'Kubernetes', 'Git', 'Linux'].includes(skill)
+                        ).map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Cloud & DevOps */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        Cloud & DevOps
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.subjects.filter(skill => 
+                          ['AWS', 'Azure', 'Google Cloud', 'Firebase', 'DevOps', 'CI/CD'].includes(skill)
+                        ).map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Skill Level Indicators */}
+                  <div className="border-t pt-6">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-4">Skill Proficiency</h4>
+                    <div className="space-y-3">
+                      {profile.subjects.slice(0, 6).map((skill, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{skill}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${Math.min(85, 60 + (index * 5))}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs text-gray-500 w-8 text-right">
+                              {Math.min(85, 60 + (index * 5))}%
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Learning Goals */}
+                  <div className="border-t pt-6">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Learning Goals</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Target className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Master React Advanced Patterns</p>
+                          <p className="text-xs text-gray-500">Target: 3 months</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
+                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                          <Target className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Learn System Design</p>
+                          <p className="text-xs text-gray-500">Target: 6 months</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <AskedTopicsTimeline />
           </div>
         </div>
       </div>
+
+      {/* Skills Editing Modal */}
+      {showSubjectsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Edit Skills & Technologies</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSubjectsModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {/* Search */}
+              <div className="mb-6">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Search technologies..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Selected Skills */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Your Skills</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSubjects.map((subject, index) => (
+                    <Badge key={index} variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                      {subject}
+                      <button
+                        onClick={() => removeSubject(subject)}
+                        className="ml-2 hover:text-blue-900"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Available Technologies */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Available Technologies</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {filteredTechnologies.slice(0, 30).map((tech, index) => (
+                    <button
+                      key={index}
+                      onClick={() => addSubject(tech)}
+                      className="text-left p-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md border border-gray-200 hover:border-blue-300 transition-colors"
+                    >
+                      {tech}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Skill Input */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Add Custom Skill</h4>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter custom skill..."
+                    value={customSubject}
+                    onChange={(e) => setCustomSubject(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="flex-1"
+                  />
+                  <Button onClick={addCustomSubject} size="sm">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t bg-gray-50">
+              <div className="flex gap-3">
+                <Button
+                  onClick={saveSubjects}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedSubjects(profile.subjects)
+                    setShowSubjectsModal(false)
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
