@@ -21,9 +21,9 @@ export function AppNavbar() {
             <Menu className="h-8 w-8" />
           </Button>
         </SidebarTrigger>
-        <div className="flex flex-col p-2">
-        <h1 className="text-md font-medium text-gray-600 dark:text-white">Greetings,sudeis!</h1>
-        <p className="text-sm text-gray-500">7 May,2025</p>
+        <div className="flex flex-col px-5 ">
+        <h1 className="text-md font-sans font-medium text-gray-600 dark:text-white">Greetings,sudeis!</h1>
+        <p className="text-sm font-sans text-gray-500">7 May,2025</p>
         </div>
       </div>
 

@@ -69,7 +69,7 @@ export default function BookmarksPage() {
   })).filter(section => section.topics.length > 0)
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto p-6 max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -119,76 +119,102 @@ export default function BookmarksPage() {
                   {section.date}
                 </h3>
               </div>
+              
+              {/* Connecting line from previous section */}
+              {i > 0 && (
+                <div className="flex gap-x-3">
+                  <div className="relative">
+                    <div className="absolute top-0 bottom-0 start-3.5 w-px -translate-x-[0.5px] bg-gray-200 dark:bg-neutral-700"></div>
+                  </div>
+                  <div className="grow"></div>
+                </div>
+              )}
 
               <div className="space-y-4">
                 {section.topics.map((topic, index) => (
-                  <Card key={topic.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {topic.title}
-                            </h3>
-                            <Badge 
-                              variant="outline" 
-                              className={`text-xs ${
-                                topic.category === 'question' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                topic.category === 'tutorial' ? 'bg-green-50 text-green-700 border-green-200' :
-                                'bg-purple-50 text-purple-700 border-purple-200'
-                              }`}
-                            >
-                              {topic.category}
-                            </Badge>
-                          </div>
-                          
-                          {topic.description && (
-                            <p className="text-gray-600 mb-3 text-sm">
-                              {topic.description}
-                            </p>
-                          )}
+                  <div key={topic.id} className="flex gap-x-3">
+                    {/* Timeline column */}
+                    <div className="relative flex flex-col items-center">
+                      {/* Dot */}
+                      <div className="w-3 h-3 rounded-full bg-red-600 z-10 mt-2"></div>
 
-                          <div className="flex items-center gap-4 mb-3">
-                            <div className="flex items-center gap-1 text-sm text-gray-500">
-                              <Calendar className="h-4 w-4" />
-                              {topic.time}
+                      {/* Vertical line (except for last item) */}
+                      {index < section.topics.length - 1 && (
+                        <div className="absolute top-5 bottom-0 w-px bg-gray-200"></div>
+                      )}
+                    </div>
+
+                    {/* Card column */}
+                    <div className="grow pb-8">
+                      <Card className="shadow-none border-none">
+                        <CardContent className="border p-2 rounded-sm shadow-xs">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                  {topic.title}
+                                </h3>
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-xs ${
+                                    topic.category === 'question' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                    topic.category === 'tutorial' ? 'bg-green-50 text-green-700 border-green-200' :
+                                    'bg-purple-50 text-purple-700 border-purple-200'
+                                  }`}
+                                >
+                                  {topic.category}
+                                </Badge>
+                              </div>
+
+                              {topic.description && (
+                                <p className="text-gray-600 mb-3 text-sm">
+                                  {topic.description}
+                                </p>
+                              )}
+
+                              <div className="flex items-center gap-4 mb-3">
+                                <div className="flex items-center gap-1 text-sm text-gray-500">
+                                  <Calendar className="h-4 w-4" />
+                                  {topic.time}
+                                </div>
+                              </div>
+
+                              <div className="flex flex-wrap gap-2 mb-4">
+                                {topic.tags.map((tag, i) => (
+                                  <Badge
+                                    key={i}
+                                    variant="outline"
+                                    className="bg-gray-50 text-gray-600 border-gray-200 text-xs"
+                                  >
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                  <Eye className="h-4 w-4" />
+                                  View
+                                </Button>
+                                <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                  <Share2 className="h-4 w-4" />
+                                  Share
+                                </Button>
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {topic.tags.map((tag, i) => (
-                              <Badge
-                                key={i}
-                                variant="outline"
-                                className="bg-gray-50 text-gray-600 border-gray-200 text-xs"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="flex items-center gap-1">
-                              <Eye className="h-4 w-4" />
-                              View
-                            </Button>
-                            <Button variant="outline" size="sm" className="flex items-center gap-1">
-                              <Share2 className="h-4 w-4" />
-                              Share
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
-                        </div>
-
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

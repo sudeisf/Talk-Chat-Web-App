@@ -130,77 +130,86 @@ export default function NotificationsPage() {
             </CardContent>
           </Card>
         ) : (
-          filteredNotifications.map((notification) => (
-            <Card 
-              key={notification.id} 
-              className={`transition-all shadow-none duration-200 hover:shadow-xs rounded-sm ${
-                !notification.isRead ? 'border-l-2 border-l-blue-500 bg-blue-50/50' : ''
-              }`}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 mt-1">
-                    {getNotificationIcon(notification.type)}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className={`font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
-                            {notification.title}
-                          </h3>
-                          {!notification.isRead && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          )}
-                        </div>
-                        <p className="text-gray-600 text-sm mb-2">
-                          {notification.message}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
-                            {notification.timestamp}
-                          </span>
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs ${getPriorityColor(notification.priority)}`}
-                          >
-                            {notification.priority}
-                          </Badge>
-                        </div>
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+            
+            {filteredNotifications.map((notification, index) => (
+              <Card 
+                key={notification.id} 
+                className={`transition-all shadow-none duration-200 hover:shadow-xs rounded-sm bg-transparent border-0`}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    {/* Timeline dot */}
+                    <div className="relative z-10 flex-shrink-0">
+                      <div className="size-7 flex justify-center items-center">
+                        <div className={`size-2 rounded-full ${
+                          !notification.isRead ? 'bg-blue-500' : 'bg-gray-400'
+                        }`}></div>
                       </div>
-                      
-                      <div className="flex items-center gap-1 ml-4">
-                        {!notification.isRead && (
+                    </div>
+
+                    <div className="flex-shrink-0 mt-1">
+                      {getNotificationIcon(notification.type)}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className={`font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
+                              {notification.title}
+                            </h3>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-2">
+                            {notification.message}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">
+                              {notification.timestamp}
+                            </span>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${getPriorityColor(notification.priority)}`}
+                            >
+                              {notification.priority}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-1 ml-4">
+                          {!notification.isRead && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => markAsRead(notification.id)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => markAsRead(notification.id)}
-                            className="h-8 w-8 p-0"
+                            onClick={() => deleteNotification(notification.id)}
+                            className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
                           >
-                            <Check className="h-4 w-4" />
+                            <X className="h-4 w-4" />
                           </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteNotification(notification.id)}
-                          className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
 
       {/* Notification Types Legend */}
-      <Card className="mt-8">
+      <Card className="mt-8 border rounded-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Notification Types</CardTitle>
         </CardHeader>

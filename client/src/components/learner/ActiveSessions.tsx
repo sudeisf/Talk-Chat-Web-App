@@ -55,14 +55,14 @@ export default function AskedTopicsTimeline() {
 
           {section.topics.map((topic, index) => (
             <div key={index} className="flex gap-x-3">
-              {/* Timeline dot and line */}
+           
               <div className="relative after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-neutral-700">
                 <div className="z-10 size-7 flex justify-center items-center">
                   <div className="size-2 rounded-full bg-orange-500"></div>
                 </div>
               </div>
 
-              {/* Right content */}
+             
               <div className="grow pb-8">
                 <h3 className="text-md font-pt  font-medium text-gray-800 dark:text-white">
                   {topic.title}
