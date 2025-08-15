@@ -83,7 +83,7 @@ export function TagsFilterSelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-10 px-3 bg-transparent"
+            className="w-full justify-between rounded-sm shadow-none border border-gray-300 h-10 px-3 bg-transparent"
           >
             <span className="text-muted-foreground">
               {selectedTags.length === 0

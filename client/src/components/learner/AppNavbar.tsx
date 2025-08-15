@@ -21,14 +21,10 @@ export function AppNavbar() {
             <Menu className="h-8 w-8" />
           </Button>
         </SidebarTrigger>
-        <div className="flex flex-col px-5 border-l">
-        <h1 className="text-md font-sans font-medium text-gray-600 dark:text-white">Greetings,sudeis!</h1>
-        <p className="text-xs font-sans text-gray-500">7 May,2025</p>
-        </div>
+        <SearchBar/>
       </div>
 
-      <div className="flex items-center gap-2 max-w-2xl">
-            <SearchBar/>
+      <div className="flex items-center gap-2 max-w-4xl">
         <Button variant="ghost" asChild className="relative">
           <a href="/notifications">
             <Bell className="h-10 w-10 stroke-2 " />
