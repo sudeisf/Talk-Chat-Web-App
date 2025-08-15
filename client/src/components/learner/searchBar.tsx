@@ -8,7 +8,7 @@ export function SearchBar() {
       <Input
         type="text"
         placeholder="Search sessions, bookmark.."
-        className="pl-10"
+        className="pl-10 shadow-none"
       />
     </div>
   )

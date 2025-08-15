@@ -21,7 +21,7 @@ const items = [
   },
   {
     title: "My Questions",
-    url: "#",
+    url: "/my-questions",
     icon: CircleQuestionMark,
   },
   {

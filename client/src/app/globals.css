@@ -151,4 +151,31 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.439 0 0);
   }
+/* Thin scrollbar styles */
+.thin-scrollbar {
+  scrollbar-width: thin;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: oklch(0.708 0 0); /* --ring color */
+  border-radius: 3px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background-color: oklch(0.922 0 0); /* --border color */
+  border-radius: 3px;
+}
+
+.dark .thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: oklch(0.556 0 0); /* dark --muted-foreground color */
+}
+
+.dark .thin-scrollbar::-webkit-scrollbar-track {
+  background-color: oklch(1 0 0 / 10%); /* dark --border color */
+}
 }

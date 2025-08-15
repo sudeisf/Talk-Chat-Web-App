@@ -1,23 +1,25 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authReducer from './slice/authSlice';
+import tagsReducer from './slice/tagSlice';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 const rootReducer = combineReducers({
       auth: authReducer,
-    });     
+      tags: tagsReducer,
+    });
 
 const persistConfig = {
       key: 'root',
       storage,
-      whitelist : ['auth']
+      whitelist : ['auth', 'tags']
 }
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
       reducer: persistedReducer,
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-          serializableCheck: false, 
+          serializableCheck: false,
         }),
     });
 
