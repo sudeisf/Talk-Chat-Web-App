@@ -93,7 +93,7 @@ export function QuestionCard({
   }
 
   return (
-    <Card className="w-full hover:shadow-xs shadow-none rounded-sm transition-shadow duration-200">
+    <Card className="w-full  border shadow-none rounded-sm ">
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <div className="flex flex-col items-center gap-0.5 shrink-0 py-1">
@@ -141,7 +141,7 @@ export function QuestionCard({
 
           <div className="flex-1 min-w-0">
             <h3
-              className="font-medium font-pt text-lg leading-tight cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2"
+              className="font-medium font-sans text-md leading-tight cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2"
               onClick={handleTitleClick}
             >
               {title}
@@ -166,19 +166,14 @@ export function QuestionCard({
           
 
           {/* Bookmark Icon */}
-                  <Button 
+          <Button 
             variant="ghost" 
-            className="p-2 h-auto shrink-0" 
+            className=" h-auto shrink-0" 
             onClick={handleBookmarkClick}
             aria-label={bookmarked ? "Remove bookmark" : "Bookmark question"}
             >
             <Bookmark
-            className={cn(
-                  "h-10 w-10 transition-colors",
-                  bookmarked
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
-            )}
+              className="w-14 h-14"
             />
             </Button>
         </div>

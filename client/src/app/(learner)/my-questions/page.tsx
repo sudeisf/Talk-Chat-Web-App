@@ -4,6 +4,7 @@ import { DateRangePicker } from "@/components/learner/date-range-picker"
 import { QuestionCard } from "@/components/learner/questionCards"
 import { QuestionCounterSorter } from "@/components/learner/questionCount"
 import QuestionSearchBar from "@/components/learner/QuestionSearchBar"
+import { RecentQuestionsTimeline } from "@/components/learner/recentQuestionTimeline"
 import { SelectedTagsDisplay } from "@/components/learner/selected-tag-display"
 import { Tag, TagsFilterSelect } from "@/components/learner/tags-filter-select"
 // import { Tag, TagsFilterSelect } from "@/components/learner/tags-filter-select"
@@ -67,6 +68,35 @@ const sampleTags: Tag[] = [
       },
     ]
 
+    
+const timelineQuestions = [
+  {
+    id: "t1",
+    title: "How to optimize React performance with useMemo?",
+    status: "ongoing" as const,
+    timeAgo: "2 min ago",
+    answerCount: 1,
+    upvotes: 5,
+  },
+  {
+    id: "t2",
+    title: "Best practices for API error handling in Next.js",
+    status: "answered" as const,
+    timeAgo: "15 min ago",
+    answerCount: 3,
+    upvotes: 12,
+  },
+  {
+    id: "t3",
+    title: "TypeScript generic constraints explained",
+    status: "closed" as const,
+    timeAgo: "1 hour ago",
+    answerCount: 8,
+    upvotes: 24,
+  },
+]
+
+
 
 export default function MyQuestionPage(){
 
@@ -99,7 +129,7 @@ export default function MyQuestionPage(){
       const [selectedTags, setSelectedTags] = useState<Tag[]>([])
       return (
             <div className=" h-full">
-                  <div className="p-4 max-w-5xl mx-auto space-y-4 ">
+                  <div className="p-4 max-w-6xl mx-auto space-y-4 ">
                         <h1 className="font-sans font-semibold text-2xl text-gray-600">My Questions</h1>
                         <div className="flex justify-evenly gap-4">
                         <QuestionSearchBar/>
@@ -117,8 +147,9 @@ export default function MyQuestionPage(){
                           selectedTags={selectedTags}
                           onTagRemove={(tagId) => setSelectedTags(selectedTags.filter(tag => tag.id !== tagId))}
                         /></div>
-                         <div className="space-y-4">
-                         <QuestionCounterSorter questionCount={sampleQuestions.length} onSortChange={handleSortChange} />
+                         <div className="flex gap-4">
+                        <div className="space-y-4 w-3/4">
+                        <QuestionCounterSorter questionCount={sampleQuestions.length} onSortChange={handleSortChange} />
                               {sampleQuestions.map((question) => (
                               <QuestionCard
                                     key={question.id}
@@ -130,6 +161,10 @@ export default function MyQuestionPage(){
                                     onDownvote={handleDownvote}
                               />
                               ))}
+                        </div>
+                        <div>
+                        <RecentQuestionsTimeline questions={timelineQuestions}/>
+                        </div>
                               </div>
                   </div>
             </div>
