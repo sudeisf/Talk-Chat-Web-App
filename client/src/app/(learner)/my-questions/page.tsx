@@ -4,10 +4,12 @@ import { DateRangePicker } from "@/components/learner/date-range-picker"
 import { QuestionCard } from "@/components/learner/questionCards"
 import { QuestionCounterSorter } from "@/components/learner/questionCount"
 import QuestionSearchBar from "@/components/learner/QuestionSearchBar"
+import { PaginationDemo } from "@/components/learner/QuestionsPaginations"
 import { RecentQuestionsTimeline } from "@/components/learner/recentQuestionTimeline"
 import { SelectedTagsDisplay } from "@/components/learner/selected-tag-display"
 import { Tag, TagsFilterSelect } from "@/components/learner/tags-filter-select"
-// import { Tag, TagsFilterSelect } from "@/components/learner/tags-filter-select"
+import { Pagination } from "@/components/ui/pagination"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { useState } from "react"
 
@@ -30,6 +32,14 @@ const sampleTags: Tag[] = [
       {
         id: "1",
         title: "How to implement server-side rendering with Next.js 14 and TypeScript?",
+        description:
+          "I'm trying to set up SSR in my Next.js 14 project with TypeScript but running into hydration issues. The components render differently on server and client, causing mismatches and console warnings.",
+        contributors: [
+          { name: "Mike Johnson", avatar: "/generic-user-avatar.png" },
+          { name: "Lisa Wang", avatar: "/database-expert.png" },
+          { name: "Tom Brown" },
+        ],
+        additionalContributors: 24,
         tags: ["Next.js", "TypeScript", "SSR"],
         status: "ongoing" as const,
         createdDate: "2 days ago",
@@ -39,10 +49,23 @@ const sampleTags: Tag[] = [
         downvotes: 2,
         userVote: "up" as const,
         isBookmarked: true,
+        user: {
+          name: "Sarah Chen",
+          avatar: "/generic-user-avatar.png",
+          reputation: 2847,
+        },
       },
       {
         id: "2",
         title: "Best practices for state management in React applications",
+        description:
+          "Looking for guidance on choosing between Redux, Zustand, and Context API for a medium-sized React app. Need to understand performance implications and when to use each approach.",
+        contributors: [
+          { name: "David Lee", avatar: "/database-expert.png" },
+          { name: "Emma Davis" },
+          { name: "Chris Wilson", avatar: "/generic-user-avatar.png" },
+        ],
+        additionalContributors: 18,
         tags: ["React", "State Management", "Redux"],
         status: "answered" as const,
         createdDate: "1 week ago",
@@ -52,10 +75,19 @@ const sampleTags: Tag[] = [
         downvotes: 1,
         userVote: null,
         isBookmarked: false,
+        user: {
+          name: "Alex Rodriguez",
+          avatar: "/database-expert.png",
+          reputation: 5432,
+        },
       },
       {
         id: "3",
         title: "Database design patterns for scalable web applications",
+        description:
+          "Working on a high-traffic web application and need advice on database architecture patterns. Considering microservices with separate databases vs monolithic approach with proper indexing strategies.",
+        contributors: [{ name: "Rachel Green" }, { name: "Kevin Park", avatar: "/generic-user-avatar.png" }],
+        additionalContributors: 31,
         tags: ["Database", "Architecture", "Performance"],
         status: "closed" as const,
         createdDate: "2 weeks ago",
@@ -65,40 +97,46 @@ const sampleTags: Tag[] = [
         downvotes: 5,
         userVote: "down" as const,
         isBookmarked: true,
+        user: {
+          name: "Jordan Kim",
+          reputation: 1205,
+        },
       },
     ]
-
     
-const timelineQuestions = [
-  {
-    id: "t1",
-    title: "How to optimize React performance with useMemo?",
-    status: "ongoing" as const,
-    timeAgo: "2 min ago",
-    answerCount: 1,
-    upvotes: 5,
-  },
-  {
-    id: "t2",
-    title: "Best practices for API error handling in Next.js",
-    status: "answered" as const,
-    timeAgo: "15 min ago",
-    answerCount: 3,
-    upvotes: 12,
-  },
-  {
-    id: "t3",
-    title: "TypeScript generic constraints explained",
-    status: "closed" as const,
-    timeAgo: "1 hour ago",
-    answerCount: 8,
-    upvotes: 24,
-  },
-]
+    const timelineQuestions = [
+      {
+        id: "t1",
+        title: "How to optimize React performance with useMemo?",
+        status: "ongoing" as const,
+        timeAgo: "2 min ago",
+        answerCount: 1,
+        upvotes: 5,
+      },
+      {
+        id: "t2",
+        title: "Best practices for API error handling in Next.js",
+        status: "answered" as const,
+        timeAgo: "15 min ago",
+        answerCount: 3,
+        upvotes: 12,
+      },
+      {
+        id: "t3",
+        title: "TypeScript generic constraints explained",
+        status: "closed" as const,
+        timeAgo: "1 hour ago",
+        answerCount: 8,
+        upvotes: 24,
+      },
+    ]
 
 
 
 export default function MyQuestionPage(){
+
+      const [selectedTags, setSelectedTags] = useState<Tag[]>([])
+      const [sortBy, setSortBy] = useState<string>("newest") // Added missing state
 
       const handleTitleClick = (id: string) => {
             console.log("Navigate to question:", id)
@@ -126,7 +164,6 @@ export default function MyQuestionPage(){
       // Here you would implement the actual sorting logic
     }
 
-      const [selectedTags, setSelectedTags] = useState<Tag[]>([])
       return (
             <div className=" h-full">
                   <div className="p-4 max-w-6xl mx-auto space-y-4 ">
@@ -150,27 +187,36 @@ export default function MyQuestionPage(){
                          <div className="flex gap-4">
                         <div className="space-y-4 w-3/4">
                         <QuestionCounterSorter questionCount={sampleQuestions.length} onSortChange={handleSortChange} />
-                              {sampleQuestions.map((question) => (
-                              <QuestionCard
-                                    key={question.id}
-                                    {...question}
-                                    onTitleClick={handleTitleClick}
-                                    onContinueClick={handleContinueClick}
-                                    onBookmarkToggle={handleBookmarkToggle}
-                                    onUpvote={handleUpvote}
-                                    onDownvote={handleDownvote}
-                              />
-                              ))}
-                        </div>
+                        <ScrollArea className="h-fit w-full p-2">
+  <div className="space-y-4">
+    {sampleQuestions.length > 0 ? (
+      sampleQuestions.map((question) => (
+        <QuestionCard
+          key={question.id}
+          {...question}
+          onTitleClick={handleTitleClick}
+          onContinueClick={handleContinueClick}
+          onBookmarkToggle={handleBookmarkToggle}
+          onUpvote={handleUpvote}
+          onDownvote={handleDownvote}
+        />
+      ))
+    ) : (
+      <div className="text-center py-8 text-gray-500">
+        No questions found. Try adjusting your filters.
+      </div>
+    )}
+  </div>
+</ScrollArea>
+<PaginationDemo/>
+</div>
                         <div>
                         <RecentQuestionsTimeline questions={timelineQuestions}/>
                         </div>
                               </div>
+
                   </div>
+
             </div>
       )
-}
-
-function setSortBy(newSortBy: string) {
-      throw new Error("Function not implemented.")
 }

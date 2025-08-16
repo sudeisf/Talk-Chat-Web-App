@@ -14,7 +14,7 @@ export function AppNavbar() {
   const { unreadCount } = useNotifications()
 
   return (
-    <header className="sticky top-0 z-30 flex h-14  items-center justify-between  bg-white px-4  dark:bg-gray-950">
+    <header className="sticky top-0 z-30 flex h-16 border-b  items-center justify-between  bg-white px-4  dark:bg-gray-950">
       <div className="flex items-center gap-2">
         <SidebarTrigger>
           <Button variant="ghost" size="icon">

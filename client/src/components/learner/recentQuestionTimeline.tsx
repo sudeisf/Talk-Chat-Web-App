@@ -30,7 +30,7 @@ export function RecentQuestionsTimeline({ questions }: RecentQuestionsTimelinePr
   }
 
   return (
-    <div className="w-80 bg-background border-l border-border p-6">
+    <div className="w-full bg-background border-l border-border p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">Recent Activity</h3>
         <p className="text-sm text-muted-foreground">Latest questions and updates</p>
