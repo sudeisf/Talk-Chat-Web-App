@@ -187,29 +187,29 @@ export default function MyQuestionPage(){
                          <div className="flex gap-4">
                         <div className="space-y-4 w-3/4">
                         <QuestionCounterSorter questionCount={sampleQuestions.length} onSortChange={handleSortChange} />
-                        <ScrollArea className="h-fit w-full p-2">
-  <div className="space-y-4">
-    {sampleQuestions.length > 0 ? (
-      sampleQuestions.map((question) => (
-        <QuestionCard
-          key={question.id}
-          {...question}
-          onTitleClick={handleTitleClick}
-          onContinueClick={handleContinueClick}
-          onBookmarkToggle={handleBookmarkToggle}
-          onUpvote={handleUpvote}
-          onDownvote={handleDownvote}
-        />
-      ))
-    ) : (
-      <div className="text-center py-8 text-gray-500">
-        No questions found. Try adjusting your filters.
-      </div>
-    )}
-  </div>
-</ScrollArea>
-<PaginationDemo/>
-</div>
+                                            <ScrollArea className="h-fit w-full p-2">
+                      <div className="space-y-4">
+                        {sampleQuestions.length > 0 ? (
+                          sampleQuestions.map((question) => (
+                            <QuestionCard
+                              key={question.id}
+                              {...question}
+                              onTitleClick={handleTitleClick}
+                              onContinueClick={handleContinueClick}
+                              onBookmarkToggle={handleBookmarkToggle}
+                              onUpvote={handleUpvote}
+                              onDownvote={handleDownvote}
+                            />
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-gray-500">
+                            No questions found. Try adjusting your filters.
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                    <PaginationDemo/>
+                    </div>
                         <div>
                         <RecentQuestionsTimeline questions={timelineQuestions}/>
                         </div>
