@@ -1,7 +1,7 @@
 // components/app-navbar.tsx
 "use client"
 
-import { Menu, Bell, User, Settings } from "lucide-react"
+import { Menu, Bell, User, Settings, Plus, PlusCircle } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
@@ -14,7 +14,7 @@ export function AppNavbar() {
   const { unreadCount } = useNotifications()
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 border-b  items-center justify-between  bg-white px-4  dark:bg-gray-950">
+    <header className="sticky top-0 z-30 flex h-16 border-b  items-center justify-between  bg-white px-4  dark:bg-gray-950">
       <div className="flex items-center gap-2">
         <SidebarTrigger>
           <Button variant="ghost" size="icon">
@@ -48,10 +48,9 @@ export function AppNavbar() {
         </Avatar>
           </Link>
        
-        {/* <div>
-          <h1 className="capitalize text-sm font-pt">sudies fedlu</h1>
-          <p className="font-sans font-light text-gray-400 text-sm">sudiesfed@gmail.com</p>
-        </div>   */}
+        <div className="w-24">
+         <Button variant={"outline"} className="rounded-sm shadow-sm flex border-1   w-full border-orange-600 text-orange-600"><PlusCircle className="w-10 h-10"/>Ask</Button>
+        </div>  
         </div>  
       </div>
     </header>

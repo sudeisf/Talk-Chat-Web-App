@@ -1,0 +1,13 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Talitk logo - Tk monogram">
+  <!-- Background -->
+  <rect x="6" y="6" width="168" height="168" rx="28" fill="#ea580c" stroke="#ea580c" stroke-width="12"/>
+  
+  <!-- T -->
+  <path d="M45 62h90" stroke="white" stroke-width="14" stroke-linecap="round"/>
+  <path d="M90 62v78" stroke="white" stroke-width="14" stroke-linecap="round"/>
+  
+  <!-- k (leg + arm) -->
+  <path d="M115 78v62" stroke="white" stroke-width="14" stroke-linecap="round"/>
+  <path d="M115 110l28-28" stroke="white" stroke-width="14" stroke-linecap="round"/>
+  <path d="M115 110l30 30" stroke="white" stroke-width="14" stroke-linecap="round"/>
+</svg>

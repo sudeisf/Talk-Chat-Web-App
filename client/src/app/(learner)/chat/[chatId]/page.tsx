@@ -184,12 +184,12 @@ export default function ChatBox() {
       </div>
 
       {/* Message Area */}
-     <ScrollArea className="h-[500px]">
+     <ScrollArea className="flex-1 min-h-[400px] max-h-[calc(100vh-212px)]">
      <div className="flex-1 p-4 space-y-4 bg-gray-50 overflow-y-auto" style={{ scrollBehavior: 'smooth' }}>
         {currentSession?.description && (
           <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0">
                 <BookOpen className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -222,7 +222,7 @@ export default function ChatBox() {
               <div
                 className={cn(
                   "rounded-lg px-4 py-2 max-w-md break-words",
-                  message.sender === "user" ? "bg-black text-white" : "bg-white text-black border border-gray-200",
+                  message.sender === "user" ? "bg-orange-600 text-white" : "bg-white text-black border border-gray-200",
                 )}
               >
                 <p className="text-sm leading-relaxed">{message.text}</p>
@@ -236,7 +236,7 @@ export default function ChatBox() {
      </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-gray-200 bg-white dark:bg-gray-800 shrink-0">
+      <div className="px-2 border-t border-b border-gray-200 bg-white dark:bg-gray-800 shrink-0">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -244,17 +244,17 @@ export default function ChatBox() {
             className="flex-shrink-0 hover:bg-gray-100 dark:hover:bg-gray-700"
             title="Attach file"
           >
-            <Paperclip className="h-5 w-5 text-black dark:text-white" />
+            <Paperclip className="h-8 w-8 text-black dark:text-white" />
           </Button>
 
-          <div className="relative flex-1">
+          <div className="relative flex-1 p-2">
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type your message…"
-              className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-300 rounded-2xl px-4 py-3 pr-12 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all duration-150"
+              className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-300 rounded-md px-4 py-2 pr-12 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all duration-150"
               rows={1}
-              style={{ minHeight: 44, maxHeight: 120, overflowY: "auto" }}
+              style={{ minHeight: 30, maxHeight: 120, overflowY: "auto" }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault()
@@ -267,7 +267,7 @@ export default function ChatBox() {
           <Button
             onClick={handleSendMessage}
             disabled={!newMessage.trim()}
-            className="flex-shrink-0 bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-300 text-white px-4 py-2 rounded-2xl transition-all"
+            className="flex-shrink-0 bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-300 text-white px-4 py-2 rounded-sm transition-all"
           >
             <Send className="h-4 w-4" />
           </Button>

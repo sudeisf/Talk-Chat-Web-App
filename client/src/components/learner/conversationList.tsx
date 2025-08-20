@@ -60,7 +60,7 @@ export default function ChatList(){
                  <SearchSessions/>
                  </div>
                  <ChatTabs/>
-                 <ScrollArea className="h-[390px]">
+                 <ScrollArea className="h-[calc(100vh-355px)]">
                         {
                               ConvoList.map((convo,index)=>{
                                     return(
@@ -71,7 +71,7 @@ export default function ChatList(){
                                                <div className="flex gap-2">
                                                       {
                                                             convo.tags.slice(0, 2).map((tag,index)=>(
-                                                                  <span key={`tag-${index}`} className="bg-orange-500 text-white text-sm px-2 rounded-sm">{tag}</span>
+                                                                  <span key={`tag-${index}`} className="bg-orange-500/5 text-orange-600 text-sm px-2 rounded-sm">{tag}</span>
                                                             ))
                                                       }
                                                 </div>
