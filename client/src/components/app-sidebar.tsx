@@ -26,7 +26,7 @@ const items = [
   },
   {
     title: "Active Chats",
-    url: "#",
+    url: "/chat",
     icon: Inbox,
   },
   {
