@@ -9,11 +9,11 @@ export default function ChatLayout({
 
 
   return (
-    <div className="flex bg-background">
+    <div className="flex bg-background ">
       <ChatList/>
-      <div>
+      <div className="flex flex-col  w-full">
             {children}
       </div>
-    </div>  
+    </div>
   );
 }
