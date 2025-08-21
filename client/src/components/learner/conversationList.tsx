@@ -60,7 +60,7 @@ export default function ChatList(){
                  <SearchSessions/>
                  </div>
                  <ChatTabs/>
-                 <ScrollArea className="h-[calc(100vh-355px)]">
+                 <ScrollArea className="h-[calc(100vh-195px)]">
                         {
                               ConvoList.map((convo,index)=>{
                                     return(

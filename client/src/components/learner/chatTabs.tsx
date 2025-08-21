@@ -3,67 +3,77 @@
 import { Archive, BookOpen, Star, User } from "lucide-react"
 import { Button } from "../ui/button"
 
-
-
 const tabs = [
-      {
-            "title" : "Active Sessions",
-            "icon" : BookOpen,
-            "count" : 3,
-            "active" : true
-      },
-      {
-            "title" : "All Sessions",
-            "icon" : User,
-            "count" : 5,
-            "active" : false
-      },
-      {
-            "title" : "Favorites",
-            "icon" : Star,
-            "count" : 0,
-            "active" : false
-      },
-      {
-            "title" : "Archived",
-            "icon" : Archive,
-            "count" : 0,
-            "active" : false
-      }
+  {
+    title: "Active ",
+    icon: BookOpen,
+    count: 3,
+    active: true,
+  },
+  {
+    title: "All ",
+    icon: User,
+    count: 5,
+    active: false,
+  },
+  {
+    title: "Favorites",
+    icon: Star,
+    count: 0,
+    active: false,
+  },
+  {
+    title: "Archived",
+    icon: Archive,
+    count: 0,
+    active: false,
+  },
 ]
 
-
-export default function ChatTabs(){
-
-
-      return (
-            <div className="flex flex-col gap-2 p-2 border-b ">
-                  {
-                        tabs.map((tab,index)=>{
-                              const Icon = tab.icon;
-                              return(
-                                    <Button
-                                    key={`tab-${index}`}
-                                     className={`flex justify-between text-sm rounded-sm py-5 shadow-none drop-shadow-none' ${
-                                          tab.active === true ? "bg-orange-500 text-white hover:bg-orange-500/90" : "bg-white text-gray-600 hover:bg-gray-100"
-                                    }`}>
-                                         <span className="flex items-center gap-2">
-                                         <Icon className="w-6 h-6"/>
-                                         {tab.title}
-                                         </span>
-                                         
-                                          { tab.count > 0 &&
-                                                 <span className={` text-xs w-6 h-6 flex items-center flex-col justify-center rounded-full ${
-                                                      tab.active ? "bg-white text-black" : "bg-gray-200"
-                                                }`}>
-                                                 {tab.count}
-                                                </span>
-                                          }
-                                         
-                                    </Button>
-                              )
-})
-                  }
-            </div>
-      )
+export default function ChatTabs() {
+  return (
+      <div
+        className="flex overflow-x-auto items-center gap-4 border-b px-2"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <style jsx>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      {tabs.map((tab, index) => {
+        const Icon = tab.icon
+        return (
+          <Button
+            key={`tab-${index}`}
+            variant="ghost"
+            className={`relative flex items-center gap-2 rounded-none border-b-2 px-4 py-3 text-sm font-medium transition-colors
+              ${
+                tab.active
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+              }`}
+          >
+            <Icon className="w-5 h-5" />
+            {tab.title}
+            {tab.count > 0 && (
+              <span
+                className={`ml-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                  tab.active
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-gray-200 text-gray-700"
+                }`}
+              >
+                {tab.count}
+              </span>
+            )}
+          </Button>
+        )
+      })}
+    </div>
+    
+  )
 }
