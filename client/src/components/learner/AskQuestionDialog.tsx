@@ -3,23 +3,36 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "../ui/dialog"
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "../ui/form"
+import { useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "../ui/dialog"
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from "../ui/form"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { Button } from "../ui/button"
 import { PlusCircle } from "lucide-react"
-import { useState } from "react"
 import { QuestionTags } from "./QuestionTags"
 
-// Define the form schema with Zod for validation
 const questionFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
   tags: z.array(z.string().min(1, "Tag cannot be empty")).min(1, "At least one tag is required").max(5, "No more than 5 tags"),
   description: z.string().min(1, "Description is required").max(1000, "Description must be less than 1000 characters"),
 })
 
-// Define the form data type
 type QuestionFormData = z.infer<typeof questionFormSchema>
 
 export default function AskQuestion() {
@@ -29,14 +42,12 @@ export default function AskQuestion() {
     defaultValues: {
       title: "",
       description: "",
+      tags: [],
     },
   })
 
   const onSubmit = (data: QuestionFormData) => {
-    // Handle form submission
     console.log("Question submitted:", data)
-    // Here you would typically send the data to your API
-    // For now, we'll just close the dialog
     setOpen(false)
     form.reset()
   }
@@ -45,77 +56,86 @@ export default function AskQuestion() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant={"outline"}
-          className="rounded-sm shadow-sm flex border border-orange-600 text-orange-600 hover:bg-orange-50"
+          variant="outline"
+          className="rounded-lg px-4 py-2 flex items-center gap-2 border border-orange-500 text-orange-600 font-medium hover:bg-orange-50 transition"
         >
-          <PlusCircle className="w-4 h-4 mr-2" />
+          <PlusCircle className="w-5 h-5" />
           Ask 
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[650px] rounded-xl shadow-lg p-6">
         <DialogHeader>
-          <DialogTitle>Ask a Question</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-800">
+            Ask a Question
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Title */}
             <FormField
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">Title</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your question title here..."
+                      placeholder="e.g. How do I optimize my React app?"
+                      className="rounded-lg border-gray-300 focus:ring-2 focus:ring-orange-400"
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Enter a concise title for your question.
+                  <FormDescription className="text-xs text-gray-500">
+                    Enter a short, descriptive title.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField 
-                  name="tags"
-                  render={({field})=>(
-                        <FormItem>
-                              <FormLabel>Tags</FormLabel>
-                              <FormControl>
-                              <QuestionTags value={field.value} onChange={field.onChange} />
-                              </FormControl>
-                        </FormItem>
-                        )}
-                  />
+            {/* Tags */}
+            <FormField
+              name="tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">Tags</FormLabel>
+                  <FormControl>
+                    <QuestionTags value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormDescription className="text-xs text-gray-500">
+                    Add up to 5 tags to categorize your question.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-
+            {/* Description */}
             <FormField
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe your question in detail..."
-                      className="resize-none"
+                      placeholder="Explain your question in detail..."
+                      className="resize-none min-h-[120px] rounded-lg border-gray-300 focus:ring-2 focus:ring-orange-400"
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Provide a detailed description of your question.
+                  <FormDescription className="text-xs text-gray-500">
+                    Provide as much detail as possible.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-
-
-            <DialogFooter>
+            {/* Footer */}
+            <DialogFooter className="flex justify-end gap-2 pt-4 border-t">
               <Button
                 type="button"
                 variant="outline"
+                className="rounded-lg"
                 onClick={() => {
                   setOpen(false)
                   form.reset()
@@ -125,6 +145,7 @@ export default function AskQuestion() {
               </Button>
               <Button
                 type="submit"
+                className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? "Submitting..." : "Submit Question"}
