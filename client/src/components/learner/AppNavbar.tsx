@@ -51,7 +51,15 @@ export function AppNavbar() {
        
         <div className="w-24">
          {/* <Button variant={"outline"} className="rounded-sm shadow-sm flex border-1   w-full border-orange-600 text-orange-600"><PlusCircle className="w-10 h-10"/>Ask</Button> */}
-         <AskQuestion/>
+         <AskQuestion btnChild={
+          <Button
+          variant="outline"
+          className="rounded-sm shadow-xs text-md w-24 py-2 flex items-center gap-2 border border-orange-500 text-orange-600 font-medium hover:bg-orange-50 transition"
+        >
+          <PlusCircle className="w-5 h-5" />
+          Ask 
+        </Button>
+         }/>
          
         </div>  
         </div>  

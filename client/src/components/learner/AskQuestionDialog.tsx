@@ -34,8 +34,11 @@ const questionFormSchema = z.object({
 })
 
 type QuestionFormData = z.infer<typeof questionFormSchema>
+type ASkQuestionProps ={
+      btnChild : React.ReactElement
+}
 
-export default function AskQuestion() {
+export default function AskQuestion({btnChild}:ASkQuestionProps) {
   const [open, setOpen] = useState(false)
   const form = useForm<QuestionFormData>({
     resolver: zodResolver(questionFormSchema),
@@ -55,17 +58,11 @@ export default function AskQuestion() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="rounded-lg px-4 py-2 flex items-center gap-2 border border-orange-500 text-orange-600 font-medium hover:bg-orange-50 transition"
-        >
-          <PlusCircle className="w-5 h-5" />
-          Ask 
-        </Button>
+        {btnChild}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[650px] rounded-xl shadow-lg p-6">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-800">
+          <DialogTitle className="text-xl font-medium text-orange-600 font-pt">
             Ask a Question
           </DialogTitle>
         </DialogHeader>
@@ -76,7 +73,7 @@ export default function AskQuestion() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">Title</FormLabel>
+                  <FormLabel className="text-md font-medium text-gray-700">Title</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g. How do I optimize my React app?"
@@ -84,7 +81,7 @@ export default function AskQuestion() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription className="text-xs text-gray-500">
+                  <FormDescription className="text-sm text-gray-500">
                     Enter a short, descriptive title.
                   </FormDescription>
                   <FormMessage />
@@ -97,11 +94,11 @@ export default function AskQuestion() {
               name="tags"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">Tags</FormLabel>
+                  <FormLabel className="text-md font-medium text-gray-700">Tags</FormLabel>
                   <FormControl>
                     <QuestionTags value={field.value} onChange={field.onChange} />
                   </FormControl>
-                  <FormDescription className="text-xs text-gray-500">
+                  <FormDescription className="text-sm text-gray-500">
                     Add up to 5 tags to categorize your question.
                   </FormDescription>
                   <FormMessage />
@@ -114,7 +111,7 @@ export default function AskQuestion() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">Description</FormLabel>
+                  <FormLabel className="text-md font-medium text-gray-700">Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Explain your question in detail..."
@@ -122,7 +119,7 @@ export default function AskQuestion() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription className="text-xs text-gray-500">
+                  <FormDescription className="text-sm text-gray-500">
                     Provide as much detail as possible.
                   </FormDescription>
                   <FormMessage />

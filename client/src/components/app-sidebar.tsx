@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Bookmark ,CircleQuestionMark, LogOut, Ghost, Bell } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Bookmark ,CircleQuestionMark, LogOut, Ghost, Bell, Settings } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Sidebar,
@@ -14,6 +14,7 @@ import {
 import { Button } from "./ui/button"
 import logo from "./../../public/svg/logo.svg"
 import Image from "next/image"
+import Link from "next/link"
 const items = [
   {
     title: "Dashboard",
@@ -53,7 +54,7 @@ export function AppSidebar() {
           <h1 className="text-2xl font-pt bg-gradient-to-r from-orange-500 via-red-400 to-orange-400 bg-clip-text text-transparent  rounded-full">Talkit</h1>
         </div>
           <SidebarGroupContent>
-            <SidebarMenu className="p-4 space-y-2">
+            <SidebarMenu className="p-4 space-y-2 mt-4">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton className="font-pt space-x-2" asChild>
@@ -67,8 +68,9 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarFooter className="p-4">
-              <Button variant={"ghost"} className="text-left w-fit"><LogOut/> logout</Button>
+        <SidebarFooter className="p-6 ml-2">
+              <Link className="flex items-center gap-2" href={"/settings"}><Settings className="w-4 h-4"/>Settings</Link>
+              <button  className="flex items-center font-pt font-medium gap-2"><LogOut className="w-4 h-4"/> logout</button>
         </SidebarFooter>
       </SidebarContent>
     </Sidebar>
