@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { SearchBar } from "./searchBar"
 import { useNotifications } from "@/contexts/NotificationContext"
 import Link from "next/link"
+import AskQuestion from "./AskQuestionDialog"
 
 
 export function AppNavbar() {
@@ -49,7 +50,9 @@ export function AppNavbar() {
           </Link>
        
         <div className="w-24">
-         <Button variant={"outline"} className="rounded-sm shadow-sm flex border-1   w-full border-orange-600 text-orange-600"><PlusCircle className="w-10 h-10"/>Ask</Button>
+         {/* <Button variant={"outline"} className="rounded-sm shadow-sm flex border-1   w-full border-orange-600 text-orange-600"><PlusCircle className="w-10 h-10"/>Ask</Button> */}
+         <AskQuestion/>
+         
         </div>  
         </div>  
       </div>
