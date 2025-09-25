@@ -1,4 +1,6 @@
 "use client"
+import HistoryOfQuestions from "@/components/learner/QuestionHistory"
+import { RecentQuestionsTimeline } from "@/components/learner/recentQuestionTimeline"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -28,6 +30,33 @@ const userInfo = {
     experience: 1250, 
     correctAnswers : 200
 }
+
+const timelineQuestions = [
+  {
+    id: "t1",
+    title: "How to optimize React performance with useMemo?",
+    status: "ongoing" as const,
+    timeAgo: "2 min ago",
+    answerCount: 1,
+    upvotes: 5,
+  },
+  {
+    id: "t2",
+    title: "Best practices for API error handling in Next.js",
+    status: "answered" as const,
+    timeAgo: "15 min ago",
+    answerCount: 3,
+    upvotes: 12,
+  },
+  {
+    id: "t3",
+    title: "TypeScript generic constraints explained",
+    status: "closed" as const,
+    timeAgo: "1 hour ago",
+    answerCount: 8,
+    upvotes: 24,
+  },
+]
 
 
 
@@ -127,9 +156,9 @@ export default function ProfilePage() {
             </div>
             </div>
             </div>
-            {/* Stats and Progress */}
+        
           <div className="lg:col-span-2 space-y-6 mt-4">
-            <Card className="shadow-none rounded-xl border-0 bg-white/95 p-2 ">
+            {/*<Card className="shadow-none rounded-xl border-0 bg-white/95 p-2 ">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-orange-600" />
@@ -154,6 +183,7 @@ export default function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
+            */}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t p-4">
               <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
@@ -197,7 +227,12 @@ export default function ProfilePage() {
               </Card>
             </div>
           </div>
+          <div className="flex gap-4 w-full pt-4 mx-auto border-t  max-w-6xl">
+          <HistoryOfQuestions/>
+          <RecentQuestionsTimeline questions={timelineQuestions}/>
           </div>
+          </div>
+
       </div>
   )
 }
