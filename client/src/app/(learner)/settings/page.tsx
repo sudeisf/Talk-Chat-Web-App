@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import AppearanceSettings from "@/components/learner/Apperance"
 
 export default function SettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true)
@@ -16,8 +17,8 @@ export default function SettingsPage() {
     <div className="container mx-auto p-6 max-w-4xl">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-blue-100 rounded-lg">
-          <Settings className="h-6 w-6 text-blue-600" />
+        <div className="p-2  rounded-lg">
+          <Settings className="h-6 w-6 text-black" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
@@ -27,7 +28,7 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         {/* Account Settings */}
-        <Card>
+        <Card className="shadow-none border-b border-x-0 border-t-0 rounded-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5 text-blue-600" />
@@ -44,22 +45,14 @@ export default function SettingsPage() {
                   defaultValue="sudiesfed@gmail.com"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="language">Language</Label>
-                <select className="w-full p-2 border border-gray-300 rounded-md">
-                  <option value="english">English</option>
-                  <option value="amharic">Amharic</option>
-                  <option value="french">French</option>
-                  <option value="spanish">Spanish</option>
-                </select>
-              </div>
+
             </div>
-            <Button>Save Changes</Button>
+            <Button variant={"outline"}>Save Changes</Button>
           </CardContent>
         </Card>
 
         {/* Notification Settings */}
-        <Card>
+        <Card className="shadow-none border-b border-x-0 border-t-0 rounded-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5 text-orange-600" />
@@ -106,36 +99,10 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Appearance Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-purple-600" />
-              Appearance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="theme">Theme</Label>
-              <select className="w-full p-2 border border-gray-300 rounded-md">
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="system">System</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="font-size">Font Size</Label>
-              <select className="w-full p-2 border border-gray-300 rounded-md">
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-              </select>
-            </div>
-          </CardContent>
-        </Card>
+        <AppearanceSettings/>
 
         {/* Study Settings */}
-        <Card>
+        <Card className="shadow-none border-b border-x-0 border-t-0 rounded-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5 text-indigo-600" />
