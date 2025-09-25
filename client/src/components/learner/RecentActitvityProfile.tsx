@@ -15,7 +15,7 @@ interface RecentQuestionsTimelineProps {
   questions: TimelineQuestion[]
 }
 
-export function RecentQuestionsTimeline({ questions }: RecentQuestionsTimelineProps) {
+export function RecentQuestionsTimelineProfile({ questions }: RecentQuestionsTimelineProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ongoing":

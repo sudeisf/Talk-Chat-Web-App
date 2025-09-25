@@ -1,6 +1,6 @@
 "use client"
 import HistoryOfQuestions from "@/components/learner/QuestionHistory"
-import { RecentQuestionsTimeline } from "@/components/learner/recentQuestionTimeline"
+import {  RecentQuestionsTimelineProfile } from "@/components/learner/RecentActitvityProfile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -229,7 +229,7 @@ export default function ProfilePage() {
           </div>
           <div className="flex flex-row-reverse gap-4 w-full pt-4 mx-auto border-t  max-w-6xl">
           <HistoryOfQuestions/>
-          <RecentQuestionsTimeline questions={timelineQuestions}/>
+          <RecentQuestionsTimelineProfile questions={timelineQuestions}/>
           </div>
           </div>
 
