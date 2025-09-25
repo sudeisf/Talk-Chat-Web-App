@@ -73,15 +73,15 @@ export default function BookmarksPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-purple-100 rounded-lg">
-            <Bookmark className="h-6 w-6 text-purple-600" />
+          <div className="p-2  rounded-lg">
+            <Bookmark className="h-6 w-6 text-ornage-600" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Bookmarks</h1>
             <p className="text-gray-600">Your saved questions and resources</p>
           </div>
         </div>
-        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+        <Badge variant="outline" className=" text-orange-700 text-sm p-2 rounded-full capitalize">
           {bookmarkedData.flatMap(section => section.topics).length} bookmarks
         </Badge>
       </div>

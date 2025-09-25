@@ -53,8 +53,8 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-md">
-            <Bell className="h-6 w-6 text-blue-600" />
+          <div className="p-2  rounded-md">
+            <Bell className="h-6 w-6 text-black" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>

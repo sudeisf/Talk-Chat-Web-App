@@ -227,7 +227,7 @@ export default function ProfilePage() {
               </Card>
             </div>
           </div>
-          <div className="flex gap-4 w-full pt-4 mx-auto border-t  max-w-6xl">
+          <div className="flex flex-row-reverse gap-4 w-full pt-4 mx-auto border-t  max-w-6xl">
           <HistoryOfQuestions/>
           <RecentQuestionsTimeline questions={timelineQuestions}/>
           </div>
