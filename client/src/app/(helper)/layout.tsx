@@ -1,4 +1,5 @@
 
+import Navbar from "@/components/helper/Navbar";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -18,6 +19,7 @@ export default function LearnerLayout({
 
   return (
     <div>
+      <Navbar/>
       {children}
     </div>
   );
