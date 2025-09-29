@@ -32,15 +32,20 @@ const userInfo = {
 export default function Navbar(){
 
       return (
-            <nav className="flex justify-between p-2">
+            <nav className="flex justify-between px-4 py-2">
                 <div className="flex items-center gap-2 ">
-                <Image alt="Logo" src={Logo} className="w-7 h-7" />
+                <div className="flex gap-2 items-center">
+                  <Image alt="Logo" src={Logo} className="w-7 h-7" />
+                  <p>Talkit</p>
+                </div> 
+                </div>
+              
                 <div className="flex gap-3 px-2 font-sans text-md font-light text-gray-600 ">
                               {Pages.map((page,index)=>(
-                                    <Link href={page.url}>{page.name}</Link>
+                                    <Link key={`dash-${index}`} href={page.url}>{page.name}</Link>
                               ))}
                         </div>
-                </div>
+                
                   <div className="flex items-center justify-center gap-2">
                   <div className={`relative w-52 `}>
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -58,17 +63,7 @@ export default function Navbar(){
                                     {userInfo.name.charAt(0)}
                               </AvatarFallback>
                         </Avatar>
-                              <Bell className="w-5 h-5"/>
-                        </div>
-                        <div>
-
-                        </div>
-
-                        <div>
-                        
-                        </div>
-                        <div>
-
+                              <Bell className="w-5 h-5 text-gray-500"/>
                         </div>
                   </div>
             </nav>
