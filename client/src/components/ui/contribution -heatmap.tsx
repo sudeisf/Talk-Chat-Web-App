@@ -91,7 +91,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
               onClick={() => setSelectedYear(year)}
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 selectedYear === year
-                  ? "bg-primary text-primary-foreground font-medium"
+                  ? "bg-orange-600 text-primary-foreground font-medium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >

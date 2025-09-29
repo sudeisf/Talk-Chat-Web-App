@@ -40,24 +40,24 @@ export default function Navbar(){
                 </div> 
                 </div>
               
-                <div className="flex gap-3 px-2 font-sans text-md font-light text-gray-600 ">
+                <div className="flex gap-5 px-2 font-Rubik text-md items-center font-light text-gray-600 ">
                               {Pages.map((page,index)=>(
                                     <Link key={`dash-${index}`} href={page.url}>{page.name}</Link>
                               ))}
                         </div>
                 
                   <div className="flex items-center justify-center gap-2">
-                  <div className={`relative w-52 `}>
+                  <div className={`relative w-10 `}>
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
+                        {/* <Input
                         type="text"
                         placeholder="Search..."
                         className="pl-10 shadow-none border border-border/50 rounded-lg bg-background focus-visible:ring-0 focus-visible:ring-ring"
-                        />
+                        /> */}
                         </div>
                        
                         <div className="flex gap-2 items-center">
-                              <Avatar className="w-8 h-8">
+                              <Avatar className="w-7 h-7">
                               <AvatarImage src={userInfo.avatar} />
                               <AvatarFallback>
                                     {userInfo.name.charAt(0)}
