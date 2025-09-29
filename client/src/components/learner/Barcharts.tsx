@@ -46,7 +46,7 @@ const chartConfig = {
 
 export function TotalSessionsChart() {
   return (
-    <Card className="w-[60%] max-w-2xl *:font-sans border-0 shadow-none">
+    <Card className="w-full max-w-2xl *:font-sans border-0 shadow-none">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-rubik font-semibold">
           <MessageSquare className="h-5 w-5 text-orange-500" />
