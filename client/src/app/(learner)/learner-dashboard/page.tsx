@@ -14,7 +14,7 @@ export default function DashBoard(){
 
       return (
             <div className="w-full max-w-6xl mx-auto min-h-screen bg-white p-4">
-                  <GreetingCard/>
+                  <GreetingCard btnName="Ask Questions" name="sudeis"/>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
                   <SummaryCard percentage="6.45" title="Total Sessions" value={124} icon={<MessageSquare size={20} />} />
                   <SummaryCard percentage="3.56" title="Total Bookmarks" value={8} icon={<Bookmark size={20} />} color="text-purple-600" />
