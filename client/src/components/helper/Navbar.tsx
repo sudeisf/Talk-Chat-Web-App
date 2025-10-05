@@ -47,13 +47,13 @@ export default function Navbar(){
                         </div>
                 
                   <div className="flex items-center justify-center gap-2">
-                  <div className={`relative w-10 `}>
+                  <div className={`relative w-54  `}>
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        {/* <Input
+                        <Input
                         type="text"
                         placeholder="Search..."
-                        className="pl-10 shadow-none border border-border/50 rounded-lg bg-background focus-visible:ring-0 focus-visible:ring-ring"
-                        /> */}
+                        className="pl-10 shadow-none border border-border/80 rounded-lg bg-background focus-visible:ring-0 focus-visible:ring-ring"
+                        />
                         </div>
                        
                         <div className="flex gap-2 items-center">

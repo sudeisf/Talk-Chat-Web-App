@@ -11,6 +11,7 @@ interface ContributionData {
 export function ContributionHeatmap({ userId }: { userId: string }) {
   const [data, setData] = useState<{ date: string; count: number }[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
   const currentYear = new Date().getFullYear()
@@ -19,7 +20,13 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
   useEffect(() => {
     async function fetchContributions() {
       try {
+        setError(null)
         const response = await fetch(`/api/contributions?userId=${userId}`)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
         const contributions: ContributionData[] = await response.json()
 
         // Fill missing dates with count: 0
@@ -27,6 +34,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
         setData(filledData)
       } catch (error) {
         console.error("Failed to fetch contributions:", error)
+        setError(error instanceof Error ? error.message : 'Failed to fetch contributions')
       } finally {
         setLoading(false)
       }
@@ -69,6 +77,17 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-muted-foreground">Loading contributions...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-red-500 text-center">
+          <div className="font-medium mb-2">Failed to load contributions</div>
+          <div className="text-sm text-muted-foreground">{error}</div>
+        </div>
       </div>
     )
   }
