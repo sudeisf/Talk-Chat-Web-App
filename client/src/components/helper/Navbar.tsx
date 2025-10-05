@@ -10,13 +10,13 @@ import { Input } from "../ui/input";
 const Pages = [
       {
             name : 'Dashboard',
-            url : '#',
+            url : '/dashboard',
       },{
             name : 'Questions',
-            url : '#',
+            url : '/questions',
       },{
             name : 'Sessions',
-            url : '#',
+            url : '/sessions',
       }
 ];
 
@@ -32,7 +32,7 @@ const userInfo = {
 export default function Navbar(){
 
       return (
-            <nav className="flex justify-between px-4 py-2">
+            <nav className="flex justify-between px-4 py-2 border-b">
                 <div className="flex items-center gap-2 ">
                 <div className="flex gap-2 items-center">
                   <Image alt="Logo" src={Logo} className="w-7 h-7" />
