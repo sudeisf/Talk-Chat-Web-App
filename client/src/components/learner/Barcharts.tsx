@@ -37,7 +37,7 @@ const sessionData = [
 const chartConfig = {
   sessions: {
     label: "Sessions",
-    color: "#f97316", 
+    color: "#387417", 
   },
   label: {
     color: "var(--background)",
@@ -49,7 +49,7 @@ export function TotalSessionsChart() {
     <Card className="w-full max-w-2xl *:font-sans border-0 shadow-none">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-rubik font-semibold">
-          <MessageSquare className="h-5 w-5 text-orange-500" />
+          <MessageSquare className="h-5 w-5 text-[#387417]" />
           Total Sessions
         </CardTitle> 
         <CardDescription>January – June 2024</CardDescription>

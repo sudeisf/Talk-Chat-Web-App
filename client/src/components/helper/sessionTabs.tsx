@@ -33,7 +33,7 @@ const tabs = [
 export default function SessionTabs() {
   return (
     <div
-      className="flex overflow-x-auto items-center gap-4 border-b px-2"
+      className="flex border rounded-lg mt-4 overflow-x-auto items-center gap-4 border-b px-2"
       style={{
         scrollbarWidth: "none",
         msOverflowStyle: "none",

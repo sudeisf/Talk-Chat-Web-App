@@ -54,13 +54,13 @@ const ConvoList = [
 export default function SessionsList(){
       const router = useRouter();
       return (
-            <div className="w-[30%] border-r h-full">
-                 <div className="px-4 py-2 border-b">
+            <div className="w-[35%]   m-4 h-[calc(100vh-100px)] overflow-hidden">
+                 <div className="px-4 py-2 ">
                  <h1 className="text-lg font-medium mb-4">Learning Sessions</h1>
                  <SearchSessions/>
                  </div>
                  <SessionTabs/>
-                 <ScrollArea className="h-[calc(100vh-195px)]">
+                 <ScrollArea className="h-[calc(100vh-195px)] border rounded-lg mt-4">
                         {
                               ConvoList.map((convo,index)=>{
                                     return(

@@ -6,6 +6,7 @@ import { BookOpen, MoreVertical, Paperclip, Send } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { MessageInput } from "@/components/helper/inputBox"
 
 const userInfo = {
   name: "Sudeis Fedlu",
@@ -134,9 +135,9 @@ export default function sessionBox() {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex rounded-lg border mt-4 mx-4 shadow-xs flex-col h-[calc(100vh-100px)]">
       {/* Message Header */}
-      <div className="px-4 py-2 border-b border-gray-200 bg-white shrink-0">
+      <div className="px-4 py-2 border-b rounded-t-lg border-gray-200 bg-white shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Avatar className="w-15 h-15 border-8 border-white">
@@ -236,43 +237,7 @@ export default function sessionBox() {
      </ScrollArea>
 
       {/* Input Area */}
-      <div className="px-2 border-t border-b border-gray-200 bg-white dark:bg-gray-800 shrink-0">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="flex-shrink-0 hover:bg-gray-100 dark:hover:bg-gray-700"
-            title="Attach file"
-          >
-            <Paperclip className="h-8 w-8 text-black dark:text-white" />
-          </Button>
-
-          <div className="relative flex-1 p-2">
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message…"
-              className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-300 rounded-md px-4 py-2 pr-12 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all duration-150"
-              rows={1}
-              style={{ minHeight: 30, maxHeight: 120, overflowY: "auto" }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault()
-                  handleSendMessage()
-                }
-              }}
-            />
-          </div>
-
-          <Button
-            onClick={handleSendMessage}
-            disabled={!newMessage.trim()}
-            className="flex-shrink-0 bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-300 text-white px-4 py-2 rounded-sm transition-all"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <MessageInput />
     </div>
   )
 }
