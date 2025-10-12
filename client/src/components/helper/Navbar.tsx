@@ -40,7 +40,7 @@ export default function Navbar(){
                 </div> 
                 </div>
               
-                <div className="flex gap-8 px-2 font-plus-jakarta capitalize text-md items-center  text-gray-600 ">
+                <div className="flex gap-8 px-2 font-bebas-neue capitalize text-md items-center  text-gray-600 ">
                               {Pages.map((page,index)=>(
                                     <Link key={`dash-${index}`} href={page.url}>{page.name}</Link>
                               ))}
@@ -57,14 +57,17 @@ export default function Navbar(){
                         </div>
                        
                         <div className="flex gap-4 items-center">
+                        <Link href={'/helper-notfications'} >
                         <Bell className="w-5 h-5 text-gray-500"/>
-
+                        </Link>
+                        <Link href={'/helper-profile'}>
                               <Avatar className="w-7 h-7">
-                              <AvatarImage src={userInfo.avatar} />
-                              <AvatarFallback>
-                                    {userInfo.name.charAt(0)}
-                              </AvatarFallback>
-                        </Avatar>
+                                    <AvatarImage src={userInfo.avatar} />
+                                    <AvatarFallback>
+                                          {userInfo.name.charAt(0)}
+                                    </AvatarFallback>
+                              </Avatar>
+                        </Link>
                         </div>
                   </div>
             </nav>

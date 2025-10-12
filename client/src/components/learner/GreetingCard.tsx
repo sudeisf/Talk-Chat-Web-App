@@ -10,10 +10,10 @@ interface props {
 
 export default function GreetingCard({btnName ,name} : props) {
       return (
-            <div className="max-w-7xl mt-4 w-full mx-auto bg-gradient-to-br from-[#3E831E] flex justify-around via-[#367015] to-[#2e544a] h-[220px] rounded-md shadow-xs">
+            <div className="max-w-7xl mt-4 w-full mx-auto bg-[#03624C] flex justify-around  h-[220px] rounded-md shadow-xs">
                 <div className="justify-center flex flex-col gap-3">
-                <h1 className="text-white font-pt text-5xl capitalize p-y">wellcome to Talkit , {name} !</h1>
-                  <p className="text-white font-rubik text-md capitalize">Best palce to get feedback from users</p>
+                <h1 className="text-white font-plus-jakarta font-medium text-5xl capitalize p-y">wellcome to Talkit , {name} !</h1>
+                  <p className="text-white font-plus-jakarta font-medium text-md capitalize">Best palce to get feedback from users</p>
 
                   {
                     btnName === "Start Helping" ?

@@ -84,7 +84,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-red-500 text-center">
+        <div className="text-[#03624C] text-center">
           <div className="font-medium mb-2">Failed to load contributions</div>
           <div className="text-sm text-muted-foreground">{error}</div>
         </div>
@@ -110,7 +110,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
               onClick={() => setSelectedYear(year)}
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 selectedYear === year
-                  ? "bg-orange-600 text-primary-foreground font-medium"
+                  ? "bg-[#03624C] text-primary-foreground font-medium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >

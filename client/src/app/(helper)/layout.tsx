@@ -1,5 +1,6 @@
 
 import Navbar from "@/components/helper/Navbar";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -18,9 +19,11 @@ export default function LearnerLayout({
 
 
   return (
+    <NotificationProvider>
     <div>
       <Navbar/>
       {children}
     </div>
+    </NotificationProvider>
   );
 }

@@ -20,7 +20,7 @@ export default function HelperDashboard (){
             <TotalSessionsChart/>
                   <div className="rounded-lg w-full  bg-card p-6">
                         <div className="mb-4">
-                              <h2 className="text-xl font-semibold text-card-foreground mb-1">Sudeis</h2>
+                              <h2 className="text-xl font-semibold text-[#03624C]  mb-1">Sudeis</h2>
                               <p className="text-sm text-muted-foreground">Daily contribution activity over the years</p>
                         </div>
 
