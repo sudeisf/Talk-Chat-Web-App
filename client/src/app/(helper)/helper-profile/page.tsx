@@ -1,4 +1,5 @@
 "use client"
+import { EditProfile } from "@/components/EditProfile"
 import HistoryOfQuestions from "@/components/learner/QuestionHistory"
 import {  RecentQuestionsTimelineProfile } from "@/components/learner/RecentActitvityProfile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -129,9 +130,7 @@ export default function HelperProfilePage() {
                <p className="text-md text-gray-500 max-w-md leading-relaxed">{userInfo.bio}</p>
                </div>
               <div className="flex gap-2">
-              <Button  className="bg-gradient-to-r text-md font-pt bg-[#03624C] p-5  rounded-full mt-2 shadow-xs ">
-                   Edit Profile
-               </Button>
+              <EditProfile/>
                <Button variant={"outline"} className="border-[#03624C] border p-5 text-md text-[#03624C] rounded-full mt-2 shadow-xs ">
                    Settings
                </Button>
