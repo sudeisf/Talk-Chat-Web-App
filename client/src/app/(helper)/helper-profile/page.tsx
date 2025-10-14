@@ -4,7 +4,7 @@ import {  RecentQuestionsTimelineProfile } from "@/components/learner/RecentActi
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Bookmark, BookOpen, Briefcase, Camera, Clock, Edit, Pen, Star, Stars, Target, Trash, User } from "lucide-react"
+import { Bookmark, BookOpen, Briefcase, Camera, Clock, Edit, Pen, Star, Stars, Target, TimerIcon, Trash, User } from "lucide-react"
 import { use, useRef, useState } from "react"
 
 
@@ -24,8 +24,8 @@ const userInfo = {
     "React" , "Typescript","python" ,"ML" ,"Tailwindcss" , "NodeJs"  ],
     sessionsJoined: 24,
     ongoingSessions: 3,
-    bookmarksSaved: 18,
-    totalQuestions : 30,
+    avargeResponseTime: 3.2,
+    HelpedLearners : 30,
     level: 8,
     experience: 1250, 
     correctAnswers : 200
@@ -62,7 +62,6 @@ const timelineQuestions = [
 
 export default function HelperProfilePage() {
   const [coverImage, setCoverImage] = useState<string | null>(null);
-  const accuracy = Math.round((userInfo.correctAnswers / userInfo.totalQuestions) * 100)
   const nextLevelExp = 1500;
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const progressToNextLevel = Math.round((userInfo.experience / nextLevelExp) * 100)
@@ -89,7 +88,7 @@ export default function HelperProfilePage() {
               </div>
 
             ) : (
-              <div className="w-full h-full rounded-t-md bg-gradient-to-r from-orange-500 via-red-400 to-orange-400">
+              <div className="w-full h-full rounded-t-md bg-[#03624C]">
                 <div className="relative">
                   <Button className="absolute top-4 right-4 bg-white hover:bg-gray-100 rounded-full w-10 h-10">
                     <Edit className="w-4 h-4 text-black" />
@@ -130,10 +129,10 @@ export default function HelperProfilePage() {
                <p className="text-md text-gray-500 max-w-md leading-relaxed">{userInfo.bio}</p>
                </div>
               <div className="flex gap-2">
-              <Button  className="bg-gradient-to-r text-md font-pt bg-orange-500 p-5  rounded-full mt-2 shadow-xs ">
+              <Button  className="bg-gradient-to-r text-md font-pt bg-[#03624C] p-5  rounded-full mt-2 shadow-xs ">
                    Edit Profile
                </Button>
-               <Button variant={"outline"} className="border-orange-500 border p-5 text-md text-orange-500 rounded-full mt-2 shadow-xs ">
+               <Button variant={"outline"} className="border-[#03624C] border p-5 text-md text-[#03624C] rounded-full mt-2 shadow-xs ">
                    Settings
                </Button>
               </div>
@@ -190,8 +189,8 @@ export default function HelperProfilePage() {
                 <CardContent className="p-6 text-center">
                   <div className="flex flex-col items-center">
                     <BookOpen className="h-8 w-8 text-blue-600 mb-2" />
-                    <h3 className="text-2xl font-bold text-gray-900">{userInfo.totalQuestions}</h3>
-                    <p className="text-sm text-gray-600">Questions Asked</p>
+                    <h3 className="text-2xl font-bold text-gray-900">{userInfo.HelpedLearners}</h3>
+                    <p className="text-sm text-gray-600">Helped Learners</p>
                   </div>
                 </CardContent>
               </Card>
@@ -219,9 +218,9 @@ export default function HelperProfilePage() {
               <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
                 <CardContent className="p-6 text-center">
                   <div className="flex flex-col items-center">
-                    <Bookmark className="h-8 w-8 text-purple-600 mb-2" />
-                    <h3 className="text-2xl font-bold text-gray-900">{userInfo.bookmarksSaved || 18}</h3>
-                    <p className="text-sm text-gray-600">Bookmarks Saved</p>
+                    <TimerIcon className="h-8 w-8 text-purple-600 mb-2" />
+                    <h3 className="text-2xl font-bold text-gray-900">{userInfo.avargeResponseTime || 18} min.</h3>
+                    <p className="text-sm text-gray-600">Avg. Respone</p>
                   </div>
                 </CardContent>
               </Card>
