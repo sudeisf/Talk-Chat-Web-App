@@ -136,7 +136,6 @@ const timelineQuestions = [
 ];
 
 export default function QuestionsPage() {
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [sortBy, setSortBy] = useState<string>('newest'); // Added missing state
 
   const handleTitleClick = (id: string) => {
@@ -175,21 +174,13 @@ export default function QuestionsPage() {
           <QuestionSearchBar />
           <TagsFilterSelect
             tags={sampleTags}
-            selectedTags={selectedTags}
-            onChange={setSelectedTags}
             placeholder="Choose your tech stack..."
             selectedTagsContainerId="questions-page"
           />
           <DateRangePicker />
         </div>
         <div>
-          <SelectedTagsDisplay
-            containerId="questions-page"
-            selectedTags={selectedTags}
-            onTagRemove={(tagId) =>
-              setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId))
-            }
-          />
+          <SelectedTagsDisplay containerId="questions-page" />
         </div>
         <div className="flex gap-4">
           <div className="space-y-4 w-3/4">
