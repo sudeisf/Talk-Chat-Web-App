@@ -1,20 +1,28 @@
-"use client"
+'use client';
 
-import { useState } from 'react'
-import { Bookmark, Search, Filter, Trash2, Share2, Eye, Calendar } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState } from 'react';
+import {
+  Bookmark,
+  Search,
+  Filter,
+  Trash2,
+  Share2,
+  Eye,
+  Calendar,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface BookmarkedTopic {
-  id: string
-  title: string
-  time: string
-  date: string
-  tags: string[]
-  category: 'question' | 'tutorial' | 'reference'
-  description?: string
+  id: string;
+  title: string;
+  time: string;
+  date: string;
+  tags: string[];
+  category: 'question' | 'tutorial' | 'reference';
+  description?: string;
 }
 
 const bookmarkedData: { date: string; topics: BookmarkedTopic[] }[] = [
@@ -28,7 +36,8 @@ const bookmarkedData: { date: string; topics: BookmarkedTopic[] }[] = [
         date: '7 Aug, 2025',
         tags: ['Stripe', 'Backend', 'Webhooks'],
         category: 'question',
-        description: 'Complete guide on implementing Stripe webhooks for payment processing'
+        description:
+          'Complete guide on implementing Stripe webhooks for payment processing',
       },
       {
         id: '2',
@@ -37,9 +46,9 @@ const bookmarkedData: { date: string; topics: BookmarkedTopic[] }[] = [
         date: '7 Aug, 2025',
         tags: ['Laravel', 'Auth', 'Sanctum'],
         category: 'tutorial',
-        description: 'Step-by-step implementation of Role-Based Access Control'
-      }
-    ]
+        description: 'Step-by-step implementation of Role-Based Access Control',
+      },
+    ],
   },
   {
     date: '6 Aug, 2025',
@@ -51,22 +60,25 @@ const bookmarkedData: { date: string; topics: BookmarkedTopic[] }[] = [
         date: '6 Aug, 2025',
         tags: ['Next.js', 'Auth', 'React', 'TypeScript'],
         category: 'reference',
-        description: 'Security and UX best practices for login forms'
-      }
-    ]
-  }
-]
+        description: 'Security and UX best practices for login forms',
+      },
+    ],
+  },
+];
 
 export default function BookmarksPage() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredData = bookmarkedData.map(section => ({
-    ...section,
-    topics: section.topics.filter(topic => 
-      topic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      topic.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  })).filter(section => section.topics.length > 0)
+  const filteredData = bookmarkedData
+    .map((section) => ({
+      ...section,
+      topics: section.topics.filter(
+        (topic) =>
+          topic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          topic.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    }))
+    .filter((section) => section.topics.length > 0);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
@@ -81,8 +93,11 @@ export default function BookmarksPage() {
             <p className="text-gray-600">Your saved questions and resources</p>
           </div>
         </div>
-        <Badge variant="outline" className=" text-orange-700 text-sm p-2 rounded-full capitalize">
-          {bookmarkedData.flatMap(section => section.topics).length} bookmarks
+        <Badge
+          variant="outline"
+          className=" text-orange-700 text-sm p-2 rounded-full capitalize"
+        >
+          {bookmarkedData.flatMap((section) => section.topics).length} bookmarks
         </Badge>
       </div>
 
@@ -105,9 +120,12 @@ export default function BookmarksPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Bookmark className="h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No bookmarks found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No bookmarks found
+              </h3>
               <p className="text-gray-600 text-center">
-                Start bookmarking questions and resources you want to save for later.
+                Start bookmarking questions and resources you want to save for
+                later.
               </p>
             </CardContent>
           </Card>
@@ -119,7 +137,7 @@ export default function BookmarksPage() {
                   {section.date}
                 </h3>
               </div>
-              
+
               {/* Connecting line from previous section */}
               {i > 0 && (
                 <div className="flex gap-x-3">
@@ -154,12 +172,14 @@ export default function BookmarksPage() {
                                 <h3 className="text-lg font-semibold text-gray-900">
                                   {topic.title}
                                 </h3>
-                                <Badge 
-                                  variant="outline" 
+                                <Badge
+                                  variant="outline"
                                   className={`text-xs ${
-                                    topic.category === 'question' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                    topic.category === 'tutorial' ? 'bg-green-50 text-green-700 border-green-200' :
-                                    'bg-purple-50 text-purple-700 border-purple-200'
+                                    topic.category === 'question'
+                                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                      : topic.category === 'tutorial'
+                                        ? 'bg-green-50 text-green-700 border-green-200'
+                                        : 'bg-purple-50 text-purple-700 border-purple-200'
                                   }`}
                                 >
                                   {topic.category}
@@ -192,11 +212,19 @@ export default function BookmarksPage() {
                               </div>
 
                               <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex items-center gap-1"
+                                >
                                   <Eye className="h-4 w-4" />
                                   View
                                 </Button>
-                                <Button variant="outline" size="sm" className="flex items-center gap-1">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex items-center gap-1"
+                                >
                                   <Share2 className="h-4 w-4" />
                                   Share
                                 </Button>
@@ -222,5 +250,5 @@ export default function BookmarksPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

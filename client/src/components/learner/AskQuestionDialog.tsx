@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useState } from "react"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "../ui/dialog"
+} from '../ui/dialog';
 import {
   Form,
   FormField,
@@ -20,46 +20,53 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from "../ui/form"
-import { Input } from "../ui/input"
-import { Textarea } from "../ui/textarea"
-import { Button } from "../ui/button"
-import { PlusCircle } from "lucide-react"
-import { QuestionTags } from "./QuestionTags"
+} from '../ui/form';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
+import { Button } from '../ui/button';
+import { PlusCircle } from 'lucide-react';
+import { QuestionTags } from './QuestionTags';
 
 const questionFormSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
-  tags: z.array(z.string().min(1, "Tag cannot be empty")).min(1, "At least one tag is required").max(5, "No more than 5 tags"),
-  description: z.string().min(1, "Description is required").max(1000, "Description must be less than 1000 characters"),
-})
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(100, 'Title must be less than 100 characters'),
+  tags: z
+    .array(z.string().min(1, 'Tag cannot be empty'))
+    .min(1, 'At least one tag is required')
+    .max(5, 'No more than 5 tags'),
+  description: z
+    .string()
+    .min(1, 'Description is required')
+    .max(1000, 'Description must be less than 1000 characters'),
+});
 
-type QuestionFormData = z.infer<typeof questionFormSchema>
-type ASkQuestionProps ={
-      btnChild : React.ReactElement
-}
+type QuestionFormData = z.infer<typeof questionFormSchema>;
+type ASkQuestionProps = {
+  btnChild: React.ReactElement;
+};
 
-export default function AskQuestion({btnChild}:ASkQuestionProps) {
-  const [open, setOpen] = useState(false)
+export default function AskQuestion({ btnChild }: ASkQuestionProps) {
+  const [open, setOpen] = useState(false);
   const form = useForm<QuestionFormData>({
     resolver: zodResolver(questionFormSchema),
     defaultValues: {
-      title: "",
-      description: "",
+      title: '',
+      description: '',
       tags: [],
     },
-  })
+  });
 
   const onSubmit = (data: QuestionFormData) => {
-    console.log("Question submitted:", data)
-    setOpen(false)
-    form.reset()
-  }
+    console.log('Question submitted:', data);
+    setOpen(false);
+    form.reset();
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {btnChild}
-      </DialogTrigger>
+      <DialogTrigger asChild>{btnChild}</DialogTrigger>
       <DialogContent className="sm:max-w-[650px] rounded-xl shadow-lg p-6">
         <DialogHeader>
           <DialogTitle className="text-xl font-medium text-orange-600 font-pt">
@@ -73,7 +80,9 @@ export default function AskQuestion({btnChild}:ASkQuestionProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-md font-medium text-gray-700">Title</FormLabel>
+                  <FormLabel className="text-md font-medium text-gray-700">
+                    Title
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g. How do I optimize my React app?"
@@ -94,9 +103,14 @@ export default function AskQuestion({btnChild}:ASkQuestionProps) {
               name="tags"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-md font-medium text-gray-700">Tags</FormLabel>
+                  <FormLabel className="text-md font-medium text-gray-700">
+                    Tags
+                  </FormLabel>
                   <FormControl>
-                    <QuestionTags value={field.value} onChange={field.onChange} />
+                    <QuestionTags
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormDescription className="text-sm text-gray-500">
                     Add up to 5 tags to categorize your question.
@@ -111,7 +125,9 @@ export default function AskQuestion({btnChild}:ASkQuestionProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-md font-medium text-gray-700">Description</FormLabel>
+                  <FormLabel className="text-md font-medium text-gray-700">
+                    Description
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Explain your question in detail..."
@@ -134,8 +150,8 @@ export default function AskQuestion({btnChild}:ASkQuestionProps) {
                 variant="outline"
                 className="rounded-lg"
                 onClick={() => {
-                  setOpen(false)
-                  form.reset()
+                  setOpen(false);
+                  form.reset();
                 }}
               >
                 Cancel
@@ -145,12 +161,14 @@ export default function AskQuestion({btnChild}:ASkQuestionProps) {
                 className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? "Submitting..." : "Submit Question"}
+                {form.formState.isSubmitting
+                  ? 'Submitting...'
+                  : 'Submit Question'}
               </Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

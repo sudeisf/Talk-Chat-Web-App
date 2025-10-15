@@ -15,8 +15,7 @@ export default function GitHubCallback() {
     const code = params.get('code');
 
     if (code) {
-      API
-        .post('/users/auth/github/', { code }, { withCredentials: true })
+      API.post('/users/auth/github/', { code }, { withCredentials: true })
         .then(() => {
           toast.success('Logged in via GitHub');
           router.replace('/');
@@ -31,13 +30,13 @@ export default function GitHubCallback() {
   return (
     <>
       <div className="flex items-center justify-center h-[60vh]">
-          <SpinnerInfinity
-            thickness={100}
-            secondaryColor="#f0f0f0"
-            color="#EA580C"
-            size={90}
-          />
-        </div>
+        <SpinnerInfinity
+          thickness={100}
+          secondaryColor="#f0f0f0"
+          color="#EA580C"
+          size={90}
+        />
+      </div>
     </>
   );
 }

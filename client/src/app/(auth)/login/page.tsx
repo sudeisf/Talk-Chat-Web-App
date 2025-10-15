@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Form,
   FormControl,
@@ -7,56 +7,56 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import AuthLayoutContent from "@/app/components/AuthLayoutContent";
-import { useLoginMutation } from "@/query/authMutation";
-import { SpinnerInfinity } from "spinners-react";
-import { parseDjangoError } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import GoogleLoginButton from "@/app/components/GoogleLoginButton";
-import GitHubLoginButton from "@/components/GitHubLoginButton";
+} from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import AuthLayoutContent from '@/app/components/AuthLayoutContent';
+import { useLoginMutation } from '@/query/authMutation';
+import { SpinnerInfinity } from 'spinners-react';
+import { parseDjangoError } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import GoogleLoginButton from '@/app/components/GoogleLoginButton';
+import GitHubLoginButton from '@/components/GitHubLoginButton';
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
+  email: z.string().email({ message: 'Please enter a valid email address' }),
   password: z
     .string()
-    .min(8, { message: "Your password should be at least 8 characters" }),
+    .min(8, { message: 'Your password should be at least 8 characters' }),
 });
 
 export default function Login() {
   const Login = useLoginMutation();
-  const [globalError, setGlobalError] = useState<string | null>(null); 
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setGlobalError(null); 
+    setGlobalError(null);
     Login.mutate(values, {
       onError: (error) => {
         const err = parseDjangoError(error);
 
         if (err.global && err.global.length > 0) {
-          setGlobalError(err.global.join(", "));
+          setGlobalError(err.global.join(', '));
         }
 
         if (err.fieldErrors) {
           Object.entries(err.fieldErrors).forEach(([field, messages]) => {
             form.setError(field as keyof typeof values, {
-              type: "server",
-              message: messages.join(", "),
+              type: 'server',
+              message: messages.join(', '),
             });
           });
         }
@@ -87,13 +87,15 @@ export default function Login() {
           </div>
 
           <div className="w-fit mx-auto mt-2 space-y-4">
-          <GoogleLoginButton/>
-          <GitHubLoginButton/>
+            <GoogleLoginButton />
+            <GitHubLoginButton />
           </div>
 
           <div className="flex items-center my-4 max-w-[380px] mx-auto">
             <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-500 text-md font-sans">Or sign in with</span>
+            <span className="mx-4 text-gray-500 text-md font-sans">
+              Or sign in with
+            </span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
 
@@ -122,7 +124,7 @@ export default function Login() {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage /> 
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -136,13 +138,13 @@ export default function Login() {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        type="password" 
+                        type="password"
                         placeholder="*********"
                         className="py-5 text-lg placeholder:text-md"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage /> 
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -153,7 +155,7 @@ export default function Login() {
                 Sign in <ArrowRight />
               </Button>
               <Link
-                href={"/forgot-password"}
+                href={'/forgot-password'}
                 className="font-sans font-medium underline w-fit mx-auto"
               >
                 Forget password?

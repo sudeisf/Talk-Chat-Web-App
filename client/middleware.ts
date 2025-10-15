@@ -9,7 +9,10 @@ export function middleware(request: NextRequest) {
 
   console.log('[MIDDLEWARE]', {
     path,
-    cookies: Array.from(request.cookies).map(([name, value]) => ({ name, value })),
+    cookies: Array.from(request.cookies).map(([name, value]) => ({
+      name,
+      value,
+    })),
     hasSession,
   });
 

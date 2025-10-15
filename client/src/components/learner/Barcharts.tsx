@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { MessageSquare, TrendingUp } from "lucide-react"
+import { MessageSquare, TrendingUp } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -8,7 +8,7 @@ import {
   LabelList,
   XAxis,
   YAxis,
-} from "recharts"
+} from 'recharts';
 
 import {
   Card,
@@ -17,32 +17,32 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card';
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from '@/components/ui/chart';
 
 const sessionData = [
-  { month: "January", sessions: 120 },
-  { month: "February", sessions: 190 },
-  { month: "March", sessions: 150 },
-  { month: "April", sessions: 230 },
-  { month: "May", sessions: 210 },
-  { month: "June", sessions: 200 },
-]
+  { month: 'January', sessions: 120 },
+  { month: 'February', sessions: 190 },
+  { month: 'March', sessions: 150 },
+  { month: 'April', sessions: 230 },
+  { month: 'May', sessions: 210 },
+  { month: 'June', sessions: 200 },
+];
 
 const chartConfig = {
   sessions: {
-    label: "Sessions",
-    color: "#03624C", 
+    label: 'Sessions',
+    color: '#03624C',
   },
   label: {
-    color: "var(--background)",
+    color: 'var(--background)',
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function TotalSessionsChart() {
   return (
@@ -51,7 +51,7 @@ export function TotalSessionsChart() {
         <CardTitle className="flex items-center gap-2 font-rubik font-semibold">
           <MessageSquare className="h-5 w-5 text-[#03624C]" />
           Total Sessions
-        </CardTitle> 
+        </CardTitle>
         <CardDescription>January – June 2024</CardDescription>
       </CardHeader>
       <CardContent>
@@ -106,5 +106,5 @@ export function TotalSessionsChart() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

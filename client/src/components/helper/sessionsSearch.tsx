@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 export default function SearchSessions() {
   return (
@@ -11,5 +11,5 @@ export default function SearchSessions() {
         className="pl-10 shadow-none border border-gray-300 rounded-sm "
       />
     </div>
-  )
+  );
 }

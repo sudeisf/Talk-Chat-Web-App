@@ -1,84 +1,99 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import HeatMap from "@uiw/react-heat-map"
+import { useEffect, useState } from 'react';
+import HeatMap from '@uiw/react-heat-map';
 
 interface ContributionData {
-  date: string
-  count: number
+  date: string;
+  count: number;
 }
 
 export function ContributionHeatmap({ userId }: { userId: string }) {
-  const [data, setData] = useState<{ date: string; count: number }[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [data, setData] = useState<{ date: string; count: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: currentYear - 2020 + 1 }, (_, i) => 2020 + i).reverse()
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(
+    { length: currentYear - 2020 + 1 },
+    (_, i) => 2020 + i
+  ).reverse();
 
   useEffect(() => {
     async function fetchContributions() {
       try {
-        setError(null)
-        const response = await fetch(`/api/contributions?userId=${userId}`)
-        
+        setError(null);
+        const response = await fetch(`/api/contributions?userId=${userId}`);
+
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const contributions: ContributionData[] = await response.json()
+
+        const contributions: ContributionData[] = await response.json();
 
         // Fill missing dates with count: 0
-        const filledData = fillMissingDates(contributions)
-        setData(filledData)
+        const filledData = fillMissingDates(contributions);
+        setData(filledData);
       } catch (error) {
-        console.error("Failed to fetch contributions:", error)
-        setError(error instanceof Error ? error.message : 'Failed to fetch contributions')
+        console.error('Failed to fetch contributions:', error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : 'Failed to fetch contributions'
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchContributions()
-  }, [userId])
+    fetchContributions();
+  }, [userId]);
 
   function fillMissingDates(contributions: ContributionData[]) {
-    const startDate = new Date("2020-01-01")
-    const endDate = new Date()
-    const contributionMap = new Map(contributions.map((c) => [c.date, c.count]))
+    const startDate = new Date('2020-01-01');
+    const endDate = new Date();
+    const contributionMap = new Map(
+      contributions.map((c) => [c.date, c.count])
+    );
 
-    const filledData: { date: string; count: number }[] = []
-    const currentDate = new Date(startDate)
+    const filledData: { date: string; count: number }[] = [];
+    const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      const dateStr = `${currentDate.getFullYear()}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${String(currentDate.getDate()).padStart(2, "0")}`
+      const dateStr = `${currentDate.getFullYear()}/${String(currentDate.getMonth() + 1).padStart(2, '0')}/${String(currentDate.getDate()).padStart(2, '0')}`;
       filledData.push({
         date: dateStr,
         count: contributionMap.get(dateStr) || 0,
-      })
-      currentDate.setDate(currentDate.getDate() + 1)
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return filledData
+    return filledData;
   }
 
   const filteredData = data.filter((item) => {
-    const year = Number.parseInt(item.date.split("/")[0])
-    return year === selectedYear
-  })
+    const year = Number.parseInt(item.date.split('/')[0]);
+    return year === selectedYear;
+  });
 
-  const startDate = new Date(`${selectedYear}-01-01`)
-  const endDate = selectedYear === currentYear ? new Date() : new Date(`${selectedYear}-12-31`)
+  const startDate = new Date(`${selectedYear}-01-01`);
+  const endDate =
+    selectedYear === currentYear
+      ? new Date()
+      : new Date(`${selectedYear}-12-31`);
 
-  const totalContributions = filteredData.reduce((sum, item) => sum + item.count, 0)
+  const totalContributions = filteredData.reduce(
+    (sum, item) => sum + item.count,
+    0
+  );
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-muted-foreground">Loading contributions...</div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -89,7 +104,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
           <div className="text-sm text-muted-foreground">{error}</div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -110,8 +125,8 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
               onClick={() => setSelectedYear(year)}
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 selectedYear === year
-                  ? "bg-[#03624C] text-primary-foreground font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? 'bg-[#03624C] text-primary-foreground font-medium'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               {year}
@@ -132,17 +147,30 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
             }}
             legendCellSize={0}
             panelColors={{
-              0: "#ebedf0",
-              2: "#9be9a8",
-              8: "#40c463",
-              16: "#30a14e",
-              24: "#216e39",
+              0: '#ebedf0',
+              2: '#9be9a8',
+              8: '#40c463',
+              16: '#30a14e',
+              24: '#216e39',
             }}
-            weekLabels={["", "Mon", "", "Wed", "", "Fri", ""]}
-            monthLabels={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
+            weekLabels={['', 'Mon', '', 'Wed', '', 'Fri', '']}
+            monthLabels={[
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul',
+              'Aug',
+              'Sep',
+              'Oct',
+              'Nov',
+              'Dec',
+            ]}
           />
         </div>
       </div>
     </div>
-  )
+  );
 }

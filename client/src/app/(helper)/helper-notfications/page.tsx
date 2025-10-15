@@ -1,52 +1,72 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Bell, Check, X, Clock, AlertCircle, Info, MessageSquare, BookOpen, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { useNotifications, type Notification } from "@/contexts/NotificationContext"
+import { useState } from 'react';
+import {
+  Bell,
+  Check,
+  X,
+  Clock,
+  AlertCircle,
+  Info,
+  MessageSquare,
+  BookOpen,
+  Users,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import {
+  useNotifications,
+  type Notification,
+} from '@/contexts/NotificationContext';
 
 const getNotificationIcon = (type: Notification['type']) => {
   switch (type) {
     case 'message':
-      return <MessageSquare className="h-5 w-5 text-blue-500" />
+      return <MessageSquare className="h-5 w-5 text-blue-500" />;
     case 'achievement':
-      return <Check className="h-5 w-5 text-green-500" />
+      return <Check className="h-5 w-5 text-green-500" />;
     case 'reminder':
-      return <Clock className="h-5 w-5 text-orange-500" />
+      return <Clock className="h-5 w-5 text-orange-500" />;
     case 'system':
-      return <Info className="h-5 w-5 text-purple-500" />
+      return <Info className="h-5 w-5 text-purple-500" />;
     case 'study':
-      return <BookOpen className="h-5 w-5 text-indigo-500" />
+      return <BookOpen className="h-5 w-5 text-indigo-500" />;
     default:
-      return <Bell className="h-5 w-5 text-gray-500" />
+      return <Bell className="h-5 w-5 text-gray-500" />;
   }
-}
+};
 
 const getPriorityColor = (priority: Notification['priority']) => {
   switch (priority) {
     case 'high':
-      return 'bg-red-100 text-red-800 border-red-200'
+      return 'bg-red-100 text-red-800 border-red-200';
     case 'medium':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     case 'low':
-      return 'bg-green-100 text-green-800 border-green-200'
+      return 'bg-green-100 text-green-800 border-green-200';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200'
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
-}
+};
 
 export default function NotificationsPage() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAllRead } = useNotifications()
-  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all')
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAllRead,
+  } = useNotifications();
+  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
 
-  const filteredNotifications = notifications.filter(notification => {
-    if (filter === 'unread') return !notification.isRead
-    if (filter === 'read') return notification.isRead
-    return true
-  })
+  const filteredNotifications = notifications.filter((notification) => {
+    if (filter === 'unread') return !notification.isRead;
+    if (filter === 'read') return notification.isRead;
+    return true;
+  });
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
@@ -58,7 +78,9 @@ export default function NotificationsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-            <p className="text-gray-600">Stay updated with your learning progress</p>
+            <p className="text-gray-600">
+              Stay updated with your learning progress
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -85,7 +107,6 @@ export default function NotificationsPage() {
             variant={filter === 'unread' ? 'default' : 'outline'}
             size="sm"
             className={`${filter === 'unread' ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}
-
             onClick={() => setFilter('unread')}
           >
             Unread ({unreadCount})
@@ -105,7 +126,7 @@ export default function NotificationsPage() {
               Mark all as read
             </Button>
           )}
-          {notifications.filter(n => n.isRead).length > 0 && (
+          {notifications.filter((n) => n.isRead).length > 0 && (
             <Button variant="outline" size="sm" onClick={clearAllRead}>
               Clear read
             </Button>
@@ -118,14 +139,15 @@ export default function NotificationsPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Bell className="h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No notifications
+              </h3>
               <p className="text-gray-600 text-center">
-                {filter === 'all' 
+                {filter === 'all'
                   ? "You're all caught up! No notifications at the moment."
                   : filter === 'unread'
-                  ? "No unread notifications."
-                  : "No read notifications."
-                }
+                    ? 'No unread notifications.'
+                    : 'No read notifications.'}
               </p>
             </CardContent>
           </Card>
@@ -133,10 +155,10 @@ export default function NotificationsPage() {
           <div className="relative">
             {/* Timeline line */}
             <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-            
+
             {filteredNotifications.map((notification, index) => (
-              <Card 
-                key={notification.id} 
+              <Card
+                key={notification.id}
                 className={`transition-all shadow-none duration-200 hover:shadow-xs rounded-sm bg-transparent border-0`}
               >
                 <CardContent className="p-4">
@@ -144,21 +166,25 @@ export default function NotificationsPage() {
                     {/* Timeline dot */}
                     <div className="relative z-10 flex-shrink-0">
                       <div className="size-7 flex justify-center items-center">
-                        <div className={`size-2 rounded-full ${
-                          !notification.isRead ? 'bg-blue-500' : 'bg-gray-400'
-                        }`}></div>
+                        <div
+                          className={`size-2 rounded-full ${
+                            !notification.isRead ? 'bg-blue-500' : 'bg-gray-400'
+                          }`}
+                        ></div>
                       </div>
                     </div>
 
                     <div className="flex-shrink-0 mt-1">
                       {getNotificationIcon(notification.type)}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className={`font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
+                            <h3
+                              className={`font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}
+                            >
                               {notification.title}
                             </h3>
                           </div>
@@ -169,15 +195,15 @@ export default function NotificationsPage() {
                             <span className="text-xs text-gray-500">
                               {notification.timestamp}
                             </span>
-                            <Badge 
-                              variant="outline" 
+                            <Badge
+                              variant="outline"
                               className={`text-xs ${getPriorityColor(notification.priority)}`}
                             >
                               {notification.priority}
                             </Badge>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-1 ml-4">
                           {!notification.isRead && (
                             <Button
@@ -221,7 +247,9 @@ export default function NotificationsPage() {
             </div>
             <div className="flex items-center gap-3">
               <Check className="h-5 w-5 text-green-500" />
-              <span className="text-sm text-gray-600">Achievements & Milestones</span>
+              <span className="text-sm text-gray-600">
+                Achievements & Milestones
+              </span>
             </div>
             <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-orange-500" />
@@ -229,7 +257,9 @@ export default function NotificationsPage() {
             </div>
             <div className="flex items-center gap-3">
               <Info className="h-5 w-5 text-purple-500" />
-              <span className="text-sm text-gray-600">System Notifications</span>
+              <span className="text-sm text-gray-600">
+                System Notifications
+              </span>
             </div>
             <div className="flex items-center gap-3">
               <BookOpen className="h-5 w-5 text-indigo-500" />
@@ -239,5 +269,5 @@ export default function NotificationsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

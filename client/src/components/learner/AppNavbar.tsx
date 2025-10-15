@@ -1,18 +1,17 @@
 // components/app-navbar.tsx
-"use client"
+'use client';
 
-import { Menu, Bell, User, Settings, Plus, PlusCircle } from "lucide-react"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { SearchBar } from "./searchBar"
-import { useNotifications } from "@/contexts/NotificationContext"
-import Link from "next/link"
-import AskQuestion from "./AskQuestionDialog"
-
+import { Menu, Bell, User, Settings, Plus, PlusCircle } from 'lucide-react';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { SearchBar } from './searchBar';
+import { useNotifications } from '@/contexts/NotificationContext';
+import Link from 'next/link';
+import AskQuestion from './AskQuestionDialog';
 
 export function AppNavbar() {
-  const { unreadCount } = useNotifications()
+  const { unreadCount } = useNotifications();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 border-b  items-center justify-between  bg-white px-4  dark:bg-gray-950">
@@ -22,7 +21,7 @@ export function AppNavbar() {
             <Menu className="h-8 w-8" />
           </Button>
         </SidebarTrigger>
-        <SearchBar/>
+        <SearchBar />
       </div>
 
       <div className="flex items-center gap-2 max-w-4xl">
@@ -43,27 +42,28 @@ export function AppNavbar() {
         </Button>
         <div className="flex items-center gap-4 px-2">
           <Link href="/profile">
-          <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
           </Link>
-       
-        <div className="w-24">
-         {/* <Button variant={"outline"} className="rounded-sm shadow-sm flex border-1   w-full border-orange-600 text-orange-600"><PlusCircle className="w-10 h-10"/>Ask</Button> */}
-         <AskQuestion btnChild={
-          <Button
-          variant="outline"
-          className="rounded-sm shadow-xs text-md w-24 py-2 flex items-center gap-2 border border-orange-500 text-orange-600 font-medium hover:bg-orange-50 transition"
-        >
-          <PlusCircle className="w-5 h-5" />
-          Ask 
-        </Button>
-         }/>
-         
-        </div>  
-        </div>  
+
+          <div className="w-24">
+            {/* <Button variant={"outline"} className="rounded-sm shadow-sm flex border-1   w-full border-orange-600 text-orange-600"><PlusCircle className="w-10 h-10"/>Ask</Button> */}
+            <AskQuestion
+              btnChild={
+                <Button
+                  variant="outline"
+                  className="rounded-sm shadow-xs text-md w-24 py-2 flex items-center gap-2 border border-orange-500 text-orange-600 font-medium hover:bg-orange-50 transition"
+                >
+                  <PlusCircle className="w-5 h-5" />
+                  Ask
+                </Button>
+              }
+            />
+          </div>
+        </div>
       </div>
     </header>
-  )
+  );
 }

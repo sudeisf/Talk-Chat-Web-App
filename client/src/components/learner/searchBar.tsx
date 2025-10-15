@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 export function SearchBar({ className }: { className?: string }) {
   return (
@@ -11,5 +11,5 @@ export function SearchBar({ className }: { className?: string }) {
         className="pl-10 shadow-none border border-border/50 rounded-lg bg-background focus-visible:ring-2 focus-visible:ring-ring"
       />
     </div>
-  )
+  );
 }

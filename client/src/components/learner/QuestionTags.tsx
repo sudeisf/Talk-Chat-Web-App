@@ -1,8 +1,8 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { Badge } from "@/components/ui/badge"
-import { X } from "lucide-react"
+import * as React from 'react';
+import { Badge } from '@/components/ui/badge';
+import { X } from 'lucide-react';
 
 import {
   Select,
@@ -12,37 +12,37 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select';
 
 export interface Tag {
-  id: string
-  label: string
+  id: string;
+  label: string;
 }
 
 interface QuestionTagsProps {
-  value?: Tag[]
-  onChange?: (tags: Tag[]) => void
+  value?: Tag[];
+  onChange?: (tags: Tag[]) => void;
 }
 
 const sampleTags: Tag[] = [
-  { id: "1", label: "React" },
-  { id: "2", label: "Next.js" },
-  { id: "3", label: "TypeScript" },
-  { id: "4", label: "Django" },
-  { id: "5", label: "Laravel" },
-]
+  { id: '1', label: 'React' },
+  { id: '2', label: 'Next.js' },
+  { id: '3', label: 'TypeScript' },
+  { id: '4', label: 'Django' },
+  { id: '5', label: 'Laravel' },
+];
 
 export function QuestionTags({ value = [], onChange }: QuestionTagsProps) {
   const handleAdd = (id: string) => {
-    const tag = sampleTags.find((t) => t.id === id)
+    const tag = sampleTags.find((t) => t.id === id);
     if (tag && !value.some((t) => t.id === id)) {
-      onChange?.([...value, tag])
+      onChange?.([...value, tag]);
     }
-  }
+  };
 
   const handleRemove = (id: string) => {
-    onChange?.(value.filter((t) => t.id !== id))
-  }
+    onChange?.(value.filter((t) => t.id !== id));
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -51,9 +51,7 @@ export function QuestionTags({ value = [], onChange }: QuestionTagsProps) {
         <SelectTrigger className="w-[200px]">
           {/* Instead of showing tag name, show count */}
           <span>
-            {value.length > 0
-              ? `Selected (${value.length})`
-              : "Select tags"}
+            {value.length > 0 ? `Selected (${value.length})` : 'Select tags'}
           </span>
         </SelectTrigger>
         <SelectContent>
@@ -70,7 +68,6 @@ export function QuestionTags({ value = [], onChange }: QuestionTagsProps) {
         </SelectContent>
       </Select>
 
-    
       <div className="flex flex-wrap gap-2">
         {value.map((tag) => (
           <Badge
@@ -87,5 +84,5 @@ export function QuestionTags({ value = [], onChange }: QuestionTagsProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }

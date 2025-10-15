@@ -1,10 +1,12 @@
 // Pseudo-code
 import API from './axiosInstance';
-import { LoginCredentials, 
-  NewPasswordCredentials, 
-  RegisterCredentials , 
-  VerifyEmailCredentials, 
-  VerifyOTPCredentials} from '@/types/auth';
+import {
+  LoginCredentials,
+  NewPasswordCredentials,
+  RegisterCredentials,
+  VerifyEmailCredentials,
+  VerifyOTPCredentials,
+} from '@/types/auth';
 
 export const loginUser = async (credentials: LoginCredentials) => {
   const response = await API.post('/users/auth/login/', credentials);
@@ -23,11 +25,11 @@ export const VerifyEmail = async (credentials: VerifyEmailCredentials) => {
 export const verifyOTP = async (credentials: VerifyOTPCredentials) => {
   const response = await API.post('/users/auth/otp-verify/', credentials);
   return response.data;
-}
+};
 export const resetPassword = async (credentials: NewPasswordCredentials) => {
   const response = await API.post('/users/auth/new-password/', credentials);
   return response.data;
-}
+};
 
 export const getCurrentUser = async () => {
   const response = await API.get('/api/auth/user/');

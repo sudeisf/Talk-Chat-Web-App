@@ -1,17 +1,17 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Settings, User, Bell, Shield, Palette, Globe } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import AppearanceSettings from "@/components/learner/Apperance"
+import { useState } from 'react';
+import { Settings, User, Bell, Shield, Palette, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppearanceSettings from '@/components/learner/Apperance';
 
 export default function SettingsPage() {
-  const [emailNotifications, setEmailNotifications] = useState(true)
-  const [pushNotifications, setPushNotifications] = useState(true)
-  const [studyReminders, setStudyReminders] = useState(true)
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [studyReminders, setStudyReminders] = useState(true);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
@@ -45,9 +45,8 @@ export default function SettingsPage() {
                   defaultValue="sudiesfed@gmail.com"
                 />
               </div>
-
             </div>
-            <Button variant={"outline"}>Save Changes</Button>
+            <Button variant={'outline'}>Save Changes</Button>
           </CardContent>
         </Card>
 
@@ -62,8 +61,12 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label className="text-sm font-medium">Email Notifications</Label>
-                <p className="text-xs text-gray-500">Receive notifications via email</p>
+                <Label className="text-sm font-medium">
+                  Email Notifications
+                </Label>
+                <p className="text-xs text-gray-500">
+                  Receive notifications via email
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -74,8 +77,12 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label className="text-sm font-medium">Push Notifications</Label>
-                <p className="text-xs text-gray-500">Receive notifications on your device</p>
+                <Label className="text-sm font-medium">
+                  Push Notifications
+                </Label>
+                <p className="text-xs text-gray-500">
+                  Receive notifications on your device
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -87,7 +94,9 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Study Reminders</Label>
-                <p className="text-xs text-gray-500">Daily reminders to study</p>
+                <p className="text-xs text-gray-500">
+                  Daily reminders to study
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -99,7 +108,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <AppearanceSettings/>
+        <AppearanceSettings />
 
         {/* Study Settings */}
         <Card className="shadow-none border-b border-x-0 border-t-0 rounded-none">
@@ -123,7 +132,9 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Sound Effects</Label>
-                <p className="text-xs text-gray-500">Play sounds during study sessions</p>
+                <p className="text-xs text-gray-500">
+                  Play sounds during study sessions
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -135,5 +146,5 @@ export default function SettingsPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

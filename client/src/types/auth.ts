@@ -1,27 +1,27 @@
-import { User } from "./user";
+import { User } from './user';
 export interface AuthState {
-      isAuthenticated: boolean;
-      user: User | null;
-      email: string | null;   
+  isAuthenticated: boolean;
+  user: User | null;
+  email: string | null;
 }
-export interface LoginCredentials { 
-      email : string,
-      password : string
-    }
-export interface RegisterCredentials { 
-      email : string;
-      username: string;
-      password: string;
-     }
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+export interface RegisterCredentials {
+  email: string;
+  username: string;
+  password: string;
+}
 export interface VerifyEmailCredentials {
-      email : string
+  email: string;
 }
 export interface VerifyOTPCredentials {
-      email? : string | null;
-      code :  number
+  email?: string | null;
+  code: number;
 }
 export interface NewPasswordCredentials {
-      email: string | null;
-      new_password : string;
-      confirm_password : string;
+  email: string | null;
+  new_password: string;
+  confirm_password: string;
 }

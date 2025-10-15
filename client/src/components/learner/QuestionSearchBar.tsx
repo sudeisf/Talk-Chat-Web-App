@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Search } from "lucide-react"
+import { useState } from 'react';
+import { Search } from 'lucide-react';
 
 export default function QuestionSearchBar() {
-  const [searchValue, setSearchValue] = useState("")
+  const [searchValue, setSearchValue] = useState('');
 
   return (
     <div className="w-full max-w-md">
@@ -21,5 +21,5 @@ export default function QuestionSearchBar() {
         />
       </div>
     </div>
-  )
+  );
 }

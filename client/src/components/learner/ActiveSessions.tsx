@@ -3,10 +3,11 @@
 import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
-interface AskedTopic {           // "2025-08-07"
-  title: string;           // "How to integrate Stripe webhooks?"
-  time: string;            // "10:32 AM"
-  tags: string[];          // ["Stripe", "Backend", "Webhooks"]
+interface AskedTopic {
+  // "2025-08-07"
+  title: string; // "How to integrate Stripe webhooks?"
+  time: string; // "10:32 AM"
+  tags: string[]; // ["Stripe", "Backend", "Webhooks"]
 }
 
 const topicsData: { date: string; topics: AskedTopic[] }[] = [
@@ -14,30 +15,27 @@ const topicsData: { date: string; topics: AskedTopic[] }[] = [
     date: '7 Aug, 2025',
     topics: [
       {
-            title: 'How to integrate Stripe webhooks?',
-            time: '10:32 AM',
-            tags: ['Stripe', 'Backend', 'Webhooks'],
-        
+        title: 'How to integrate Stripe webhooks?',
+        time: '10:32 AM',
+        tags: ['Stripe', 'Backend', 'Webhooks'],
       },
       {
-            title: 'RBAC with Laravel Sanctum?',
-            time: '2:45 PM',
-            tags: ['Laravel', 'Auth', 'Sanctum'],
-    
-      }
-    ]
+        title: 'RBAC with Laravel Sanctum?',
+        time: '2:45 PM',
+        tags: ['Laravel', 'Auth', 'Sanctum'],
+      },
+    ],
   },
   {
     date: '6 Aug, 2025',
     topics: [
       {
-            title: 'Next.js login form best practices?',
-            time: '11:12 AM',
-            tags: ['Next.js', 'Auth', 'React', 'TypeScript'],
-         
-      }
-    ]
-  }
+        title: 'Next.js login form best practices?',
+        time: '11:12 AM',
+        tags: ['Next.js', 'Auth', 'React', 'TypeScript'],
+      },
+    ],
+  },
 ];
 
 export default function AskedTopicsTimeline() {
@@ -55,14 +53,12 @@ export default function AskedTopicsTimeline() {
 
           {section.topics.map((topic, index) => (
             <div key={index} className="flex gap-x-3">
-           
               <div className="relative after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-neutral-700">
                 <div className="z-10 size-7 flex justify-center items-center">
                   <div className="size-2 rounded-full bg-orange-500"></div>
                 </div>
               </div>
 
-             
               <div className="grow pb-8">
                 <h3 className="text-md font-pt  font-medium text-gray-800 dark:text-white">
                   {topic.title}
@@ -80,8 +76,9 @@ export default function AskedTopicsTimeline() {
                     </span>
                   ))}
                 </div>
-                <button className='flex items-center gap-1 mt-2 text-sm text-blue-600 font-medium decoration-2 hover:underline focus:outline-none focus:underline font-sans dark:text-blue-500'>Continue Sessions <ArrowRight className='w-4 h-4'/></button>
-
+                <button className="flex items-center gap-1 mt-2 text-sm text-blue-600 font-medium decoration-2 hover:underline focus:outline-none focus:underline font-sans dark:text-blue-500">
+                  Continue Sessions <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}

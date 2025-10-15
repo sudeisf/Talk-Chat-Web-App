@@ -1,48 +1,65 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Bookmark, MessageCircle, Calendar, Clock, Triangle, ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/dist/client/link"
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Bookmark,
+  MessageCircle,
+  Calendar,
+  Clock,
+  Triangle,
+  ArrowRight,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import Link from 'next/dist/client/link';
 
 interface QuestionCardProps {
-  id: string
-  title: string
-  description?: string
+  id: string;
+  title: string;
+  description?: string;
   contributors?: Array<{
-    name: string
-    avatar?: string
-  }>
-  additionalContributors?: number
-  tags: string[]
-  status: "ongoing" | "answered" | "closed"
-  createdDate: string
-  lastActivity: string
-  answerCount: number
-  upvotes?: number
-  downvotes?: number
-  userVote?: "up" | "down" | null
-  isBookmarked?: boolean
+    name: string;
+    avatar?: string;
+  }>;
+  additionalContributors?: number;
+  tags: string[];
+  status: 'ongoing' | 'answered' | 'closed';
+  createdDate: string;
+  lastActivity: string;
+  answerCount: number;
+  upvotes?: number;
+  downvotes?: number;
+  userVote?: 'up' | 'down' | null;
+  isBookmarked?: boolean;
   user?: {
-    name: string
-    avatar?: string
-    reputation?: number
-  }
-  onTitleClick?: (id: string) => void
-  onContinueClick?: (id: string) => void
-  onBookmarkToggle?: (id: string, bookmarked: boolean) => void
-  onUpvote?: (id: string) => void
-  onDownvote?: (id: string) => void
+    name: string;
+    avatar?: string;
+    reputation?: number;
+  };
+  onTitleClick?: (id: string) => void;
+  onContinueClick?: (id: string) => void;
+  onBookmarkToggle?: (id: string, bookmarked: boolean) => void;
+  onUpvote?: (id: string) => void;
+  onDownvote?: (id: string) => void;
 }
 
 const statusConfig = {
-  ongoing: { label: "Ongoing", className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" },
-  answered: { label: "Answered", className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" },
-  closed: { label: "Closed", className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300" },
-}
+  ongoing: {
+    label: 'Ongoing',
+    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  },
+  answered: {
+    label: 'Answered',
+    className:
+      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  },
+  closed: {
+    label: 'Closed',
+    className: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+  },
+};
 
 export function QuestionCard({
   id,
@@ -59,54 +76,56 @@ export function QuestionCard({
   downvotes = 0,
   userVote = null,
   isBookmarked = false,
-  user = { name: "Anonymous User" },
+  user = { name: 'Anonymous User' },
   onTitleClick,
   onContinueClick,
   onBookmarkToggle,
   onUpvote,
   onDownvote,
 }: QuestionCardProps) {
-  const [bookmarked, setBookmarked] = useState(isBookmarked)
-  const [currentVote, setCurrentVote] = useState<"up" | "down" | null>(userVote)
-  const [voteCount, setVoteCount] = useState(upvotes - downvotes)
+  const [bookmarked, setBookmarked] = useState(isBookmarked);
+  const [currentVote, setCurrentVote] = useState<'up' | 'down' | null>(
+    userVote
+  );
+  const [voteCount, setVoteCount] = useState(upvotes - downvotes);
 
   const handleBookmarkClick = () => {
-    const newBookmarked = !bookmarked
-    setBookmarked(newBookmarked)
-    onBookmarkToggle?.(id, newBookmarked)
-  }
+    const newBookmarked = !bookmarked;
+    setBookmarked(newBookmarked);
+    onBookmarkToggle?.(id, newBookmarked);
+  };
 
   const handleTitleClick = () => {
-    onTitleClick?.(id)
-  }
+    onTitleClick?.(id);
+  };
 
   const handleContinueClick = () => {
-    onContinueClick?.(id)
-  }
+    onContinueClick?.(id);
+  };
 
   const handleUpvote = () => {
-    if (currentVote === "up") {
-      setCurrentVote(null)
-      setVoteCount((prev) => prev - 1)
+    if (currentVote === 'up') {
+      setCurrentVote(null);
+      setVoteCount((prev) => prev - 1);
     } else {
-      const adjustment = currentVote === "down" ? 2 : 1
-      setCurrentVote("up")
-      setVoteCount((prev) => prev + adjustment)
+      const adjustment = currentVote === 'down' ? 2 : 1;
+      setCurrentVote('up');
+      setVoteCount((prev) => prev + adjustment);
     }
-    onUpvote?.(id)
-  }
+    onUpvote?.(id);
+  };
 
   const handleDownvote = () => {
-    if (currentVote === "down") {
-      setCurrentVote(null)
-      setVoteCount((prev) => prev + 1)
+    if (currentVote === 'down') {
+      setCurrentVote(null);
+      setVoteCount((prev) => prev + 1);
     } else {
-      const adjustment = currentVote === "up" ? 2 : 1
-      setCurrentVote("down")
-      setVoteCount((prev) => prev - adjustment)
+      const adjustment = currentVote === 'up' ? 2 : 1;
+      setCurrentVote('down');
+      setVoteCount((prev) => prev - adjustment);
     }
-    onDownvote?.(id)
-  }
+    onDownvote?.(id);
+  };
 
   return (
     <Card className="w-full hover:shadow-xs border rounded-sm shadow-none transition-shadow duration-200">
@@ -117,10 +136,10 @@ export function QuestionCard({
               variant="ghost"
               size="sm"
               className={cn(
-                "p-1 h-auto hover:bg-transparent",
-                currentVote === "up"
-                  ? "text-orange-500"
-                  : "text-gray-400 hover:text-orange-500 dark:text-gray-500 dark:hover:text-orange-400",
+                'p-1 h-auto hover:bg-transparent',
+                currentVote === 'up'
+                  ? 'text-orange-500'
+                  : 'text-gray-400 hover:text-orange-500 dark:text-gray-500 dark:hover:text-orange-400'
               )}
               onClick={handleUpvote}
             >
@@ -129,12 +148,12 @@ export function QuestionCard({
 
             <span
               className={cn(
-                "text-xs font-bold px-1 py-0.5 min-w-[24px] text-center",
+                'text-xs font-bold px-1 py-0.5 min-w-[24px] text-center',
                 voteCount > 0
-                  ? "text-orange-500"
+                  ? 'text-orange-500'
                   : voteCount < 0
-                    ? "text-blue-500"
-                    : "text-gray-500 dark:text-gray-400",
+                    ? 'text-blue-500'
+                    : 'text-gray-500 dark:text-gray-400'
               )}
             >
               {voteCount}
@@ -144,10 +163,10 @@ export function QuestionCard({
               variant="ghost"
               size="sm"
               className={cn(
-                "p-1 h-auto hover:bg-transparent",
-                currentVote === "down"
-                  ? "text-blue-500"
-                  : "text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400",
+                'p-1 h-auto hover:bg-transparent',
+                currentVote === 'down'
+                  ? 'text-blue-500'
+                  : 'text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400'
               )}
               onClick={handleDownvote}
             >
@@ -182,13 +201,18 @@ export function QuestionCard({
             </div>
           </div>
 
-          <Button variant="ghost" size="sm" className="p-1.5 h-auto shrink-0" onClick={handleBookmarkClick}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="p-1.5 h-auto shrink-0"
+            onClick={handleBookmarkClick}
+          >
             <Bookmark
               className={cn(
-                "h-4 w-4 transition-colors",
+                'h-4 w-4 transition-colors',
                 bookmarked
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
+                  ? 'fill-yellow-400 text-yellow-400'
+                  : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
               )}
             />
           </Button>
@@ -198,12 +222,14 @@ export function QuestionCard({
       <CardContent className="pt-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-            <Badge className={cn("text-xs", statusConfig[status].className)}>{statusConfig[status].label}</Badge>
+            <Badge className={cn('text-xs', statusConfig[status].className)}>
+              {statusConfig[status].label}
+            </Badge>
 
             <div className="flex items-center gap-1">
               <MessageCircle className="h-3.5 w-3.5" />
               <span>
-                {answerCount} {answerCount === 1 ? "answer" : "answers"}
+                {answerCount} {answerCount === 1 ? 'answer' : 'answers'}
               </span>
             </div>
 
@@ -219,20 +245,30 @@ export function QuestionCard({
             </div>
           </div>
 
-          <Link href={"/"}  onClick={handleContinueClick} className="shrink-0 flex text-sm items-center gap-2 hover:text-blue-500">
-            Continue <ArrowRight className="w-4 h-4"/>
+          <Link
+            href={'/'}
+            onClick={handleContinueClick}
+            className="shrink-0 flex text-sm items-center gap-2 hover:text-blue-500"
+          >
+            Continue <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {contributors.length > 0 && (
           <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Contributors:</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              Contributors:
+            </span>
             <div className="flex items-center">
               {contributors.slice(0, 3).map((contributor, index) => (
-                <div key={index} className="relative -ml-1 first:ml-0" style={{ zIndex: contributors.length - index }}>
+                <div
+                  key={index}
+                  className="relative -ml-1 first:ml-0"
+                  style={{ zIndex: contributors.length - index }}
+                >
                   {contributor.avatar ? (
                     <img
-                      src={contributor.avatar || "/placeholder.svg"}
+                      src={contributor.avatar || '/placeholder.svg'}
                       alt={contributor.name}
                       className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-800 object-cover"
                     />
@@ -259,7 +295,7 @@ export function QuestionCard({
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
           {user.avatar ? (
             <img
-              src={user.avatar || "/placeholder.svg"}
+              src={user.avatar || '/placeholder.svg'}
               alt={user.name}
               className="w-6 h-6 rounded-full object-cover"
             />
@@ -270,10 +306,16 @@ export function QuestionCard({
               </span>
             </div>
           )}
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user.name}</span>
-          {user.reputation && <span className="text-xs text-gray-500 dark:text-gray-400">({user.reputation} rep)</span>}
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {user.name}
+          </span>
+          {user.reputation && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              ({user.reputation} rep)
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

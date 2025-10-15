@@ -1,6 +1,6 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+'use client';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import {
   ArrowBigRight,
   ArrowRightFromLineIcon,
@@ -11,7 +11,7 @@ import {
   PhoneCall,
   PhoneIncoming,
   PinIcon,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   MessageCircle,
   BarChart,
@@ -20,50 +20,50 @@ import {
   BookOpen,
   Bell,
   Sparkles,
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import L from "../../public/svg/wave-haikei.svg";
-import Lottie from "lottie-react";
-import animationData from "../../public/animate/manifest.json";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import L from '../../public/svg/wave-haikei.svg';
+import Lottie from 'lottie-react';
+import animationData from '../../public/animate/manifest.json';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const features = [
   {
     icon: MessageCircle,
-    title: "Live Chat Sessions",
+    title: 'Live Chat Sessions',
     description:
-      "Talk to real people, in real time. Ask questions and get unstuck instantly.",
+      'Talk to real people, in real time. Ask questions and get unstuck instantly.',
   },
   {
     icon: BarChart,
-    title: "Personal Learning Dashboard",
+    title: 'Personal Learning Dashboard',
     description:
-      "Track what you’ve asked, what you’ve learned, and how you’re improving.",
+      'Track what you’ve asked, what you’ve learned, and how you’re improving.',
   },
   {
     icon: Bot,
-    title: "AI + Human Collaboration",
+    title: 'AI + Human Collaboration',
     description:
-      "AI helps guide and suggest, but real humans give the best answers.",
+      'AI helps guide and suggest, but real humans give the best answers.',
   },
   {
     icon: Rocket,
-    title: "Instant Matching",
+    title: 'Instant Matching',
     description:
-      "No waiting. Get paired with a helper right after you submit your question.",
+      'No waiting. Get paired with a helper right after you submit your question.',
   },
   {
     icon: BookOpen,
-    title: "Topic Progress Tracker",
+    title: 'Topic Progress Tracker',
     description:
-      "See how confident you are in topics like React, Python, or Data Structures.",
+      'See how confident you are in topics like React, Python, or Data Structures.',
   },
   {
     icon: Bell,
-    title: "Smart Notifications",
+    title: 'Smart Notifications',
     description:
-      "Be alerted when a helper joins your session or replies to your question.",
+      'Be alerted when a helper joins your session or replies to your question.',
   },
 ];
 
@@ -79,14 +79,14 @@ export default function Home() {
 
         <div className="flex">
           <Button
-            onClick={() => router.push("/register")}
-            variant={"ghost"}
+            onClick={() => router.push('/register')}
+            variant={'ghost'}
             className="text-md"
           >
             Sign up
           </Button>
           <Button
-            onClick={() => router.push("/login")}
+            onClick={() => router.push('/login')}
             className="rounded-sm text-md shadow-xs bg-gradient-to-r from-orange-400 via-red-500/70 to-red-500  text-white px-6"
           >
             Sign in

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { MessageCircle } from 'lucide-react';
 
 export default function DefaultInterfaceForChat() {
   return (
@@ -16,11 +16,14 @@ export default function DefaultInterfaceForChat() {
         </h1>
 
         <p className="text-gray-500 text-md">
-          Choose a conversation from the sidebar to start chatting.  
-          If you don’t see any, create a new one and start connecting 
+          Choose a conversation from the sidebar to start chatting. If you don’t
+          see any, create a new one and start connecting
         </p>
 
-        <Button variant={"outline"} className="px-4 py-2 mt-2 rounded-sm text-orange-600 border-1 shadow-2xs  transition-all ">
+        <Button
+          variant={'outline'}
+          className="px-4 py-2 mt-2 rounded-sm text-orange-600 border-1 shadow-2xs  transition-all "
+        >
           Ask and Start Session
         </Button>
       </div>
