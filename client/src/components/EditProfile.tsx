@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { Button } from './ui/button';
-import { Edit3, LockIcon, Plus, X } from 'lucide-react';
+import { Briefcase, Edit3, LocationEdit, LockIcon, Plus, X } from 'lucide-react';
 import { Form, FormDescription, FormMessage } from './ui/form';
 import { array, z } from 'zod';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -18,6 +18,15 @@ import { Input } from './ui/input';
 const formSchema = z
   .object({
     email: z.email(),
+    currentRole : z.string().min(10 , "the feild accepts at least 10 chars"),
+    city: z.string()
+    .min(2, "City must be at least 2 characters")
+    .max(50, "City name is too long")
+    .regex(/^[a-zA-Z\s\-']+$/, "Please enter a valid city name"),
+  country: z.string()
+    .min(2, "Country must be at least 2 characters")
+    .max(50, "Country name is too long")
+    .regex(/^[a-zA-Z\s\-']+$/, "Please enter a valid country name"),
     password: z
       .string()
       .min(8, 'Password must contain at least 8 characters.')
@@ -42,6 +51,9 @@ export function EditProfile() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
+      currentRole : '',
+      city : '',
+      country : '',
       password: '',
       confirmPassword: '',
       skills: [],
@@ -70,7 +82,7 @@ export function EditProfile() {
               name="email"
               render={({ field }) => (
                 <FormItem className='flex flex-col gap-2'>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>E-mail</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -85,6 +97,64 @@ export function EditProfile() {
                 </FormItem>
               )}
             />
+
+<FormField
+              control={form.control}
+              name="currentRole"
+              render={({ field }) => (
+                <FormItem className='flex flex-col gap-2 mt-3'>
+                  <FormLabel>Current role <Briefcase className='w-4 h-4'/></FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="senior backend developer"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage/>
+                </FormItem>
+              )}
+            />
+            <div className='mt-4 space-y-3'>
+              <p className='text-sm font-medium flex gap-2'>Adress <LocationEdit className='w-4 h-4'/></p>
+           <div className='flex gap-3 py-2'>
+           <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem className='flex flex-col gap-2'>
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Addis Abeba"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage/>
+                </FormItem>
+              )}
+            />
+            <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem className='flex flex-col gap-2'>
+                <FormLabel>Country</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Ethiopia"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage/>
+              </FormItem>
+            )}
+          />
+           </div>
+           
+            </div>
            <div className='flex flex-col gap-2 mt-2'>
             <p
              className='text-sm py-2  flex gap-3 font-medium'>
@@ -123,6 +193,10 @@ export function EditProfile() {
               )}
             />
            </div>
+
+           <Button className='rounded-sm mt-2 bg-[#03624C]'>
+            update Inforamtion
+           </Button>
           </form>
         </Form>
       </DialogContent>
