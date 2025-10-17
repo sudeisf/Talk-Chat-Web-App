@@ -16,6 +16,7 @@ import { FormControl, FormField, FormItem, FormLabel } from './ui/form';
 import { Input } from './ui/input';
 import { useSelector } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { SkillsInput } from './helper/skillsTagInput';
 
 const formSchema = z
   .object({
@@ -127,11 +128,9 @@ export function EditProfile() {
                 <FormItem className='flex flex-col gap-2 mt-3'>
                   <FormLabel>Skills <Cog className='w-4 h-4'/></FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="add your skills"
-                      {...field}
-                    />
+                  <SkillsInput value={[]} onChange={function (skills: String[]): void {
+                      throw new Error('Function not implemented.');
+                    } } />
                   </FormControl>
                   <FormMessage/>
                 </FormItem>

@@ -2,7 +2,10 @@
 
 
 import { useAppSelector } from "@/redux/hooks";
+import { Plus, X } from "lucide-react";
 import { useState ,useRef } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 
 interface SkillsInputProps {
@@ -60,6 +63,95 @@ export const  SkillsInput : React.FC<SkillsInputProps> = ({ value , onChange}) =
       };
 
     return (
+      <div className="space-y-3">
+      
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {value.map((skill, index) => (
+            <div
+              key={`${skill}-${index}`}
+              className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+            >
+              <span>{skill}</span>
+              <button
+                type="button"
+                onClick={() => removeSkill(skill as string)}
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+    
+      <div className="relative">
+        <div className="flex gap-2">
+          <Input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onFocus={() => setShowSuggestions(true)}
+            onKeyDown={handleKeyDown}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            placeholder={value.length === 0 ? "Add skills (React, TypeScript, etc.)" : "Add another skill..."}
+            className="flex-1 px-3  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <Button
+            type="button"
+            onClick={() => inputValue.trim() && addSkill(inputValue)}
+            disabled={!inputValue.trim()}
+            className=" bg-blue-600 text-white rounded-sm shadow-2xs hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+          >
+            <Plus className="w-4 h-4" />
+            Add
+          </Button>
+        </div>
+
+       
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+            {suggestions.map((suggestion) => (
+              <Button
+                key={suggestion}
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => addSkill(suggestion)}
+                className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
+              >
+                {suggestion}
+              </Button>
+            ))}
+          </div>
+        )}
+      </div>
+
+     
+      {inputValue === '' && (
+        <div className="flex flex-wrap gap-2">
+          {['React', 'JavaScript', 'TypeScript', 'Node.js', 'Python'].map(skill => (
+            <button
+              key={skill}
+              type="button"
+              onClick={() => addSkill(skill)}
+              disabled={value.includes(skill)}
+              className={`px-3 py-1 rounded-full text-sm border transition-colors ${
+                value.includes(skill)
+                  ? 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              {skill} +
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
 
     )
 
