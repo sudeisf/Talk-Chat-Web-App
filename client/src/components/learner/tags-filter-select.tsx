@@ -47,7 +47,7 @@ export function TagsFilterSelect({
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState('');
 
-  // Get selected tags from Redux or use external prop
+
   const dispatch = useAppDispatch();
   const reduxSelectedTags = useAppSelector(
     (state: any) => state.tags?.[selectedTagsContainerId] || []
