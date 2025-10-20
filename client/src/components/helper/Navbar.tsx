@@ -29,7 +29,7 @@ const userInfo = {
 
 export default function Navbar() {
   return (
-    <nav className="flex justify-between px-4 py-2 ">
+    <nav className="flex  justify-between px-4 py-2 ">
       <div className="flex items-center gap-2 ">
         <div className="flex gap-2 items-center">
           <Image alt="Logo" src={Logo} className="w-7 h-7" />
@@ -37,7 +37,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="flex gap-8 px-2 font-bebas-neue capitalize text-md items-center  text-gray-600 ">
+      <div className="flex gap-8 px-2 font-main capitalize text-md items-center  text-gray-600 ">
         {Pages.map((page, index) => (
           <Link key={`dash-${index}`} href={page.url}>
             {page.name}
