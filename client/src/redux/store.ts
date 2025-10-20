@@ -1,14 +1,14 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import authReducer from './slice/authSlice';
 import tagsReducer from './slice/tagSlice';
-import  proTagsSlice  from './slice/professional-tags-slice/proTagSlice';
+import proTagsSlice from './slice/professional-tags-slice/proTagSlice';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   tags: tagsReducer,
-  proTags : proTagsSlice
+  proTags: proTagsSlice,
 });
 
 const persistConfig = {
