@@ -20,6 +20,7 @@ import {
   Trash,
   User,
 } from 'lucide-react';
+import Link from 'next/link';
 import { use, useRef, useState } from 'react';
 
 const userInfo = {
@@ -141,12 +142,15 @@ export default function HelperProfilePage() {
               </div>
               <div className="flex gap-2">
                 <EditProfile />
+                <Link href={'/helper-settings'}>
                 <Button
                   variant={'outline'}
                   className="border-[#03624C] border p-5 text-md text-[#03624C] rounded-full mt-2 shadow-xs "
                 >
                   Settings
                 </Button>
+                </Link>
+
               </div>
             </div>
             <div className="flex flex-col gap-2 justify-between">
