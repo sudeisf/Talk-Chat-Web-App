@@ -1,4 +1,5 @@
 'use client';
+import UploadCoverImage from '@/components/coverImageUpload';
 import { EditProfile } from '@/components/EditProfile';
 import HistoryOfQuestions from '@/components/learner/QuestionHistory';
 import { RecentQuestionsTimelineProfile } from '@/components/learner/RecentActitvityProfile';
@@ -99,12 +100,8 @@ export default function HelperProfilePage() {
               </Button>
             </div>
           ) : (
-            <div className="w-full h-full rounded-t-md bg-[#03624C]">
-              <div className="relative">
-                <Button className="absolute top-4 right-4 bg-white hover:bg-gray-100 rounded-full w-10 h-10">
-                  <Edit className="w-4 h-4 text-black" />
-                </Button>
-              </div>
+            <div className="w-full h-full rounded-t-md bg-[#03624C] flex justify-end p-4">
+                <UploadCoverImage/>
             </div>
           )}
         </div>
