@@ -16,7 +16,9 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog"
-import { Edit } from "lucide-react";
+import { Edit, File as FileIcon, X } from "lucide-react";
+import Image from 'next/image';
+import { Button } from "./ui/button";
 
 // Define the form schema with proper typing
 const formSchema = z.object({
@@ -37,6 +39,7 @@ type FormData = z.infer<typeof formSchema>;
 export default function UploadCoverImage() {
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const { setNodeRef, isOver } = useDroppable({
     id: "dropzone",
@@ -54,6 +57,8 @@ export default function UploadCoverImage() {
       if (file) {
         try {
           form.setValue("coverImage", file);
+          const imageUrl = URL.createObjectURL(file);
+          setPreviewUrl(imageUrl);
           setDroppedFile(file);
           form.trigger("coverImage"); // Validate immediately
         } catch (error) {
@@ -79,6 +84,8 @@ export default function UploadCoverImage() {
       if (file) {
         try {
           form.setValue("coverImage", file);
+          const imageUrl = URL.createObjectURL(file);
+          setPreviewUrl(imageUrl);
           setDroppedFile(file);
           form.trigger("coverImage");
         } catch (error) {
@@ -157,6 +164,39 @@ export default function UploadCoverImage() {
               </FormItem>
             )}
           />
+
+          { droppedFile && previewUrl ? (
+            <div>
+                <div className="flex justify-between items-center-safe p-2 border rounded-md shadow-2xs">
+                    <div className="flex gap-3">
+                    <Image
+                      src={previewUrl}
+                      alt="Preview"
+                      width={50}
+                      height={50}
+                      className="rounded-lg object-cover border"
+                    />
+                  <div>
+                  <p className="text-md text-gray-700">
+    {droppedFile.name} 
+  </p>
+  <p className="text-xs">
+  {(droppedFile.size / (1024 * 1024)).toFixed(2)} MB
+  </p>
+                  </div>
+                    </div>
+                  <Button onClick={(e)=>{
+                    e.preventDefault();
+                    setDroppedFile(null);
+                    setPreviewUrl(null);
+                    form.reset();
+                  }} variant={"ghost"}>
+                    <X className="w-2 h-2" />
+                  </Button>
+                </div>
+            </div>
+          ) : null
+          }
           <button
             type="submit"
             className="w-full bg-[#03624C] text-white py-2 px-4 rounded hover:bg-[#03624C]/90 disabled:opacity-50"
