@@ -30,20 +30,21 @@ const userInfo = {
 export default function Navbar() {
   return (
     <nav className="flex  justify-between px-4 py-2 ">
-      <div className="flex items-center gap-2 ">
-        <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-3 ">
+        <div className="flex flex-col gap-1 items-center">
           <Image alt="Logo" src={Logo} className="w-7 h-7" />
-          <p className="font-plus-jakarta capitalize text-md">Talkit</p>
+          {/* <p className="font-plus-jakarta capitalize text-xs ">Talkit</p> */}
         </div>
-      </div>
-
-      <div className="flex gap-8 px-2 font-main capitalize text-md items-center  text-gray-600 ">
+        <div className="flex gap-6 px-2 font-main capitalize text-[.95rem] items-center  text-gray-600 ">
         {Pages.map((page, index) => (
           <Link key={`dash-${index}`} href={page.url}>
             {page.name}
           </Link>
         ))}
       </div>
+      </div>
+
+      
 
       <div className="flex items-center justify-center gap-2">
         <div className={`relative max-w-64  `}>

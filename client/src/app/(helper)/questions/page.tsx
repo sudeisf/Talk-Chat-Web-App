@@ -167,8 +167,8 @@ export default function QuestionsPage() {
   return (
     <div className=" h-full">
       <div className="p-4 max-w-7xl mx-auto space-y-4 ">
-        <h1 className="font-sans font-semibold text-2xl text-gray-600">
-          My Questions
+        <h1 className="font-sans font-medium text-2xl text-gray-600">
+          Questions
         </h1>
         <div className="flex justify-evenly gap-4">
           <QuestionSearchBar />

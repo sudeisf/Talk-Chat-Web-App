@@ -174,10 +174,10 @@ export default function UploadCoverImage() {
                       alt="Preview"
                       width={50}
                       height={50}
-                      className="rounded-lg object-cover border"
+                      className="rounded-lg object-center border"
                     />
                   <div>
-                  <p className="text-md text-gray-700">
+                  <p className="text-md text-gray-700"> 
     {droppedFile.name} 
   </p>
   <p className="text-xs">

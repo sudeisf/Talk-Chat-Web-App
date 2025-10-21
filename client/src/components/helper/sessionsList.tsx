@@ -51,7 +51,7 @@ export default function SessionsList() {
   return (
     <div className="w-[35%] px-2  m-4 h-[calc(100vh-100px)] overflow-hidden">
       <div className="py-2 ">
-        <h1 className="text-lg font-medium mb-4">Learning Sessions</h1>
+        <h1 className="text-lg font-medium mb-4">Sessions</h1>
         <SearchSessions />
       </div>
       <SessionTabs />

@@ -208,7 +208,7 @@ export default function HelperProfilePage() {
             <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
-                  <BookOpen className="h-8 w-8 text-blue-600 mb-2" />
+                  <BookOpen className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-gray-900">
                     {userInfo.HelpedLearners}
                   </h3>
@@ -220,7 +220,7 @@ export default function HelperProfilePage() {
             <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
-                  <User className="h-8 w-8 text-green-600 mb-2" />
+                  <User className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-gray-900">
                     {userInfo.sessionsJoined || 24}
                   </h3>
@@ -232,8 +232,8 @@ export default function HelperProfilePage() {
             <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
-                  <Clock className="h-8 w-8 text-orange-600 mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <Clock className="h-8 w-8 text-[text-[#03624c]] mb-2" />
+                  <h3 className="text-2xl font-bold text-[#03624c]">
                     {userInfo.ongoingSessions || 3}
                   </h3>
                   <p className="text-sm text-gray-600">Ongoing Sessions</p>
@@ -244,9 +244,9 @@ export default function HelperProfilePage() {
             <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
-                  <TimerIcon className="h-8 w-8 text-purple-600 mb-2" />
+                  <TimerIcon className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {userInfo.avargeResponseTime || 18} min.
+                    {userInfo.avargeResponseTime || 18} <span className='text-[.96rem]'>min</span>
                   </h3>
                   <p className="text-sm text-gray-600">Avg. Respone</p>
                 </div>
