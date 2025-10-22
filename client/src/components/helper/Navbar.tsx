@@ -36,15 +36,13 @@ export default function Navbar() {
           {/* <p className="font-plus-jakarta capitalize text-xs ">Talkit</p> */}
         </div>
         <div className="flex gap-6 px-2 font-main capitalize text-[.95rem] items-center  text-gray-600 ">
-        {Pages.map((page, index) => (
-          <Link key={`dash-${index}`} href={page.url}>
-            {page.name}
-          </Link>
-        ))}
+          {Pages.map((page, index) => (
+            <Link key={`dash-${index}`} href={page.url}>
+              {page.name}
+            </Link>
+          ))}
+        </div>
       </div>
-      </div>
-
-      
 
       <div className="flex items-center justify-center gap-2">
         <div className={`relative max-w-64  `}>

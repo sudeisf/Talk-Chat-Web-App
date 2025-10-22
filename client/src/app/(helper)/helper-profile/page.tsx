@@ -101,7 +101,7 @@ export default function HelperProfilePage() {
             </div>
           ) : (
             <div className="w-full h-full rounded-t-md bg-[#03624C] flex justify-end p-4">
-                <UploadCoverImage/>
+              <UploadCoverImage />
             </div>
           )}
         </div>
@@ -246,7 +246,8 @@ export default function HelperProfilePage() {
                 <div className="flex flex-col items-center">
                   <TimerIcon className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {userInfo.avargeResponseTime || 18} <span className='text-[.96rem]'>min</span>
+                    {userInfo.avargeResponseTime || 18}{' '}
+                    <span className="text-[.96rem]">min</span>
                   </h3>
                   <p className="text-sm text-gray-600">Avg. Respone</p>
                 </div>

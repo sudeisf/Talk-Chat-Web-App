@@ -84,89 +84,141 @@ export function EditProfile() {
       <DialogTrigger className="bg-gradient-to-r text-sm font-pt bg-[#03624C] px-4 text-white  rounded-full mt-2 shadow-xs ">
         Edit Profile
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-4xl">
         <DialogTitle className="text-sm font-sans font-medium flex gap-3">
           Edit Your Profile <Edit3 className="w-4 h-4" />
         </DialogTitle>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2">
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="sudeisfed@gmail.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    you can change your email here.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            autoComplete="off"
+            className="flex gap-4"
+          >
+            <div className="w-full">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-2">
+                    <FormLabel>E-mail</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
+                        placeholder="sudeisfed@gmail.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      you can change your email here.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="currentRole"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2 mt-3">
-                  <FormLabel>
-                    Current role <Briefcase className="w-4 h-4" />
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="senior backend developer"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="currentRole"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-2 mt-3">
+                    <FormLabel>
+                      Current role <Briefcase className="w-4 h-4" />
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
+                        type="text"
+                        placeholder="senior backend developer"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="skills"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2 mt-3">
-                  <FormLabel>
-                    Skills <Cog className="w-4 h-4" />
-                  </FormLabel>
-                  <FormControl>
-                    <SkillsInput
-                      value={[]}
-                      onChange={function (skills: String[]): void {
-                        throw new Error('Function not implemented.');
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="skills"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-2 mt-3">
+                    <FormLabel>
+                      Skills <Cog className="w-4 h-4" />
+                    </FormLabel>
+                    <FormControl>
+                      <SkillsInput
+                        value={[]}
+                        onChange={function (skills: String[]): void {
+                          throw new Error('Function not implemented.');
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <div className="mt-4 space-y-3">
-              <p className="text-sm font-medium flex gap-2">
-                Adress <LocationEdit className="w-4 h-4" />
-              </p>
-              <div className="flex gap-3 py-2">
+            <div className="w-full">
+              <div className="">
+                <p className="text-sm font-medium flex gap-2">
+                  Adress <LocationEdit className="w-4 h-4" />
+                </p>
+                <div className="flex gap-4 py-2">
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col gap-2">
+                        <FormLabel>City</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
+                            type="text"
+                            placeholder="Addis Abeba"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col gap-2">
+                        <FormLabel>Country</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
+                            type="text"
+                            placeholder="Ethiopia"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                <p className="text-sm py-2  flex gap-3 font-medium">
+                  Change your Password
+                  <LockIcon className="w-4 h-4" />
+                </p>
                 <FormField
                   control={form.control}
-                  name="city"
+                  name="password"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-2">
-                      <FormLabel>City</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input
-                          type="text"
-                          placeholder="Addis Abeba"
+                          className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
+                          type="Password"
                           {...field}
                         />
                       </FormControl>
@@ -174,14 +226,19 @@ export function EditProfile() {
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
-                  name="country"
+                  name="confirmPassword"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-2">
-                      <FormLabel>Country</FormLabel>
+                      <FormLabel>Confirm password</FormLabel>
                       <FormControl>
-                        <Input type="text" placeholder="Ethiopia" {...field} />
+                        <Input
+                          className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
+                          type="Password"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -189,45 +246,13 @@ export function EditProfile() {
                 />
               </div>
             </div>
-            <div className="flex flex-col gap-2 mt-2">
-              <p className="text-sm py-2  flex gap-3 font-medium">
-                Change your Password
-                <LockIcon className="w-4 h-4" />
-              </p>
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col gap-2">
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="Password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col gap-2">
-                    <FormLabel>Confirm password</FormLabel>
-                    <FormControl>
-                      <Input type="Password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <Button className="rounded-sm mt-2 bg-[#03624C]">
-              Update Information
-            </Button>
           </form>
         </Form>
+        <div className="flex justify-end-safe">
+          <Button className="rounded-sm bg-[#03624C] ">
+            Update Information
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

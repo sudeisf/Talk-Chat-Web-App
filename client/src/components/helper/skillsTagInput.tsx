@@ -103,13 +103,13 @@ export const SkillsInput: React.FC<SkillsInputProps> = ({
                 ? 'Add skills (React, TypeScript, etc.)'
                 : 'Add another skill...'
             }
-            className="flex-1 px-3  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
           />
           <Button
             type="button"
             onClick={() => inputValue.trim() && addSkill(inputValue)}
             disabled={!inputValue.trim()}
-            className=" bg-blue-600 text-white rounded-sm shadow-2xs hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+            className=" bg-[#03624C] text-white rounded-sm shadow-2xs hover:bg-[#03624C]/90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
           >
             <Plus className="w-4 h-4" />
             Add
