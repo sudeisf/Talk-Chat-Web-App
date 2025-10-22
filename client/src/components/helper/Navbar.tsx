@@ -35,7 +35,7 @@ export default function Navbar() {
           <Image alt="Logo" src={Logo} className="w-7 h-7" />
           {/* <p className="font-plus-jakarta capitalize text-xs ">Talkit</p> */}
         </div>
-        <div className="flex gap-6 px-2 font-main capitalize text-[.95rem] items-center  text-gray-600 ">
+        <div className="flex gap-4   px-2 font-main capitalize text-[.92rem] items-center  text-gray-600 ">
           {Pages.map((page, index) => (
             <Link key={`dash-${index}`} href={page.url}>
               {page.name}

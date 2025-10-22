@@ -32,10 +32,10 @@ export function RecentQuestionsTimeline({
   };
 
   return (
-    <div className="w-full bg-background border-l  border-border p-6">
+    <div className="w-full bg-[#03624C]  border-l rounded-md shadow-sm  border-border p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">Recent Activity</h3>
-        <p className="text-sm text-muted-foreground">
+        <h3 className="text-lg text-white font-semibold mb-2">Recent Activity</h3>
+        <p className="text-sm text-white">
           Latest questions and updates
         </p>
       </div>
@@ -59,17 +59,17 @@ export function RecentQuestionsTimeline({
                 >
                   {question.status}
                 </span>
-                <div className="flex items-center text-xs text-muted-foreground">
+                <div className="flex items-center text-xs text-white">
                   <Clock className="w-3 h-3 mr-1" />
                   {question.timeAgo}
                 </div>
               </div>
 
-              <h4 className="text-sm font-medium leading-tight mb-3 hover:text-primary cursor-pointer transition-colors">
+              <h4 className="text-sm  text-white font-medium leading-tight mb-3 hover:text-primary cursor-pointer transition-colors">
                 {question.title}
               </h4>
 
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-4 text-xs text-white">
                 <div className="flex items-center">
                   <MessageCircle className="w-3 h-3 mr-1" />
                   {question.answerCount} answers
@@ -85,7 +85,7 @@ export function RecentQuestionsTimeline({
       </div>
 
       <div className="mt-6 pt-4 border-t border-border">
-        <button className="text-sm text-primary hover:underline">
+        <button className="text-sm text-white hover:underline">
           View all activity →
         </button>
       </div>
