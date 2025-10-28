@@ -24,9 +24,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Camera, Edit, File as FileIcon, X } from 'lucide-react';
+import { Camera, Edit, File as FileIcon, User, X } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from './ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 
 // Define the form schema with proper typing
 const formSchema = z.object({
@@ -114,37 +115,42 @@ export default function UploadProfileImage() {
 
   return (
     <Dialog>
-      <DialogTrigger className="flex itesm-center">
-      <Button
-              id="edit-avatar"
-              size="sm"
-              variant="outline"
-            //   onClick={() => avatarFileInputRef.current?.click()}
-              className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50"
-            >
-              <Camera className="h-5 w-5" />
-            </Button> 
+      <DialogTrigger className="flex items-center">
+        <Button
+          id="edit-avatar"
+          size="sm"
+          variant="outline"
+          className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600"
+        >
+          <Camera className="h-5 w-5" />
+        </Button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogTitle></DialogTitle>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold text-center">
+            Change Profile Picture
+          </DialogTitle>
+          <DialogDescription className="text-center text-gray-500">
+            Upload a new profile picture. Supported formats: JPG, PNG, GIF, WebP
+          </DialogDescription>
+        </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               name="coverImage"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Upload Cover Image</FormLabel>
                   <FormControl>
                     <div
                       ref={setNodeRef}
                       onDrop={handleDrop}
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
-                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                      className={`rounded-lg p-6 text-center cursor-pointer transition-all duration-200 border-2 border-dashed ${
                         isDragOver || isOver
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                          : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500 bg-gray-50 dark:bg-gray-800/50'
                       }`}
                       onClick={() =>
                         document.getElementById('file-input')?.click()
@@ -153,81 +159,69 @@ export default function UploadProfileImage() {
                       <Input
                         id="file-input"
                         type="file"
-                        accept="image/jpeg,image/png,image/jpg"
+                        accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
                         onChange={handleFileInputChange}
                         className="hidden"
                       />
                       {droppedFile ? (
-                        <div>
-                          <p className="text-sm text-gray-600">
-                            Selected: {droppedFile.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Size: {(droppedFile.size / 1024 / 1024).toFixed(2)}{' '}
-                            MB
+                        <div className="flex flex-col items-center space-y-4">
+                          <Avatar className="w-32 h-32 mx-auto border-4 border-white dark:border-gray-800 shadow-lg">
+                            <AvatarImage
+                              src={previewUrl || undefined}
+                              className="object-cover"
+                              alt="Profile preview"
+                            />
+                            <AvatarFallback className="bg-gray-200 dark:bg-gray-600">
+                              <User className="h-8 w-8 text-gray-500 dark:text-gray-400" />
+                            </AvatarFallback>
+                          </Avatar>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            {droppedFile.name}
                           </p>
                         </div>
                       ) : (
-                        <div>
-                          <p className="text-gray-600">
-                            Drag and drop an image here, or click to select
-                          </p>
-                          <p className="text-sm text-gray-500 mt-2">
-                            JPEG, PNG up to 2MB
-                          </p>
+                        <div className="flex flex-col items-center space-y-4">
+                          <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                            <User className="h-10 w-10 text-gray-500 dark:text-gray-400" />
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Drag and drop or click to upload
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              Max file size: 2MB
+                            </p>
+                          </div>
                         </div>
                       )}
                     </div>
                   </FormControl>
-                  <FormDescription>
-                    Select or drag and drop your cover image file.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {droppedFile && previewUrl ? (
-              <div>
-                <div className="flex justify-between items-center-safe p-2 border rounded-md shadow-2xs">
-                  <div className="flex gap-3">
-                    <Image
-                      src={previewUrl}
-                      alt="Preview"
-                      width={50}
-                      height={50}
-                      className="rounded-lg object-center border"
-                    />
-                    <div>
-                      <p className="text-md text-gray-700">
-                        {droppedFile.name}
-                      </p>
-                      <p className="text-xs">
-                        {(droppedFile.size / (1024 * 1024)).toFixed(2)} MB
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setDroppedFile(null);
-                      setPreviewUrl(null);
-                      form.reset();
-                    }}
-                    variant={'ghost'}
-                  >
-                    <X className="w-2 h-2" />
-                  </Button>
-                </div>
-              </div>
-            ) : null}
-            <button
-              type="submit"
-              className="w-full bg-[#03624C] text-white py-2 px-4 rounded hover:bg-[#03624C]/90 disabled:opacity-50"
-              disabled={!droppedFile || !form.formState.isValid}
-            >
-              Upload
-            </button>
+            <div className="flex w-full justify-end gap-2">
+              <Button
+                variant="outline"
+                type="button"
+                className=""
+                onClick={() => {
+                  setDroppedFile(null);
+                  setPreviewUrl(null);
+                  form.reset();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className=" bg-[#03624C] text-white rounded-md hover:bg-[#03624C]/90 disabled:opacity-50 dark:bg-[#03624C] dark:hover:bg-[#03624C]/80"
+                disabled={!droppedFile || !form.formState.isValid}
+              >
+                Save Changes
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
