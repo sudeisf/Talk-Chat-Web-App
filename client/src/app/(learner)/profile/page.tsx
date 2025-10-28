@@ -1,6 +1,9 @@
 'use client';
+import UploadCoverImage from '@/components/coverImageUpload';
+import { EditProfile } from '@/components/EditProfile';
 import HistoryOfQuestions from '@/components/learner/QuestionHistory';
 import { RecentQuestionsTimelineProfile } from '@/components/learner/RecentActitvityProfile';
+import UploadProfileImage from '@/components/ProfileImageEdit';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,13 +102,9 @@ export default function ProfilePage() {
               </Button>
             </div>
           ) : (
-            <div className="w-full h-full rounded-t-md bg-gradient-to-r from-orange-500 via-red-400 to-orange-400">
-              <div className="relative">
-                <Button className="absolute top-4 right-4 bg-white hover:bg-gray-100 rounded-full w-10 h-10">
-                  <Edit className="w-4 h-4 text-black" />
-                </Button>
-              </div>
-            </div>
+            <div className="w-full h-full rounded-t-md bg-[#03624C] flex justify-end p-4">
+            <UploadCoverImage />
+          </div>
           )}
         </div>
 
@@ -116,15 +115,7 @@ export default function ProfilePage() {
               <AvatarImage src={userInfo.avatar} />
               <AvatarFallback>{userInfo.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <Button
-              id="edit-avatar"
-              size="sm"
-              variant="outline"
-              onClick={() => avatarFileInputRef.current?.click()}
-              className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50"
-            >
-              <Camera className="h-5 w-5" />
-            </Button>
+            <UploadProfileImage/>
           </div>
 
           <div className="flex justify-between">
@@ -141,12 +132,10 @@ export default function ProfilePage() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button className="bg-gradient-to-r text-md font-pt bg-orange-500 p-5  rounded-full mt-2 shadow-xs ">
-                  Edit Profile
-                </Button>
+               <EditProfile/> 
                 <Button
                   variant={'outline'}
-                  className="border-orange-500 border p-5 text-md text-orange-500 rounded-full mt-2 shadow-xs "
+                  className=" border p-5 text-md text-balck rounded-full mt-2 shadow-xs "
                 >
                   Settings
                 </Button>
