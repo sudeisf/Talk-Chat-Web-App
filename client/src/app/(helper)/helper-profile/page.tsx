@@ -3,6 +3,7 @@ import UploadCoverImage from '@/components/coverImageUpload';
 import { EditProfile } from '@/components/EditProfile';
 import HistoryOfQuestions from '@/components/learner/QuestionHistory';
 import { RecentQuestionsTimelineProfile } from '@/components/learner/RecentActitvityProfile';
+import UploadProfileImage from '@/components/ProfileImageEdit';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -113,7 +114,7 @@ export default function HelperProfilePage() {
               <AvatarImage src={userInfo.avatar} />
               <AvatarFallback>{userInfo.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <Button
+            {/* <Button
               id="edit-avatar"
               size="sm"
               variant="outline"
@@ -121,7 +122,8 @@ export default function HelperProfilePage() {
               className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50"
             >
               <Camera className="h-5 w-5" />
-            </Button>
+            </Button> */}
+            <UploadProfileImage/>
           </div>
 
           <div className="flex justify-between">
