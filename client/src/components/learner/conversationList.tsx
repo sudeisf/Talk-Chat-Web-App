@@ -51,7 +51,7 @@ export default function ChatList() {
   return (
     <div className="w-[30%] border-r h-full">
       <div className="px-4 py-2 border-b">
-        <h1 className="text-lg font-medium mb-4">Learning Sessions</h1>
+        <h1 className="text-lg font-medium mb-4 text-[#03624c]">Learning Sessions</h1>
         <SearchSessions />
       </div>
       <ChatTabs />
@@ -68,7 +68,7 @@ export default function ChatList() {
                   {convo.tags.slice(0, 2).map((tag, index) => (
                     <span
                       key={`tag-${index}`}
-                      className="bg-orange-500/5 text-orange-600 text-sm px-2 rounded-sm"
+                      className="bg-orange-500/5 text-[#03624c] text-sm px-2 rounded-sm"
                     >
                       {tag}
                     </span>

@@ -69,7 +69,7 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
       <DialogTrigger asChild>{btnChild}</DialogTrigger>
       <DialogContent className="sm:max-w-[650px] rounded-xl shadow-lg p-6">
         <DialogHeader>
-          <DialogTitle className="text-xl font-medium text-orange-600 font-pt">
+          <DialogTitle className="text-xl font-medium text-[#03624c] font-pt">
             Ask a Question
           </DialogTitle>
         </DialogHeader>
@@ -131,7 +131,7 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
                   <FormControl>
                     <Textarea
                       placeholder="Explain your question in detail..."
-                      className="resize-none min-h-[120px] rounded-lg border-gray-300 focus:ring-2 focus:ring-orange-400"
+                      className="resize-none min-h-[120px] rounded-lg border-gray-300 focus:ring-2 focus:ring-[#03624c]"
                       {...field}
                     />
                   </FormControl>
@@ -158,7 +158,7 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
               </Button>
               <Button
                 type="submit"
-                className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
+                className="bg-[#03624c] hover:bg-[#03624c] text-white rounded-lg"
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting

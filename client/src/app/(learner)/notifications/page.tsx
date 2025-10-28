@@ -85,7 +85,7 @@ export default function NotificationsPage() {
         </div>
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
-            <Badge variant="destructive" className="text-sm">
+            <Badge variant="destructive" className="text-sm bg-[#03624c]">
               {unreadCount} unread
             </Badge>
           )}
@@ -98,7 +98,7 @@ export default function NotificationsPage() {
           <Button
             size="sm"
             variant={filter === 'all' ? 'default' : 'outline'}
-            className={`${filter === 'all' ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}
+            className={`${filter === 'all' ? 'bg-[#03624c] text-white hover:bg-[#03624c]' : ''}`}
             onClick={() => setFilter('all')}
           >
             All ({notifications.length})
@@ -106,7 +106,7 @@ export default function NotificationsPage() {
           <Button
             variant={filter === 'unread' ? 'default' : 'outline'}
             size="sm"
-            className={`${filter === 'unread' ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}
+            className={`${filter === 'unread' ? 'bg-[#03624c] text-white hover:bg-[#03624c]' : ''}`}
             onClick={() => setFilter('unread')}
           >
             Unread ({unreadCount})
@@ -114,7 +114,7 @@ export default function NotificationsPage() {
           <Button
             variant={filter === 'read' ? 'default' : 'outline'}
             size="sm"
-            className={`${filter === 'read' ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}`}
+            className={`${filter === 'read' ? 'bg-[#03624c] text-white hover:bg-[#03624c]' : ''}`}
             onClick={() => setFilter('read')}
           >
             Read ({notifications.length - unreadCount})
@@ -219,7 +219,7 @@ export default function NotificationsPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => deleteNotification(notification.id)}
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
+                            className="h-8 w-8 p-0 text-gray-400 hover:text-[#03624c]"
                           >
                             <X className="h-4 w-4" />
                           </Button>

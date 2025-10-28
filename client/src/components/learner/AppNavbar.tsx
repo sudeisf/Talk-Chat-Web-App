@@ -29,7 +29,7 @@ export function AppNavbar() {
           <a href="/notifications">
             <Bell className="h-10 w-10 stroke-2 " />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-[#03624c] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -54,7 +54,7 @@ export function AppNavbar() {
               btnChild={
                 <Button
                   variant="outline"
-                  className="rounded-sm shadow-xs text-md w-24 py-2 flex items-center gap-2 border border-orange-500 text-orange-600 font-medium hover:bg-orange-50 transition"
+                  className="rounded-sm shadow-xs text-md w-24 py-2 flex items-center gap-2 border border-[#03624c] text-[#03624c] font-medium hover:bg-orange-50 transition"
                 >
                   <PlusCircle className="w-5 h-5" />
                   Ask
