@@ -9,13 +9,14 @@ services:
     environment:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${SECRET_KEY}
-      - DB_HOST=localhost
+      - DB_HOST=postgres
       - DB_NAME=talkit_db
       - DB_USER=sudies
       - DB_PASSWORD=BMB8DB4L9RQ@s
+    depends_on:
+      - postgres
     volumes:
       - ./server:/app
-    network_mode: "host"
 
   frontend:
     build:
@@ -35,3 +36,18 @@ services:
       - /app/node_modules
       - /app/.next
     network_mode: "host"
+  
+  postgres:
+    image: postgres:17
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: talkit_db
+      POSTGRES_USER: sudeis
+      POSTGRES_PASSWORD: BMB8DB4L9RQ@s
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
