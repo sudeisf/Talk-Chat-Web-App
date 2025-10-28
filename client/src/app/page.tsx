@@ -227,7 +227,7 @@ export default function Home() {
               </p>
             </div>
             <div className="w-[60%]">
-              <form className="space-y-6 p-5">
+              <form className="space-y-6 p-5" autoComplete="off">
                 <div className="flex gap-2 w-full">
                   <fieldset className="w-full">
                     <Input

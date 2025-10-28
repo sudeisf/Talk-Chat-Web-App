@@ -167,7 +167,7 @@ export default function MyQuestionPage() {
 
   return (
     <div className=" h-full">
-      <div className="p-4 max-w-6xl mx-auto space-y-4 ">
+      <div className="p-4 max-w-[78rem] mx-auto space-y-4 ">
         <h1 className="font-sans font-semibold text-2xl text-gray-600">
           My Questions
         </h1>

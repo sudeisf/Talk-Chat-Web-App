@@ -130,7 +130,7 @@ export default function UploadProfileImage() {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off" className="space-y-6">
             <FormField
               name="coverImage"
               control={form.control}

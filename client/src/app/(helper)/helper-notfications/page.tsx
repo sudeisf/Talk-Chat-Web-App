@@ -24,17 +24,17 @@ import {
 const getNotificationIcon = (type: Notification['type']) => {
   switch (type) {
     case 'message':
-      return <MessageSquare className="h-5 w-5 text-blue-500" />;
+      return <MessageSquare className="h-5 w-5 text-[#03624c]" />;
     case 'achievement':
-      return <Check className="h-5 w-5 text-green-500" />;
+      return <Check className="h-5 w-5 text-[#03624c]" />;
     case 'reminder':
-      return <Clock className="h-5 w-5 text-orange-500" />;
+      return <Clock className="h-5 w-5 text-[#03624c]" />;
     case 'system':
-      return <Info className="h-5 w-5 text-purple-500" />;
+      return <Info className="h-5 w-5 text-[#03624c]" />;
     case 'study':
-      return <BookOpen className="h-5 w-5 text-indigo-500" />;
+      return <BookOpen className="h-5 w-5 text-[#03624c]" />;
     default:
-      return <Bell className="h-5 w-5 text-gray-500" />;
+      return <Bell className="h-5 w-5 text-[#03624c]" />;
   }
 };
 
@@ -85,7 +85,7 @@ export default function NotificationsPage() {
         </div>
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
-            <Badge variant="destructive" className="text-sm">
+            <Badge variant="destructive" className="text-sm bg-[#03624c]">
               {unreadCount} unread
             </Badge>
           )}

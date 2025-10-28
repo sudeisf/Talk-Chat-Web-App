@@ -74,7 +74,7 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off" className="space-y-6">
             {/* Title */}
             <FormField
               name="title"

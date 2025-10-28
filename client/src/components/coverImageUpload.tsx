@@ -122,7 +122,7 @@ export default function UploadCoverImage() {
       <DialogContent>
         <DialogTitle></DialogTitle>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off" className="space-y-4">
             <FormField
               name="coverImage"
               control={form.control}

@@ -60,8 +60,8 @@ export function AppSidebar() {
       <SidebarContent className="bg-white flex flex-col h-full justify-between">
         <SidebarGroup>
           <div className="flex p-2 gap-2 pl-6">
-            <Image src={logo} alt="" width={30} height={30} />
-            <h1 className="text-2xl font-pt bg-gradient-to-r from-orange-500 via-red-400 to-orange-400 bg-clip-text text-transparent  rounded-full">
+            <Image src={logo} alt="" width={25} height={25} />
+            <h1 className="text-lg font-pt text-[#03624c] rounded-full">
               Talkit
             </h1>
           </div>
