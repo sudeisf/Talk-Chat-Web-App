@@ -115,15 +115,10 @@ export default function UploadProfileImage() {
 
   return (
     <Dialog>
-      <DialogTrigger className="flex items-center">
-        <Button
-          id="edit-avatar"
-          size="sm"
-          variant="outline"
-          className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600"
-        >
-          <Camera className="h-5 w-5" />
-        </Button>
+      <DialogTrigger 
+        className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600 flex items-center justify-center"
+      >
+        <Camera className="h-5 w-5" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

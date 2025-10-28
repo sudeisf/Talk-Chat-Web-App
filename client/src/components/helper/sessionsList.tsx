@@ -68,7 +68,7 @@ export default function SessionsList() {
                   {convo.tags.slice(0, 2).map((tag, index) => (
                     <span
                       key={`tag-${index}`}
-                      className="bg-orange-500/5 text-orange-600 text-sm px-2 rounded-sm"
+                      className="bg-orange-500/5 text-[#03624C] text-sm px-2 rounded-sm"
                     >
                       {tag}
                     </span>

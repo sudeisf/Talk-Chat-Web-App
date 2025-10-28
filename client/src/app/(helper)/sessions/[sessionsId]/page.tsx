@@ -202,7 +202,7 @@ export default function sessionBox() {
           {currentSession?.description && (
             <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#03624C] flex items-center justify-center flex-shrink-0">
                   <BookOpen className="h-4 w-4 text-white" />
                 </div>
                 <div>
@@ -248,7 +248,7 @@ export default function sessionBox() {
                   className={cn(
                     'rounded-lg px-4 py-2 max-w-md break-words',
                     message.sender === 'user'
-                      ? 'bg-orange-600 text-white'
+                      ? 'bg-[#03624C] text-white'
                       : 'bg-white text-black border border-gray-200'
                   )}
                 >

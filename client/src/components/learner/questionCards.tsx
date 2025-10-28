@@ -138,8 +138,8 @@ export function QuestionCard({
               className={cn(
                 'p-1 h-auto hover:bg-transparent',
                 currentVote === 'up'
-                  ? 'text-orange-500'
-                  : 'text-gray-400 hover:text-orange-500 dark:text-gray-500 dark:hover:text-orange-400'
+                  ? 'text-[#03624C]'
+                  : 'text-gray-400 hover:text-[#03624C] dark:text-gray-500 dark:hover:text-orange-400'
               )}
               onClick={handleUpvote}
             >
@@ -150,7 +150,7 @@ export function QuestionCard({
               className={cn(
                 'text-xs font-bold px-1 py-0.5 min-w-[24px] text-center',
                 voteCount > 0
-                  ? 'text-orange-500'
+                  ? 'text-[#03624C]'
                   : voteCount < 0
                     ? 'text-blue-500'
                     : 'text-gray-500 dark:text-gray-400'
@@ -165,8 +165,8 @@ export function QuestionCard({
               className={cn(
                 'p-1 h-auto hover:bg-transparent',
                 currentVote === 'down'
-                  ? 'text-blue-500'
-                  : 'text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400'
+                  ? 'text-[#03624C]'
+                  : 'text-gray-400 hover:text-[#03624C] dark:text-gray-500 dark:hover:text-[#03624C]'
               )}
               onClick={handleDownvote}
             >
@@ -176,7 +176,7 @@ export function QuestionCard({
 
           <div className="flex-1 min-w-0">
             <h3
-              className="font-medium font-sans text-lg leading-tight cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2"
+              className="font-medium font-sans text-lg leading-tight cursor-pointer hover:text-[#03624C] dark:hover:text-blue-400 transition-colors line-clamp-2"
               onClick={handleTitleClick}
             >
               {title}
@@ -211,7 +211,7 @@ export function QuestionCard({
               className={cn(
                 'h-4 w-4 transition-colors',
                 bookmarked
-                  ? 'fill-yellow-400 text-yellow-400'
+                  ? 'fill-[#03624C] text-[#03624C]'
                   : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
               )}
             />
@@ -248,7 +248,7 @@ export function QuestionCard({
           <Link
             href={'/'}
             onClick={handleContinueClick}
-            className="shrink-0 flex text-sm items-center gap-2 hover:text-blue-500"
+            className="shrink-0 flex text-sm items-center gap-2 hover:text-[#03624C]"
           >
             Continue <ArrowRight className="w-4 h-4" />
           </Link>

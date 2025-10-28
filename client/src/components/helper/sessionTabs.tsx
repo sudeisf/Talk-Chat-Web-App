@@ -53,7 +53,7 @@ export default function SessionTabs() {
             className={`relative flex items-center gap-2 rounded-none border-b-2 px-4 py-3 text-sm font-medium transition-colors
               ${
                 tab.active
-                  ? 'border-orange-500 text-orange-600'
+                  ? 'border-[#03624C] text-[#03624C]'
                   : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
               }`}
           >
@@ -63,7 +63,7 @@ export default function SessionTabs() {
               <span
                 className={`ml-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                   tab.active
-                    ? 'bg-orange-100 text-orange-700'
+                    ? 'bg-[#03624C]/10 text-[#03624C]'
                     : 'bg-gray-200 text-gray-700'
                 }`}
               >

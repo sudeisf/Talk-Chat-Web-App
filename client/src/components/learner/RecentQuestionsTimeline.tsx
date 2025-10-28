@@ -32,7 +32,7 @@ export function RecentQuestionsTimeline({
   };
 
   return (
-    <div className="w-full bg-[#03624C]  border-l rounded-md shadow-sm  border-border p-6">
+    <div className="w-full bg-[#03624C]/90  border-l rounded-md shadow-sm  border-border p-6">
       <div className="mb-6">
         <h3 className="text-lg text-white font-semibold mb-2">Recent Activity</h3>
         <p className="text-sm text-white">
@@ -49,7 +49,7 @@ export function RecentQuestionsTimeline({
             )}
 
             {/* Timeline dot */}
-            <div className="absolute left-2 top-2 w-4 h-4 bg-primary rounded-full border-2 border-background" />
+            <div className="absolute left-2 top-2 w-4 h-4 bg-[#03624C] rounded-full border-2 border-background" />
 
             {/* Content */}
             <div className="ml-8 pb-4">
