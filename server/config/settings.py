@@ -45,7 +45,12 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'channels',
-    'users'
+    'users',
+
+    'questions',
+    'chat',
+    'notifications',
+    'common',
 ]
 
 
