@@ -1,6 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Logo from '../../public/svg/logo.svg';
 import {
   ArrowBigRight,
   ArrowRightFromLineIcon,
@@ -73,9 +74,12 @@ export default function Home() {
   return (
     <div>
       <nav className="flex justify-between p-4 *:font-sans">
-        <p className="text-2xl bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent text-shadow-xs">
-          Talktit
+        <div className='flex flex-column items-center gap-2'>
+        <Image  src={Logo}  width={30} height={30} alt='logo'   />
+        <p className="text-lg text-[#03624C]  text-shadow-xs">
+          Talkit
         </p>
+        </div>
 
         <div className="flex">
           <Button
@@ -87,7 +91,7 @@ export default function Home() {
           </Button>
           <Button
             onClick={() => router.push('/login')}
-            className="rounded-sm text-md shadow-xs bg-gradient-to-r from-orange-400 via-red-500/70 to-red-500  text-white px-6"
+            className="rounded-sm text-md shadow-xs bg-[#03624C]  text-white px-6"
           >
             Sign in
           </Button>
@@ -104,20 +108,20 @@ export default function Home() {
 
           {/* Main heading */}
           <div className="mx-auto text-center">
-            <h1 className="inline-block text-orange-500  bg-red-500/5 text-lg md:text-sm py-2 px-6 rounded-full animate-bounce">
+            <h1 className="inline-block text-[#03624C]  bg-[#03624C]/5 text-lg md:text-sm py-2 px-6 rounded-full animate-bounce">
               Ask smarter. Learn faster. Never get stuck again.
             </h1>
           </div>
 
           {/* Content section */}
           <div className="max-w-6xl mx-auto space-y-8 px-4">
-            <p className="text-3xl md:text-4xl font-medium text-center font-rubik  text-[#060518] leading-tight">
+            <p className="text-3xl md:text-4xl font-medium text-center font-rubik  text-[#03624C] leading-tight">
               Whether you're debugging a tricky function, confused by async
               behavior, or just need a second brain - this platform connects you
               with real people, in real time.
             </p>
 
-            <p className="text-lg md:text-xl bg-gradient-to-br from-orange-500 via-red-400 to-orange-300 bg-clip-text text-transparent text-center leading-relaxed">
+            <p className="text-lg md:text-xl text-[#03624C]/90 text-center leading-relaxed">
               No more endless Googling. No more waiting for forum replies.
               <br />
               Just ask, get matched instantly, and learn through live chat — one
@@ -134,7 +138,7 @@ export default function Home() {
 
           {/* CTA button */}
           <div className="flex justify-center mt-12">
-            <Button className="bg-red-500 hover:bg-red-600 text-white text-lg py-6 px-10 rounded-lg shadow-lg transition-colors duration-200 flex items-center gap-2">
+            <Button className="bg-[#085543] hover:bg-[##085543]/90 text-white text-md max-w-4xl rounded-md shadow-xs transition-colors duration-200 flex items-center gap-2">
               Ask a Question & Get Help <ArrowUpRight size={18} />
             </Button>
           </div>
