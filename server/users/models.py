@@ -25,7 +25,7 @@ class User(AbstractUser):
             blank=True
       )
 
-      role= models.CharField(max_length=20, choices=Role.choices)
+      role= models.CharField(max_length=20, choices=Role.choices , default=Role.LEARNER)
       bio = models.TextField(max_length=500, null=True, blank=True)
       profession = models.CharField(max_length=200, null=True, blank=True)
 

@@ -20,7 +20,7 @@ class Notification(models.Model):
         MESSAGE_ANNOUNCEMENT = 'message_announcement', 'Message Announcement'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    notification_type = models.CharField(max_length=20, choices=NotificationType.choices, default='system_update')
+    notification_type = models.CharField(max_length=25, choices=NotificationType.choices, default='system_update')
     title = models.CharField(max_length=255)
     message = models.TextField()
 

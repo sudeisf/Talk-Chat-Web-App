@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'chat',
     'notifications',
     'common',
+    'achievements',  
+    'activities',
 ]
 
 

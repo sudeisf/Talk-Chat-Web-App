@@ -37,7 +37,7 @@ class ChatMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages')
 
     message_content = models.TextField()
-    message_type = models.CharField(max_length=20, choices=MessageType.choices, default='text')
+    message_type = models.CharField(max_length=100, choices=MessageType.choices, default='text')
     
 
     code_snippet = models.CharField(max_length=800, null=True, blank=True)
@@ -60,7 +60,7 @@ class ChatMessage(models.Model):
 
 class MessageReaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name='reactions')
+    message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name='message_reactions')
     emoji = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
 
