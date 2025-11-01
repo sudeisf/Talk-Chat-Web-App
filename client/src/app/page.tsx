@@ -70,6 +70,11 @@ const features = [
 
 export default function Home() {
   const router = useRouter();
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   return (
     <div>
@@ -290,7 +295,7 @@ export default function Home() {
           </div>
 
           <p className="text-xs text-black">
-            &copy; {new Date().getFullYear()} Talktit. Built for learners. All
+            &copy; {currentYear || ''} Talktit. Built for learners. All
             rights reserved.
           </p>
         </div>

@@ -12,13 +12,13 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
   const [data, setData] = useState<{ date: string; count: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from(
-    { length: currentYear - 2020 + 1 },
-    (_, i) => 2020 + i
-  ).reverse();
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+  useEffect(() => {
+    // Set current year on client side only
+    setCurrentYear(new Date().getFullYear());
+    setSelectedYear(new Date().getFullYear());
+  }, []);
 
   useEffect(() => {
     async function fetchContributions() {
@@ -52,7 +52,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
 
   function fillMissingDates(contributions: ContributionData[]) {
     const startDate = new Date('2020-01-01');
-    const endDate = new Date();
+    const endDate = currentYear ? new Date() : new Date('2020-01-01');
     const contributionMap = new Map(
       contributions.map((c) => [c.date, c.count])
     );
@@ -71,6 +71,19 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
 
     return filledData;
   }
+
+  if (!selectedYear || !currentYear) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  const years = Array.from(
+    { length: currentYear - 2020 + 1 },
+    (_, i) => 2020 + i
+  ).reverse();
 
   const filteredData = data.filter((item) => {
     const year = Number.parseInt(item.date.split('/')[0]);

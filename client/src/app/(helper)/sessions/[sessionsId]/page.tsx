@@ -80,39 +80,44 @@ export default function sessionBox() {
     });
   };
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hi! I'm trying to integrate Stripe payment gateway in my React app. Can you help me understand the best approach?",
-      sender: 'other',
-      timestamp: new Date(Date.now() - 300000),
-      name: 'Alex Johnson',
-    },
-    {
-      id: '2',
-      text: "Let's start with the basics. First, you'll need to install the Stripe SDK and set up your API keys. Have you created a Stripe account yet?",
-      sender: 'user',
-      timestamp: new Date(Date.now() - 240000),
-      name: 'Instructor',
-    },
-    {
-      id: '3',
-      text: "Yes, I have the account set up. I'm just not sure about the frontend implementation and how to handle the payment flow securely.",
-      sender: 'other',
-      timestamp: new Date(Date.now() - 180000),
-      name: 'Alex Johnson',
-    },
-    {
-      id: '4',
-      text: "Great! For the frontend, you'll want to use Stripe Elements for secure card input. Let me walk you through creating a payment form component...",
-      sender: 'user',
-      timestamp: new Date(Date.now() - 120000),
-      name: 'Instructor',
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Set initial messages on client side only
+    setMessages([
+      {
+        id: '1',
+        text: "Hi! I'm trying to integrate Stripe payment gateway in my React app. Can you help me understand the best approach?",
+        sender: 'other',
+        timestamp: new Date(Date.now() - 300000),
+        name: 'Alex Johnson',
+      },
+      {
+        id: '2',
+        text: "Let's start with the basics. First, you'll need to install the Stripe SDK and set up your API keys. Have you created a Stripe account yet?",
+        sender: 'user',
+        timestamp: new Date(Date.now() - 240000),
+        name: 'Instructor',
+      },
+      {
+        id: '3',
+        text: "Yes, I have the account set up. I'm just not sure about the frontend implementation and how to handle the payment flow securely.",
+        sender: 'other',
+        timestamp: new Date(Date.now() - 180000),
+        name: 'Alex Johnson',
+      },
+      {
+        id: '4',
+        text: "Great! For the frontend, you'll want to use Stripe Elements for secure card input. Let me walk you through creating a payment form component...",
+        sender: 'user',
+        timestamp: new Date(Date.now() - 120000),
+        name: 'Instructor',
+      },
+    ]);
+  }, []);
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;

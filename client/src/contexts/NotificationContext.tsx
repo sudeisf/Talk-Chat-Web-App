@@ -95,6 +95,7 @@ export function NotificationProvider({
 }) {
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
+  const [notificationIdCounter, setNotificationIdCounter] = useState(1000);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -103,9 +104,10 @@ export function NotificationProvider({
   ) => {
     const newNotification: Notification = {
       ...notification,
-      id: Date.now().toString(),
+      id: `notification-${notificationIdCounter}`,
       timestamp: 'Just now',
     };
+    setNotificationIdCounter(prev => prev + 1);
     setNotifications((prev) => [newNotification, ...prev]);
   };
 
