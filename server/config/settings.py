@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
-load_dotenv()
+from urllib.parse import quote_plus
+# Load .env file, but Docker Compose environment variables will override
+load_dotenv(override=False)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -136,10 +138,40 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 import dj_database_url
+
+# Build DATABASE_URL from individual components
+# Priority: If DB_HOST is set (Docker Compose), use Docker env vars
+# Otherwise, check for DATABASE_URL, or default to postgres (Docker service name)
+db_host = os.getenv("DB_HOST")
+if db_host:
+    # Docker Compose environment - build from individual components
+    db_port = os.getenv("DB_PORT", "5432")
+    db_name = os.getenv("DB_NAME", "talkit_db")
+    db_user = os.getenv("DB_USER", "sudeis")
+    db_password = os.getenv("DB_PASSWORD", "")
+    # URL-encode user and password to handle special characters
+    db_user_encoded = quote_plus(db_user)
+    db_password_encoded = quote_plus(db_password)
+    database_url = f"postgresql://{db_user_encoded}:{db_password_encoded}@{db_host}:{db_port}/{db_name}"
+else:
+    # Not in Docker or DB_HOST not set - check for DATABASE_URL or use defaults
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        # Default to "postgres" (Docker service name) for local development
+        db_host = "postgres"
+        db_port = os.getenv("DB_PORT", "5432")
+        db_name = os.getenv("DB_NAME", "talkit_db")
+        db_user = os.getenv("DB_USER", "sudeis")
+        db_password = os.getenv("DB_PASSWORD", "")
+        # URL-encode user and password to handle special characters
+        db_user_encoded = quote_plus(db_user)
+        db_password_encoded = quote_plus(db_password)
+        database_url = f"postgresql://{db_user_encoded}:{db_password_encoded}@{db_host}:{db_port}/{db_name}"
+
 DATABASES = {
-    "default" : dj_database_url.parse(
-          os.getenv("DATABASE_URL"),
-          conn_max_age=600
+    "default": dj_database_url.parse(
+        database_url,
+        conn_max_age=600
     )
 }
 

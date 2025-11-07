@@ -10,11 +10,13 @@ services:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${SECRET_KEY}
       - DB_HOST=postgres
+      - DB_PORT=5432
       - DB_NAME=talkit_db
-      - DB_USER=sudies
+      - DB_USER=sudeis
       - DB_PASSWORD=BMB8DB4L9RQ@s
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./server:/app
 
@@ -48,6 +50,11 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sudeis -d talkit_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
