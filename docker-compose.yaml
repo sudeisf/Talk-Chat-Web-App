@@ -37,7 +37,6 @@ services:
       - ./client:/app
       - /app/node_modules
       - /app/.next
-    network_mode: "host"
   
   postgres:
     image: postgres:17
