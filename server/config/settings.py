@@ -31,6 +31,8 @@ DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS = []
 
+ASGI_APPLICATION = "config.asgi.application"
+
 
 # Application definition
 
