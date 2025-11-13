@@ -12,12 +12,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+import cloudinary
 import os
 from urllib.parse import quote_plus
 # Load .env file, but Docker Compose environment variables will override
 load_dotenv(override=False)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -34,6 +39,14 @@ ALLOWED_HOSTS = []
 ASGI_APPLICATION = "config.asgi.application"
 
 
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django_celery_results',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',     
@@ -49,7 +63,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'channels',
-
     'users',
     'questions',
     'chat',
@@ -116,6 +129,32 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'your_email@gmail.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'your_app_password')
+
+
+# Celery configuration
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
+#celery configuration
+CELERY_ENABLE_UTC = True
+CELERY_TIMEZONE = "Africa/Addis_Ababa"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1", 
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+
+
 
 TEMPLATES = [
     {
@@ -205,11 +244,12 @@ AUTHENTICATION_BACKENDS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Addis_Ababa'
 
 USE_I18N = True
 
 USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)
