@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/dist/client/link';
+import { AvatarFallback, AvatarImage ,Avatar } from '../ui/avatar';
 
 interface QuestionCardProps {
   id: string;
@@ -255,65 +256,69 @@ export function QuestionCard({
         </div>
 
         {contributors.length > 0 && (
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-3 mt-3">
+            <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
               Contributors:
             </span>
             <div className="flex items-center">
               {contributors.slice(0, 3).map((contributor, index) => (
                 <div
                   key={index}
-                  className="relative -ml-1 first:ml-0"
-                  style={{ zIndex: contributors.length - index }}
+                  className="relative -ml-2 first:ml-0"
+                  style={{ zIndex: index + 1 }}
+                  title={contributor.name}
                 >
-                  {contributor.avatar ? (
-                    <img
-                      src={contributor.avatar || '/placeholder.svg'}
-                      alt={contributor.name}
-                      className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-800 object-cover"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 border-2 border-white dark:border-gray-800 flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                        {contributor.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  <Avatar className="w-6 h-6 rounded-full ring-2 ring-white dark:ring-gray-800 border">
+                    {contributor.avatar ? (
+                      <AvatarImage src={contributor.avatar} alt={contributor.name} loading="lazy" />
+                    ) : (
+                      <AvatarFallback>{contributor.name.charAt(0).toUpperCase()}</AvatarFallback>
+                    )}
+                  </Avatar>
                 </div>
               ))}
               {additionalContributors > 0 && (
-                <div className="relative -ml-1 w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-800 flex items-center justify-center">
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                    +{additionalContributors}
-                  </span>
+                <div
+                  className="relative -ml-2 w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center ring-2 ring-white dark:ring-gray-800 text-xs font-medium text-gray-600 dark:text-gray-300 border"
+                  style={{ zIndex: contributors.length + 1 }}
+                  title={`+${additionalContributors} more`}
+                >
+                  +{additionalContributors}
                 </div>
               )}
             </div>
           </div>
         )}
 
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-          {user.avatar ? (
-            <img
-              src={user.avatar || '/placeholder.svg'}
-              alt={user.name}
-              className="w-6 h-6 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                {user.name.charAt(0).toUpperCase()}
+        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+          
+
+          <Avatar className="w-8 h-8 rounded-full ring-2 ring-white dark:ring-gray-800 border">
+            {user.avatar ? (
+              <AvatarImage src={user.avatar} alt={user.name} loading="lazy" />
+            ) : null}
+            <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span
+          className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate"
+          title={user.name}
+              >
+          {user.name.charAt(0).toUpperCase() + user.name.slice(1)}
               </span>
-            </div>
-          )}
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {user.name}
+              {typeof user.reputation === 'number' && (
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            ({user.reputation} rep)
           </span>
-          {user.reputation && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              ({user.reputation} rep)
-            </span>
-          )}
+              )}
+            </div>
+            {/* optional small meta line for better spacing / context */}
+            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              Posted by {user.name}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
