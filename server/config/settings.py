@@ -132,8 +132,8 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'your_app_password')
 
 
 # Celery configuration
-CELERY_BROKER_URL = "redis://redis:6379/0"
-CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
 
 #celery configuration
 CELERY_ENABLE_UTC = True
@@ -146,7 +146,7 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/1", 
+        "LOCATION": os.getenv("REDIS_CACHE_URL", "redis://redis:6379/1"), 
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -179,35 +179,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 import dj_database_url
 
-# Build DATABASE_URL from individual components
-# Priority: If DB_HOST is set (Docker Compose), use Docker env vars
-# Otherwise, check for DATABASE_URL, or default to postgres (Docker service name)
-db_host = os.getenv("DB_HOST")
-if db_host:
-    # Docker Compose environment - build from individual components
-    db_port = os.getenv("DB_PORT", "5432")
-    db_name = os.getenv("DB_NAME", "talkit_db")
-    db_user = os.getenv("DB_USER", "sudeis")
-    db_password = os.getenv("DB_PASSWORD", "")
-    # URL-encode user and password to handle special characters
-    db_user_encoded = quote_plus(db_user)
-    db_password_encoded = quote_plus(db_password)
-    database_url = f"postgresql://{db_user_encoded}:{db_password_encoded}@{db_host}:{db_port}/{db_name}"
-else:
-    # Not in Docker or DB_HOST not set - check for DATABASE_URL or use defaults
-    database_url = os.getenv("DATABASE_URL")
-    if not database_url:
-        # Default to "postgres" (Docker service name) for local development
-        db_host = "postgres"
-        db_port = os.getenv("DB_PORT", "5432")
-        db_name = os.getenv("DB_NAME", "talkit_db")
-        db_user = os.getenv("DB_USER", "sudeis")
-        db_password = os.getenv("DB_PASSWORD", "")
-        # URL-encode user and password to handle special characters
-        db_user_encoded = quote_plus(db_user)
-        db_password_encoded = quote_plus(db_password)
-        database_url = f"postgresql://{db_user_encoded}:{db_password_encoded}@{db_host}:{db_port}/{db_name}"
-
+database_url = os.getenv('DATABASE_URL')
 DATABASES = {
     "default": dj_database_url.parse(
         database_url,

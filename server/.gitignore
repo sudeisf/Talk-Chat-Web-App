@@ -1,2 +1,24 @@
-.env
-venv
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment
+.venv/
+env/
+venv/
+
+# Django
+*.log
+staticfiles/
+media/
+db.sqlite3
+
+# Celery
+*.pid
+
+# IDE / OS
+.vscode/
+.idea/
+*.DS_Store
