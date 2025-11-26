@@ -98,7 +98,7 @@ export default function NotificationsPage() {
           <Button
             size="sm"
             variant={filter === 'all' ? 'default' : 'outline'}
-            className={`${filter === 'all' ? 'bg-[#03624c] text-white hover:bg-[#03624c]' : ''}`}
+            className={filter === 'all' ? 'bg-[#03624c] text-white hover:bg-[#03624c] shadow-none transition-none' : ' transition-none '}
             onClick={() => setFilter('all')}
           >
             All ({notifications.length})
@@ -106,7 +106,7 @@ export default function NotificationsPage() {
           <Button
             variant={filter === 'unread' ? 'default' : 'outline'}
             size="sm"
-            className={`${filter === 'unread' ? 'bg-[#03624c] text-white hover:bg-[#03624c]' : ''}`}
+            className={filter === 'unread' ? 'bg-[#03624c] text-white hover:bg-[#03624c] shadow-none' : ''}
             onClick={() => setFilter('unread')}
           >
             Unread ({unreadCount})
@@ -114,7 +114,7 @@ export default function NotificationsPage() {
           <Button
             variant={filter === 'read' ? 'default' : 'outline'}
             size="sm"
-            className={`${filter === 'read' ? 'bg-[#03624c] text-white hover:bg-[#03624c]' : ''}`}
+            className={filter === 'read' ? 'bg-[#03624c] text-white hover:bg-[#03624c] shadow-none' : ''}
             onClick={() => setFilter('read')}
           >
             Read ({notifications.length - unreadCount})
