@@ -165,7 +165,7 @@ export default function BookmarksPage() {
                     {/* Card column */}
                     <div className="grow pb-8">
                       <Card className="shadow-none border-none">
-                        <CardContent className="border p-2 rounded-sm shadow-xs">
+                        <CardContent className=" p-2 rounded-sm ">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
