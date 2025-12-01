@@ -386,6 +386,12 @@ export function MessageInput({ onVoiceMessage, onSendText }: MessageInputProps) 
               type="text"
               value={message}
               onChange={(e) => handleChangeMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendText();
+                }
+              }}
               placeholder="Type something to send"
               className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
             />
