@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { BookOpen, MoreVertical, Paperclip, Send } from 'lucide-react';
+import { BookOpen, MoreVertical, Mic, Play, Square } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -64,12 +64,26 @@ const currentSession = {
 
 interface Message {
   id: string;
-  text: string;
+  text?: string;
+  type: 'text' | 'voice';
   sender: 'user' | 'other';
   timestamp: Date;
   avatar?: string;
   name: string;
+  audioUrl?: string;
 }
+
+// simple emoji-only check
+const isEmojiOnly = (text?: string) => {
+  if (!text) return false;
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  // remove all emoji characters and check if anything remains
+  const emojiRegex =
+    /[\p{Emoji_Presentation}\uFE0F\u200D\p{Extended_Pictographic}]/gu;
+  const onlyEmoji = trimmed.replace(emojiRegex, '').trim().length === 0;
+  return onlyEmoji;
+};
 
 export default function sessionBox() {
   const formatTime = (date: Date) => {
@@ -81,7 +95,6 @@ export default function sessionBox() {
   };
 
   const [messages, setMessages] = useState<Message[]>([]);
-
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -91,6 +104,7 @@ export default function sessionBox() {
       {
         id: '1',
         text: "Hi! I'm trying to integrate Stripe payment gateway in my React app. Can you help me understand the best approach?",
+        type: 'text',
         sender: 'other',
         timestamp: new Date(Date.now() - 300000),
         name: 'Alex Johnson',
@@ -98,6 +112,7 @@ export default function sessionBox() {
       {
         id: '2',
         text: "Let's start with the basics. First, you'll need to install the Stripe SDK and set up your API keys. Have you created a Stripe account yet?",
+        type: 'text',
         sender: 'user',
         timestamp: new Date(Date.now() - 240000),
         name: 'Instructor',
@@ -105,13 +120,15 @@ export default function sessionBox() {
       {
         id: '3',
         text: "Yes, I have the account set up. I'm just not sure about the frontend implementation and how to handle the payment flow securely.",
+        type: 'text',
         sender: 'other',
         timestamp: new Date(Date.now() - 180000),
         name: 'Alex Johnson',
       },
       {
         id: '4',
-        text: "Great! For the frontend, you'll want to use Stripe Elements for secure card input. Let me walk you through creating a payment form component...",
+        text: 'Great! For the frontend, you\'ll want to use Stripe Elements for secure card input. Let me walk you through creating a payment form component...',
+        type: 'text',
         sender: 'user',
         timestamp: new Date(Date.now() - 120000),
         name: 'Instructor',
@@ -119,19 +136,34 @@ export default function sessionBox() {
     ]);
   }, []);
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+  const handleSendTextMessage = (text: string) => {
+    if (!text.trim()) return;
     setMessages((prev) => [
       ...prev,
       {
         id: (prev.length + 1).toString(),
-        text: newMessage,
+        text,
+        type: 'text',
         sender: 'user',
         timestamp: new Date(),
         name: 'Instructor',
       },
     ]);
-    setNewMessage('');
+  };
+
+  const handleVoiceMessage = (audioBlob: Blob) => {
+    const url = URL.createObjectURL(audioBlob);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: (prev.length + 1).toString(),
+        type: 'voice',
+        sender: 'user',
+        timestamp: new Date(),
+        name: 'Instructor',
+        audioUrl: url,
+      },
+    ]);
   };
 
   useEffect(() => {
@@ -249,16 +281,38 @@ export default function sessionBox() {
                   message.sender === 'user' ? 'items-end' : 'items-start'
                 )}
               >
-                <div
-                  className={cn(
-                    'rounded-lg px-4 py-2 max-w-md break-words',
-                    message.sender === 'user'
-                      ? 'bg-[#03624C] text-white'
-                      : 'bg-white text-black border border-gray-200'
-                  )}
-                >
-                  <p className="text-sm leading-relaxed">{message.text}</p>
-                </div>
+                {/* text bubble */}
+                {message.type === 'text' && (
+                  isEmojiOnly(message.text) && message.sender === 'user' ? (
+                    // emoji-only: no green background, just big emoji
+                    <div className="px-1 py-0.5">
+                      <p className="text-3xl leading-none">
+                        {message.text}
+                      </p>
+                    </div>
+                  ) : (
+                    // normal text bubble
+                    <div
+                      className={cn(
+                        'rounded-lg px-4 py-2 max-w-md break-words',
+                        message.sender === 'user'
+                          ? 'bg-[#03624C] text-white'
+                          : 'bg-white text-black border border-gray-200'
+                      )}
+                    >
+                      <p className="text-sm leading-relaxed">{message.text}</p>
+                    </div>
+                  )
+                )}
+
+                {/* voice bubble */}
+                {message.type === 'voice' && message.audioUrl && (
+                  <VoiceMessageBubble
+                    audioUrl={message.audioUrl}
+                    isUser={message.sender === 'user'}
+                  />
+                )}
+
                 <span className="text-xs text-gray-500 px-1">
                   {formatTime(message.timestamp)}
                 </span>
@@ -270,7 +324,130 @@ export default function sessionBox() {
       </ScrollArea>
 
       {/* Input Area */}
-      <MessageInput />
+      <MessageInput
+        onVoiceMessage={handleVoiceMessage}
+        onSendText={handleSendTextMessage}
+      />
+    </div>
+  );
+}
+
+// Compact card-style voice bubble: white rounded card, play + Instagram-style line visualizer
+function VoiceMessageBubble({
+  audioUrl,
+  isUser,
+}: {
+  audioUrl: string;
+  isUser: boolean;
+}) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const togglePlayback = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) setCurrentTime(audioRef.current.currentTime);
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) setDuration(audioRef.current.duration);
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+  };
+
+  const formatTime = (secs: number) => {
+    const s = Math.floor(secs % 60)
+      .toString()
+      .padStart(2, '0');
+    const m = Math.floor(secs / 60)
+      .toString()
+      .padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  const timeLabel = formatTime(currentTime || duration || 0);
+  const progress = duration > 0 ? currentTime / duration : 0;
+
+  // heights pattern for bars (0–1)
+  const barPattern = [
+    0.2, 0.4, 0.7, 0.9, 0.8, 0.6, 0.35, 0.25,
+    0.5, 0.85, 0.7, 0.55, 0.4, 0.3, 0.45, 0.65,
+    0.7, 0.6, 0.45, 0.3, 0.2,
+  ];
+
+  return (
+    <div className="flex items-end gap-2 max-w-md w-full">
+      {/* small gray mic circle */}
+      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-1">
+        <Mic className="w-4 h-4 text-gray-700" />
+      </div>
+
+      {/* main pill */}
+      <div className="flex items-center w-[280px] bg-white rounded-full shadow-xs border border-gray-200 px-4 py-3">
+        {/* play button */}
+        <button
+          onClick={togglePlayback}
+          className="w-8 h-8 rounded-full flex items-center justify-center bg-black text-white mr-3 flex-shrink-0"
+          aria-label={isPlaying ? 'Pause voice message' : 'Play voice message'}
+        >
+          {isPlaying ? (
+            <Square className="w-3.5 h-3.5 fill-current" />
+          ) : (
+            <Play className="w-3.5 h-3.5 fill-current ml-[1px]" />
+          )}
+        </button>
+
+        {/* full-width line visualizer */}
+        <div className="flex-1 h-7 flex items-center">
+          <div className="w-full h-full flex items-center justify-between">
+            {barPattern.map((v, idx) => {
+              const played = idx / barPattern.length < progress;
+              const color = played ? '#000000' : '#d4d4d8'; // black / gray-300
+              const heightPct = 25 + v * 65; // 25–90%
+
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    width: 2,
+                    borderRadius: 9999,
+                    backgroundColor: color,
+                    height: `${heightPct}%`,
+                    minHeight: '20%',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* optional time label on the very right; remove if you don't want it */}
+        <span className="ml-3 text-[11px] text-gray-500">{timeLabel}</span>
+      </div>
+
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={handleEnded}
+        className="hidden"
+      />
     </div>
   );
 }
