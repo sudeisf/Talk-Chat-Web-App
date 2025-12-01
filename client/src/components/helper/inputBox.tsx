@@ -37,6 +37,7 @@ const VoiceRecorder = forwardRef(function VoiceRecorder(
   const animationFrameRef = useRef<number | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const isCancellingRef = useRef(false); // <-- new flag to prevent recursion
 
   useEffect(() => {
     // expose control methods to parent
@@ -78,12 +79,19 @@ const VoiceRecorder = forwardRef(function VoiceRecorder(
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
+      isCancellingRef.current = false; // reset cancel flag for this session
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
       mediaRecorder.onstop = () => {
+        // if we are cancelling, skip normal onstop logic to avoid recursion / double-calls
+        if (isCancellingRef.current) {
+          chunksRef.current = [];
+          return;
+        }
+
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
@@ -104,6 +112,7 @@ const VoiceRecorder = forwardRef(function VoiceRecorder(
 
   const stopRecordingInternal = () => {
     if (mediaRecorderRef.current && isRecording) {
+      isCancellingRef.current = false;
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
@@ -111,23 +120,37 @@ const VoiceRecorder = forwardRef(function VoiceRecorder(
   };
 
   const cancelInternal = () => {
+    // mark as cancelling so onstop knows to skip normal handling
+    isCancellingRef.current = true;
+
     // stop recorder, close stream, clear audio and waveform
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
     }
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    if (audioContextRef.current) audioContextRef.current.close();
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
     setIsRecording(false);
     setIsPlaying(false);
     setAudioUrl(null);
     setDuration(0);
     setCurrentTime(0);
-    setWaveformData([0.2, 0.4, 0.6, 0.8, 0.5, 0.3, 0.7, 0.9, 0.6, 0.4, 0.2, 0.5, 0.7, 0.4, 0.3]);
-    // notify parent so it can hide the bubble
+    setWaveformData([
+      0.2, 0.4, 0.6, 0.8, 0.5, 0.3, 0.7, 0.9, 0.6, 0.4, 0.2, 0.5, 0.7, 0.4, 0.3,
+    ]);
+
+    // 6. Notify parent so it hides the recording UI
     onCancel?.();
   };
 

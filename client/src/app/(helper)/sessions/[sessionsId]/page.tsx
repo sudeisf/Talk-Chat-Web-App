@@ -254,72 +254,12 @@ export default function sessionBox() {
             </div>
           )}
 
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                'flex gap-3 max-w-[80%]',
-                message.sender === 'user' ? 'ml-auto flex-row-reverse' : ''
-              )}
-            >
-              <Avatar className="h-8 w-8 flex-shrink-0">
-                <AvatarImage
-                  src={
-                    message.sender === 'user'
-                      ? '/placeholder.svg?height=32&width=32&query=user avatar'
-                      : '/placeholder.svg?height=32&width=32&query=professional woman avatar'
-                  }
-                />
-                <AvatarFallback className="bg-gray-200 text-black text-xs">
-                  {message.sender === 'user' ? 'YU' : 'SC'}
-                </AvatarFallback>
-              </Avatar>
-
-              <div
-                className={cn(
-                  'flex flex-col gap-1',
-                  message.sender === 'user' ? 'items-end' : 'items-start'
-                )}
-              >
-                {/* text bubble */}
-                {message.type === 'text' && (
-                  isEmojiOnly(message.text) && message.sender === 'user' ? (
-                    // emoji-only: no green background, just big emoji
-                    <div className="px-1 py-0.5">
-                      <p className="text-3xl leading-none">
-                        {message.text}
-                      </p>
-                    </div>
-                  ) : (
-                    // normal text bubble
-                    <div
-                      className={cn(
-                        'rounded-lg px-4 py-2 max-w-md break-words',
-                        message.sender === 'user'
-                          ? 'bg-[#03624C] text-white'
-                          : 'bg-white text-black border border-gray-200'
-                      )}
-                    >
-                      <p className="text-sm leading-relaxed">{message.text}</p>
-                    </div>
-                  )
-                )}
-
-                {/* voice bubble */}
-                {message.type === 'voice' && message.audioUrl && (
-                  <VoiceMessageBubble
-                    audioUrl={message.audioUrl}
-                    isUser={message.sender === 'user'}
-                  />
-                )}
-
-                <span className="text-xs text-gray-500 px-1">
-                  {formatTime(message.timestamp)}
-                </span>
-              </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
+          {/* Messages list as its own component */}
+          <MessageList
+            messages={messages}
+            formatTime={formatTime}
+            messagesEndRef={messagesEndRef}
+          />
         </div>
       </ScrollArea>
 
@@ -328,6 +268,100 @@ export default function sessionBox() {
         onVoiceMessage={handleVoiceMessage}
         onSendText={handleSendTextMessage}
       />
+    </div>
+  );
+}
+
+/** Renders the whole messages list */
+function MessageList({
+  messages,
+  formatTime,
+  messagesEndRef,
+}: {
+  messages: Message[];
+  formatTime: (d: Date) => string;
+  messagesEndRef: React.RefObject<HTMLDivElement>;
+}) {
+  return (
+    <>
+      {messages.map((message) => (
+        <ChatMessageRow
+          key={message.id}
+          message={message}
+          formatTime={formatTime}
+        />
+      ))}
+      <div ref={messagesEndRef} />
+    </>
+  );
+}
+
+/** Renders a single chat message row (avatar + bubble) */
+function ChatMessageRow({
+  message,
+  formatTime,
+}: {
+  message: Message;
+  formatTime: (d: Date) => string;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex gap-3 max-w-[80%]',
+        message.sender === 'user' ? 'ml-auto flex-row-reverse' : ''
+      )}
+    >
+      <Avatar className="h-8 w-8 flex-shrink-0">
+        <AvatarImage
+          src={
+            message.sender === 'user'
+              ? '/placeholder.svg?height=32&width=32&query=user avatar'
+              : '/placeholder.svg?height=32&width=32&query=professional woman avatar'
+          }
+        />
+        <AvatarFallback className="bg-gray-200 text-black text-xs">
+          {message.sender === 'user' ? 'YU' : 'SC'}
+        </AvatarFallback>
+      </Avatar>
+
+      <div
+        className={cn(
+          'flex flex-col gap-1',
+          message.sender === 'user' ? 'items-end' : 'items-start'
+        )}
+      >
+        {/* text bubble */}
+        {message.type === 'text' && (
+          isEmojiOnly(message.text) && message.sender === 'user' ? (
+            <div className="px-1 py-0.5">
+              <p className="text-3xl leading-none">{message.text}</p>
+            </div>
+          ) : (
+            <div
+              className={cn(
+                'rounded-lg px-4 py-2 max-w-md break-words',
+                message.sender === 'user'
+                  ? 'bg-[#03624C] text-white'
+                  : 'bg-white text-black border border-gray-200'
+              )}
+            >
+              <p className="text-sm leading-relaxed">{message.text}</p>
+            </div>
+          )
+        )}
+
+        {/* voice bubble */}
+        {message.type === 'voice' && message.audioUrl && (
+          <VoiceMessageBubble
+            audioUrl={message.audioUrl}
+            isUser={message.sender === 'user'}
+          />
+        )}
+
+        <span className="text-xs text-gray-500 px-1">
+          {formatTime(message.timestamp)}
+        </span>
+      </div>
     </div>
   );
 }

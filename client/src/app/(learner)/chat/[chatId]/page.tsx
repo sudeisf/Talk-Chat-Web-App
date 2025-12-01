@@ -2,10 +2,11 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { BookOpen, MoreVertical, Paperclip, Send } from 'lucide-react';
+import { BookOpen, MoreVertical } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { MessageInput } from '@/components/helper/inputBox';
 
 const userInfo = {
   name: 'Sudeis Fedlu',
@@ -63,12 +64,25 @@ const currentSession = {
 
 interface Message {
   id: string;
-  text: string;
+  text?: string;
+  type?: 'text' | 'voice'; // optional for backward compat
   sender: 'user' | 'other';
   timestamp: Date;
   avatar?: string;
   name: string;
+  audioUrl?: string;
 }
+
+// helper: true if text is only emojis (no letters/digits)
+const isEmojiOnly = (text?: string) => {
+  if (!text) return false;
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  const emojiRegex =
+    /[\p{Emoji_Presentation}\uFE0F\u200D\p{Extended_Pictographic}]/gu;
+  const withoutEmoji = trimmed.replace(emojiRegex, '').trim();
+  return withoutEmoji.length === 0;
+};
 
 export default function ChatBox() {
   const formatTime = (date: Date) => {
@@ -80,8 +94,6 @@ export default function ChatBox() {
   };
 
   const [messages, setMessages] = useState<Message[]>([]);
-
-  const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,6 +102,7 @@ export default function ChatBox() {
       {
         id: '1',
         text: "Hi! I'm trying to integrate Stripe payment gateway in my React app. Can you help me understand the best approach?",
+        type: 'text',
         sender: 'other',
         timestamp: new Date(Date.now() - 300000),
         name: 'Alex Johnson',
@@ -97,6 +110,7 @@ export default function ChatBox() {
       {
         id: '2',
         text: "Let's start with the basics. First, you'll need to install the Stripe SDK and set up your API keys. Have you created a Stripe account yet?",
+        type: 'text',
         sender: 'user',
         timestamp: new Date(Date.now() - 240000),
         name: 'Instructor',
@@ -104,6 +118,7 @@ export default function ChatBox() {
       {
         id: '3',
         text: "Yes, I have the account set up. I'm just not sure about the frontend implementation and how to handle the payment flow securely.",
+        type: 'text',
         sender: 'other',
         timestamp: new Date(Date.now() - 180000),
         name: 'Alex Johnson',
@@ -111,6 +126,7 @@ export default function ChatBox() {
       {
         id: '4',
         text: "Great! For the frontend, you'll want to use Stripe Elements for secure card input. Let me walk you through creating a payment form component...",
+        type: 'text',
         sender: 'user',
         timestamp: new Date(Date.now() - 120000),
         name: 'Instructor',
@@ -118,19 +134,35 @@ export default function ChatBox() {
     ]);
   }, []);
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+  const handleSendTextMessage = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
     setMessages((prev) => [
       ...prev,
       {
         id: (prev.length + 1).toString(),
-        text: newMessage,
+        text: trimmed,
+        type: 'text',
         sender: 'user',
         timestamp: new Date(),
         name: 'Instructor',
       },
     ]);
-    setNewMessage('');
+  };
+
+  const handleVoiceMessage = (audioBlob: Blob) => {
+    const url = URL.createObjectURL(audioBlob);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: (prev.length + 1).toString(),
+        type: 'voice',
+        sender: 'user',
+        timestamp: new Date(),
+        name: 'Instructor',
+        audioUrl: url,
+      },
+    ]);
   };
 
   useEffect(() => {
@@ -138,7 +170,7 @@ export default function ChatBox() {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex rounded-lg border mt-2 mx-4 shadow-xs flex-col h-[calc(96vh-50px)]">
       {/* Message Header */}
       <div className="px-4 py-2 border-b border-gray-200 bg-white shrink-0">
         <div className="flex items-center justify-between mb-3">
@@ -248,16 +280,35 @@ export default function ChatBox() {
                   message.sender === 'user' ? 'items-end' : 'items-start'
                 )}
               >
-                <div
-                  className={cn(
-                    'rounded-lg px-4 py-2 max-w-md break-words',
-                    message.sender === 'user'
-                      ? 'bg-[#03624c] text-white'
-                      : 'bg-white text-black border border-gray-200'
-                  )}
-                >
-                  <p className="text-sm leading-relaxed">{message.text}</p>
-                </div>
+                {/* text bubble */}
+                {(!message.type || message.type === 'text') && (
+                  isEmojiOnly(message.text) && message.sender === 'user' ? (
+                    // emoji-only: no green background, just big emoji
+                    <div className="px-1 py-0.5">
+                      <p className="text-3xl leading-none">{message.text}</p>
+                    </div>
+                  ) : (
+                    // normal bubble
+                    <div
+                      className={cn(
+                        'rounded-lg px-4 py-2 max-w-md break-words',
+                        message.sender === 'user'
+                          ? 'bg-[#03624c] text-white'
+                          : 'bg-white text-black border border-gray-200'
+                      )}
+                    >
+                      <p className="text-sm leading-relaxed">{message.text}</p>
+                    </div>
+                  )
+                )}
+
+                {/* voice bubble */}
+                {message.type === 'voice' && message.audioUrl && (
+                  <audio controls src={message.audioUrl} className="w-48">
+                    Your browser does not support the audio element.
+                  </audio>
+                )}
+
                 <span className="text-xs text-gray-500 px-1">
                   {formatTime(message.timestamp)}
                 </span>
@@ -268,44 +319,10 @@ export default function ChatBox() {
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
-      <div className="px-2 border-t border-b border-gray-200 bg-white dark:bg-gray-800 shrink-0">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="flex-shrink-0 hover:bg-gray-100 dark:hover:bg-gray-700"
-            title="Attach file"
-          >
-            <Paperclip className="h-8 w-8 text-black dark:text-white" />
-          </Button>
-
-          <div className="relative flex-1 p-2">
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message…"
-              className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-300 rounded-md px-4 py-2 pr-12 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all duration-150"
-              rows={1}
-              style={{ minHeight: 30, maxHeight: 120, overflowY: 'auto' }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-          </div>
-
-          <Button
-            onClick={handleSendMessage}
-            disabled={!newMessage.trim()}
-            className="flex-shrink-0 bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-300 text-white px-4 py-2 rounded-sm transition-all"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <MessageInput
+        onVoiceMessage={handleVoiceMessage}
+        onSendText={handleSendTextMessage}
+      />
     </div>
   );
 }
