@@ -4,15 +4,21 @@ from django.contrib.auth.models import AbstractUser , Group, Permission
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Q
 
 class User(AbstractUser):
       class Gender(models.TextChoices):
-            MALLE = 'male',
-            FEMALE = "female"
+            MALE = 'male', 'Male'
+            FEMALE = 'female', 'Female'
 
       class Role(models.TextChoices):
             LEARNER = 'learner',
             HELPER = 'helper'
+            
+      class LoginMethod(models.TextChoices):
+            EMAIL = 'email', 'Email'
+            GOOGLE = 'google', 'Google'
+            GITHUB = 'github', 'Github'
     
       groups = models.ManyToManyField(
             Group,
@@ -21,9 +27,11 @@ class User(AbstractUser):
       )
       user_permissions = models.ManyToManyField(
             Permission,
-            related_name="ustomUsers_user_permissions",
+            related_name="CustomUsers_user_permissions",
             blank=True
       )
+      
+      login_method = models.CharField(max_length=20, choices=LoginMethod.choices, default=LoginMethod.EMAIL)
 
       role= models.CharField(max_length=20, choices=Role.choices , default=Role.LEARNER)
       bio = models.TextField(max_length=500, null=True, blank=True)
@@ -33,10 +41,8 @@ class User(AbstractUser):
       country = models.CharField(max_length=200, null=True, blank=True)
 
 
-      email = models.EmailField(unique=True)
+      email = models.EmailField()
       username = models.CharField(max_length=30 , unique=True)
-      firstName = models.CharField(max_length=30 ,null=True , blank=True) 
-      lastName = models.CharField(max_length=30 ,null=True , blank=True)
       birth_date = models.DateField(null=True,blank=True)
       gender = models.CharField(max_length=200, choices=Gender.choices,blank=True , null=True)
       phone_number = models.CharField(max_length=20,null=True,blank=True)
@@ -52,8 +58,27 @@ class User(AbstractUser):
       created_at = models.DateTimeField(auto_now_add=True)
       updated_at = models.DateTimeField(auto_now=True)
 
-      USERNAME_FIELD = "email"
-      REQUIRED_FIELDS = ['username', 'firstName', 'lastName']
+      REQUIRED_FIELDS = ["first_name", "last_name"]
+      
+      class Meta:
+            constraints =[
+                  models.UniqueConstraint(
+                        fields = ["email"],
+                        condition=Q(login_method='email'),
+                        name="unique_email_for_email_login"
+                  ),
+                  models.UniqueConstraint(
+                        fields = ["google_id"],
+                        condition=Q(login_method='google'),
+                        name="unique_google_id_for_google_login"
+                  ),
+                  models.UniqueConstraint(
+                        fields = ["github_id"],
+                        condition=Q(login_method='github'),
+                        name="unique_github_id_for_github_login"
+                  ),
+            ]
+
 
 
       def __str__(self) -> str:
@@ -69,9 +94,13 @@ class Tag(models.Model):
 class UserTag(models.Model):
       user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_tags')
       tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name='user_tags')
+      
+      class Meta:
+        unique_together = ('user', 'tag')
 
       def __str__(self):
             return f"{self.user.username} - {self.tag.name}"
+      
       
 class Otp(models.Model):
       email = models.EmailField()
@@ -91,4 +120,4 @@ class Otp(models.Model):
 
       @property
       def is_valid(self):
-            return not self.is_used and self.expires_at < timezone.now()
+            return not self.is_used and self.expires_at > timezone.now()

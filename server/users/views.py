@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from .serilizers import (
@@ -48,8 +47,8 @@ class LoginView(APIView):
                         "user" : user.id,
                         "email" : user.email,
                         "username" : user.username,
-                        "firstName" : user.firstName,
-                        "lastName" : user.lastName
+                        "firstName" : user.first_name,
+                        "lastName" : user.last_name
                   },status=status.HTTP_200_OK)
             return Response(serializer.errors, status=400)
 
@@ -209,8 +208,8 @@ class GoogleLoginAPIView(APIView):
             email=email,
             google_id=google_sub,
             is_google_account=True,
-            firstName=first_name,
-            lasName=last_name,
+            first_name=first_name,
+            last_name=last_name,
         ), True
 
     def generate_unique_username(self, email):
@@ -288,6 +287,6 @@ class GithubLoginAPIView(APIView):
                         "user" : user.id,
                         "email" : user.email,
                         "username" : user.username,
-                        "firstName" : user.firstName,
-                        "lastName" : user.lastName
+                        "firstName" : user.first_name,
+                        "lastName" : user.last_name
         },status=status.HTTP_200_OK)
