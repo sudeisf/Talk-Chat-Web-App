@@ -78,32 +78,30 @@ export default function Home() {
 
   return (
     <div>
-      <nav className="flex justify-between p-4 *:font-sans">
-        <div className='flex flex-column items-center gap-2'>
-        <Image  src={Logo}  width={30} height={30} alt='logo'   />
-        <p className="text-lg text-[#03624C]  text-shadow-xs">
-          Talkit
-        </p>
-        </div>
+      <nav className="flex items-center justify-between p-4 *:font-sans">
+  <div className="flex items-center gap-2">
+    <Image src={Logo} width={30} height={30} alt="logo" />
+    <p className="text-lg text-[#03624C] text-shadow-xs">Talkit</p>
+  </div>
 
-        <div className="flex">
-          <Button
-            onClick={() => router.push('/register')}
-            variant={'ghost'}
-            className="text-md"
-          >
-            Sign up
-          </Button>
-          <Button
-            onClick={() => router.push('/login')}
-            className="rounded-sm text-md shadow-xs bg-[#03624C]  text-white px-6"
-          >
-            Sign in
-          </Button>
-        </div>
-      </nav>
+  <div className="flex items-center gap-2">
+    <Button
+      onClick={() => router.push('/register')}
+      variant="ghost"
+      className="text-sm md:text-md px-3 md:px-4"
+    >
+      Sign up
+    </Button>
+    <Button
+      onClick={() => router.push('/login')}
+      className="rounded-sm text-sm md:text-md shadow-xs bg-[#03624C] text-white px-4 md:px-6"
+    >
+      Sign in
+    </Button>
+  </div>
+</nav>
       <main>
-        <div className="relative min-h-screen space-y-8 py-5">
+        <div className="relative min-h-screen space-y-8 py-5 px-4 sm:px-6">
           <Image
             src={L}
             alt="decorative blob"
@@ -113,60 +111,60 @@ export default function Home() {
 
           {/* Main heading */}
           <div className="mx-auto text-center">
-            <h1 className="inline-block text-[#03624C]  bg-[#03624C]/5 text-lg md:text-sm py-2 px-6 rounded-full animate-bounce">
+            <h1 className="inline-block text-[#03624C] bg-[#03624C]/5 text-sm sm:text-base md:text-lg py-2 px-6 rounded-full">
               Ask smarter. Learn faster. Never get stuck again.
             </h1>
           </div>
 
           {/* Content section */}
-          <div className="max-w-6xl mx-auto space-y-8 px-4">
-            <p className="text-3xl md:text-4xl font-medium text-center font-rubik  text-[#03624C] leading-tight">
+          <div className="max-w-5xl mx-auto space-y-8">
+            <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-center font-rubik  leading-tight">
               Whether you're debugging a tricky function, confused by async
-              behavior, or just need a second brain - this platform connects you
-              with real people, in real time.
+              behavior, or just need a second brain<span className="text-[#085543]"> - this platform connects you
+              with real people, in real time.</span>
             </p>
 
-            <p className="text-lg md:text-xl text-[#03624C]/90 text-center leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-[#03624C]/90 text-center leading-relaxed">
               No more endless Googling. No more waiting for forum replies.
               <br />
               Just ask, get matched instantly, and learn through live chat — one
               question at a time.
             </p>
 
-            <p className="text-center text-gray-500 text-lg underline">
+            <p className="text-sm sm:text-base text-gray-500 text-center underline">
               Start learning the way you always wanted:
-              <span className="text-red-500 mx-1">fast</span>,
-              <span className="text-red-500 mx-1">focused</span>, and
-              <span className="text-red-500 mx-1 animate-in">human</span>.
+              <span className="text-[#085543] mx-1">fast</span>,
+              <span className="text-[#085543] mx-1">focused</span>, and
+              <span className="text-[#085543] mx-1 animate-in">human</span>.
             </p>
           </div>
 
           {/* CTA button */}
           <div className="flex justify-center mt-12">
-            <Button className="bg-[#085543] hover:bg-[##085543]/90 text-white text-md max-w-4xl rounded-md shadow-xs transition-colors duration-200 flex items-center gap-2">
+            <Button className="bg-[#085543] hover:bg-[#085543]/90 text-sm sm:text-base max-w-4xl rounded-md shadow-xs flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3">
               Ask a Question & Get Help <ArrowUpRight size={18} />
             </Button>
           </div>
         </div>
         <div className="min-h-screen max-w-[1400px] mx-auto p-5 space-y-8">
-          <div className="flex justify-between mt-4 items-center">
-            <h1 className="font-pt font-medium text-4xl p-5 ">
-              Why Choose Us & <br /> What You Get
-            </h1>
-            <Button className="font-pt text-lg  bg-red-500 text-md py-6 px-10 rounded-md shadow-xs hover:bg-red-500/80">
-              <Sparkles fill="#ffffff" className="stroke-1 w-8 h-8" />
-              Let's start learning
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="flex flex-col md:flex-row justify-between mt-4 items-center gap-4">
+    <h1 className="font-pt font-medium text-2xl sm:text-3xl md:text-4xl text-center md:text-left">
+      Why Choose Us & <br /> What You Get
+    </h1>
+    <Button className="w-full sm:w-auto font-pt text-sm sm:text-base bg-[#085543] py-3 sm:py-4 px-6 sm:px-8 rounded-md shadow-xs hover:bg-[#085543]/90">
+      <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
+      <span className="ml-2">Let's start learning</span>
+    </Button>
+  </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {features.map((feature, idx) => (
               <div
                 key={idx}
                 className="p-4 rounded-md  hover:shadow-lg hover:border transition-shadow animation-duration-initial duration-500 bg-white text-left"
               >
-                <feature.icon className="w-8 h-8 text-red-500 mb-5" />
-                <h3 className="text-xl font-pt font-medium">{feature.title}</h3>
-                <p className="text-gray-600 mt-2 text-md">
+                <feature.icon className="w-8 h-8 text-[#085543] mb-5" />
+                <h3 className="text-lg sm:text-xl font-pt font-medium">{feature.title}</h3>
+                <p className="text-sm sm:text-base text-gray-600 mt-2">
                   {feature.description}
                 </p>
               </div>
@@ -174,44 +172,44 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="min-h-screen p-5 w-full">
-          <div className="p-4 h-[270px] bg-gradient-to-r from-orange-500 via-red-400 to-orange-400 rounded-md space-y-5">
-            <h1 className="text-center uppercase font-medium text-white text-2xl font-pt mt-8">
+        <div className="min-h-screen p-3 sm:p-5 w-full">
+          <div className="p-3 sm:p-4 bg-[#085543] rounded-md space-y-5">
+            <h1 className="text-center uppercase font-medium text-white text-xl sm:text-2xl font-pt mt-6">
               contact us
             </h1>
-            <p className="text-center text-white text-6xl font-pt">
+            <p className="text-center text-white text-xl sm:text-3xl md:text-4xl font-pt">
               We'd love to talk to you
             </p>
-            <div className="flex gap-8 justify-evenly relative top-10 max-w-[80%] mx-auto">
-              <div className="py-10 border space-y-3 bg-white px-8 rounded-md w-1/3 shadow-2xs">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 sm:max-w-[80%] mx-auto mt-6">
+              <div className="py-8 border space-y-3 bg-white px-6 rounded-md shadow-2xs">
                 <div className="flex gap-4">
-                  <PhoneIncoming className="w-8 h-8 stroke-orange-500/80" />
+                  <PhoneIncoming className="w-8 h-8 stroke-[#085543]/80" />
                   <div className="flex flex-col align-baseline">
-                    <h1 className="uppercase font-pt text-gray-500 text-sm font-medium">
+                    <h1 className="uppercase font-pt text-gray-500 text-xs sm:text-sm font-medium">
                       Call us
                     </h1>
-                    <p className="font-sans font-medium text-lg">
+                    <p className="font-sans font-medium text-base sm:text-lg">
                       +25111789089
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="py-10 border space-y-3 bg-white px-8 rounded-md w-1/3 shadow-2xs">
+              <div className="py-8 border space-y-3 bg-white px-3 px-6 rounded-md shadow-2xs">
                 <div className="flex gap-4">
-                  <Mail className="w-8 h-8 stroke-orange-500/80" />
+                  <Mail className="w-8 h-8 stroke-[#085543]/80" />
                   <div className="flex flex-col align-baseline">
                     <h1 className="uppercase text-gray-500 font-pt text-sm font-medium">
                       Email us
                     </h1>
-                    <p className="font-sans font-medium text-lg">
+                    <p className="font-sans font-medium text-md sm:text-lg">
                       sudeisfed@gmail.com
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="py-10 border space-y-3 px-8 bg-white rounded-md w-1/3 shadow-2xs">
+              <div className="py-8 border space-y-3 bg-white px-6 rounded-md shadow-2xs">
                 <div className="flex gap-4">
-                  <MapPin className="w-8 h-8 stroke-orange-500/80" />
+                  <MapPin className="w-8 h-8 stroke-[#085543]/80" />
                   <div className="flex flex-col align-baseline">
                     <h1 className="uppercase text-sm text-gray-500 font-medium font-pt">
                       Head Quarters
@@ -224,30 +222,32 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="flex gap-5 mt-25 p-4 max-w-6xl  mx-auto">
-            <div className="w-[40%] flex flex-col justify-center gap-2">
-              <p className="bg-orange-500/5 text-orange-400 shadow-2xs rounded-full py-2 px-4 text-md w-fit font-pt">
+          <div className="flex flex-col lg:flex-row gap-6 mt-10 p-4 max-w-6xl mx-auto">
+            <div className="w-full lg:w-2/5 flex flex-col justify-center gap-2">
+              <p className="bg-[#085543]/5 text-[#085543] shadow-2xs rounded-full py-2 px-4 text-xs sm:text-sm font-pt">
                 Our success number
               </p>
-              <h1 className="text-4xl font-medium">Lets Work Togather</h1>
-              <p className="font-pt text-gray-400 text-lg font-medium">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium">
+                Lets Work Togather
+              </h1>
+              <p className="font-pt text-gray-400 text-sm sm:text-base md:text-lg font-medium">
                 share us improvements , features too add feedback , please
                 contact us for basic questions. we're here to help!
               </p>
             </div>
-            <div className="w-[60%]">
-              <form className="space-y-6 p-5" autoComplete="off">
-                <div className="flex gap-2 w-full">
+            <div className="w-full lg:w-3/5">
+              <form className="space-y-6 p-0 md:p-5" autoComplete="off">
+                <div className="flex flex-col md:flex-row gap-2 w-full">
                   <fieldset className="w-full">
                     <Input
                       placeholder="First Name"
-                      className="py-5 rounded-sm"
+                      className="py-3 sm:py-4 rounded-sm text-sm sm:text-base"
                     />
                   </fieldset>
                   <fieldset className="w-full">
                     <Input
                       placeholder="Last Name"
-                      className="py-5 rounded-sm"
+                      className="py-4 md:py-5 rounded-sm"
                     />
                   </fieldset>
                 </div>
@@ -264,7 +264,7 @@ export default function Home() {
                     placeholder="Tell us about your feedback , idea  , improvements..."
                   />
                 </fieldset>
-                <Button className="w-full py-5 rounded-sm bg-gradient-to-r from-orange-500 via-red-400 to-orange-400 text-lg font-sans">
+                <Button className="w-full py-3 sm:py-6 rounded-sm bg-[#085543] text-sm sm:text-base md:text-lg font-sans">
                   Submit
                 </Button>
               </form>
@@ -273,13 +273,13 @@ export default function Home() {
           -
         </div>
       </main>
-      <footer className="mt-20 py-10 px-6 text-sm text-black *:font-pt *:font-medium">
+      <footer className="mt-16 py-10 px-4 sm:px-6 text-sm text-black *:font-pt *:font-medium">
         <div className="max-w-6xl mx-auto text-center space-y-4">
-          <p className="text-lg italic text-black max-w-xl mx-auto">
+          <p className="text-base sm:text-lg italic text-black max-w-xl mx-auto">
             "The right question asked at the right time can change everything."
           </p>
 
-          <div className="flex justify-center gap-6 text-sm text-black font-medium">
+          <div className="flex justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-black font-medium">
             <a href="/terms" className="hover:text-red-500 transition">
               Terms
             </a>
@@ -294,9 +294,8 @@ export default function Home() {
             </a>
           </div>
 
-          <p className="text-xs text-black">
-            &copy; {currentYear || ''} Talktit. Built for learners. All
-            rights reserved.
+          <p className="text-[11px] sm:text-xs text-black">
+            &copy; {currentYear || ''} Talktit. Built for learners. All rights reserved.
           </p>
         </div>
       </footer>

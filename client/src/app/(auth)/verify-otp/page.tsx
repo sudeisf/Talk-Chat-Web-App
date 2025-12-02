@@ -100,7 +100,7 @@ export default function OtpPage() {
       ) : (
         <div>
           <div className="flex justify-between p-4">
-            <h1 className="bg-gradient-to-r from-orange-200 font-sans to-red-700 bg-clip-text text-transparent text-xl">
+            <h1 className="bg-gradient-to-r from-[#03624C] to-[#03624C]/80 bg-clip-text text-transparent text-xl">
               Talkit
             </h1>
             <div className="flex space-x-0.5 text-md"></div>
@@ -162,7 +162,7 @@ export default function OtpPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-orange-600 text-white font-sans to-red-700 py-5 text-sm "
+                className="w-full bg-gradient-to-r from-[#03624C] to-[#03624C]/80  text-white font-medium font-sans  py-5 text-sm "
               >
                 Verify OTP <ArrowRight />
               </Button>
@@ -173,7 +173,7 @@ export default function OtpPage() {
                 </p>
                 <Link
                   href="/forgot-password"
-                  className="text-md  font-medium font-sans"
+                  className="text-md text-[#03624C]  font-medium font-sans"
                 >
                   Resend OTP
                 </Link>

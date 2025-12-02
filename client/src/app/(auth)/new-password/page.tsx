@@ -102,10 +102,11 @@ export default function NewPassword() {
         </div>
       ) : (
         <div>
-          <div className="flex justify-center p-4">
-            <h1 className="bg-gradient-to-r from-orange-200 font-sans to-red-700 bg-clip-text text-transparent text-4xl">
+          <div className="flex justify-between p-4">
+            <h1 className="bg-gradient-to-r from-[#03624C] to-[#03624C]/80 bg-clip-text text-transparent text-xl">
               Talkit
             </h1>
+            <div className="flex space-x-0.5 text-md"></div>
           </div>
           <div className="  mx-auto mt-10">
             <div className="flex flex-col items-center">
@@ -165,7 +166,7 @@ export default function NewPassword() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-orange-600 text-white font-sans to-red-700 py-5 text-sm "
+                  className="w-full bg-gradient-to-r from-[#03624C] to-[#03624C]/80 py-5 text-sm "
                 >
                   Confirm
                   <ArrowRight />

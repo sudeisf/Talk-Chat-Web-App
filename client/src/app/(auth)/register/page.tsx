@@ -184,7 +184,7 @@ export default function Register() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-orange-600 text-white font-sans to-red-700 py-5 text-sm "
+                className="w-full bg-gradient-to-r from-[#03624C] to-[#03624C]/80 font-sans text-white py-5 text-sm "
               >
                 Sign up <ArrowRight />
               </Button>

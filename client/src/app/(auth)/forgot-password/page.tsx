@@ -88,7 +88,7 @@ export default function ForgotPassword() {
       ) : (
         <div>
           <div className="flex justify-between p-4">
-            <h1 className="bg-gradient-to-r from-orange-200 font-sans to-red-700 bg-clip-text text-transparent text-xl">
+            <h1 className="bg-gradient-to-r from-[#03624C] to-[#085543]/90 font-sans bg-clip-text text-transparent text-xl">
               Talkit
             </h1>
             <div className="flex space-x-0.5 text-md"></div>
@@ -131,7 +131,7 @@ export default function ForgotPassword() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-orange-600 text-white font-sans to-red-700 py-5 text-sm "
+                  className="w-full bg-gradient-to-r from-[#03624C] to-[#085543] text-white font-sans  py-5 text-sm "
                 >
                   Verify email <ArrowRight />
                 </Button>
