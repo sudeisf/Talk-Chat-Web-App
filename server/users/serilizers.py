@@ -26,17 +26,30 @@ class RegisterUserSerilizer(serializers.ModelSerializer):
             return value
       
       def create(self, validated_data):
-            return User.objects.create_user(**validated_data)
+        # Ensure normal registration is marked as email/password login
+        return User.objects.create_user(
+            login_method=getattr(User, "LoginMethod").EMAIL,
+            **validated_data,
+        )
       
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField()
 
     def validate(self, data):
-        user = authenticate(
-            username=data.get("email"),  
-            password=data.get("password")
-        )
+        # Only allow email/password accounts to log in here
+        email = data.get("email")
+        password = data.get("password")
+
+        try:
+            user_obj = User.objects.get(
+                  email=email,
+                  login_method=getattr(User, "LoginMethod").EMAIL,
+            )
+        except User.DoesNotExist:
+            raise serializers.ValidationError("invalid credentials")
+
+        user = authenticate(username=user_obj.username, password=password)
         if not user:
             raise serializers.ValidationError("invalid credentials")
        

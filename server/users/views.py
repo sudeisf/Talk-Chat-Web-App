@@ -186,14 +186,23 @@ class GoogleLoginAPIView(APIView):
 
     def get_or_create_user(self, email, google_sub, first_name, last_name):
         User = get_user_model()
+
+        # If user already linked by google_id
         user = User.objects.filter(google_id=google_sub).first()
         if user:
+            # make sure login_method is correct
+            if user.login_method != User.LoginMethod.GOOGLE:
+                user.login_method = User.LoginMethod.GOOGLE
+                user.is_google_account = True
+                user.save()
             return user, False
 
+        # If user exists by email, link Google
         user = User.objects.filter(email=email).first()
         if user:
             user.google_id = google_sub
             user.is_google_account = True
+            user.login_method = User.LoginMethod.GOOGLE
             if not user.first_name:
                 user.first_name = first_name
             if not user.last_name:
@@ -201,13 +210,14 @@ class GoogleLoginAPIView(APIView):
             user.save()
             return user, False
 
-      
+        # New Google-only user
         username = self.generate_unique_username(email)
         return User.objects.create_user(
             username=username,
             email=email,
             google_id=google_sub,
             is_google_account=True,
+            login_method=User.LoginMethod.GOOGLE,
             first_name=first_name,
             last_name=last_name,
         ), True
@@ -226,9 +236,10 @@ class GoogleLoginAPIView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GithubLoginAPIView(APIView):
-     permission_classes =[]
-     authentication_classes =[]
-     def post(self,request):
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request):
         code = request.data.get("code")
         if not code:
             return Response({"error": "Missing GitHub code"}, status=400)
@@ -273,20 +284,23 @@ class GithubLoginAPIView(APIView):
             if not user.github_id:
                 user.github_id = github_id
                 user.is_github_account = True
-                user.save()
+            # ensure correct login method
+            user.login_method = User.LoginMethod.GITHUB
+            user.save()
         except User.DoesNotExist:
             user = User.objects.create(
                 email=email,
                 username=username,
                 github_id=github_id,
-                is_github_account=True
+                is_github_account=True,
+                login_method=User.LoginMethod.GITHUB,
             )
-        login(request, user)
 
+        login(request, user)
         return Response({
-                        "user" : user.id,
-                        "email" : user.email,
-                        "username" : user.username,
-                        "firstName" : user.first_name,
-                        "lastName" : user.last_name
-        },status=status.HTTP_200_OK)
+            "user": user.id,
+            "email": user.email,
+            "username": user.username,
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+        }, status=status.HTTP_200_OK)
