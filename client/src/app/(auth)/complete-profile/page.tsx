@@ -31,10 +31,10 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
     >
       {/* Content wrapper */}
       <div className="relative z-10">
-        {/* Badge */}
-        <span className={cn(badgeColor, "inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4")}>
+
+        {/* <span className={cn(badgeColor, "inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4")}>
           {title}
-        </span>
+        </span> */}
 
         {/* Illustration */}
         <div className="h-16 w-16 mb-4 mx-auto opacity-90">{illustration}</div>

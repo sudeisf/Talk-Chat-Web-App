@@ -31,7 +31,8 @@ class RegisterView(APIView):
             if serilizer.is_valid():
                   serilizer.save()
                   return Response({
-                        "message" : "user successfully registerd successfully."
+                        "message" : "user successfully registerd successfully.",
+                        "user_id": serilizer.instance.id
                   },status=201)
             return Response(serilizer.errors,status=400)
       

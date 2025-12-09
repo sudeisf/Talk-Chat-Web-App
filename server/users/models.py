@@ -50,6 +50,7 @@ class User(AbstractUser):
 
       cover_image =  CloudinaryField('image', null=True, blank=True)
       profile_image =  CloudinaryField('image', null=True, blank=True)
+      profile_completed = models.BooleanField(default=False)
 
       google_id = models.CharField(max_length=255, null=True, blank=True)
       github_id = models.CharField(max_length=255, null=True, blank=True)
