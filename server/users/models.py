@@ -12,8 +12,9 @@ class User(AbstractUser):
             FEMALE = 'female', 'Female'
 
       class Role(models.TextChoices):
-            LEARNER = 'learner',
-            HELPER = 'helper'
+            LEARNER = 'learner', 'Learner'
+            HELPER = 'helper', 'Helper'
+
             
       class LoginMethod(models.TextChoices):
             EMAIL = 'email', 'Email'
