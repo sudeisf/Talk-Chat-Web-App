@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageInput } from '@/components/helper/inputBox';
+import Memebers from '@/components/learner/Memebers';
 
 const userInfo = {
   name: 'Sudeis Fedlu',
@@ -175,7 +176,7 @@ export default function sessionBox() {
       {/* Message Header */}
       <div className="px-4 py-2 border-b rounded-t-lg border-gray-200 bg-white shrink-0">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
+          <div className="flex jus items-center gap-2">
             <Avatar className="w-15 h-15 border-8 border-white">
               <AvatarImage src={userInfo.avatar} />
               <AvatarFallback>{userInfo.name.charAt(0)}</AvatarFallback>
@@ -194,41 +195,20 @@ export default function sessionBox() {
                     {cat}
                   </span>
                 ))}
-              </div>
             </div>
           </div>
-          <div className="flex flex-col justify-end items-end">
-            <Button variant="ghost" size="icon" className="hover:bg-gray-100">
-              <MoreVertical className="h-5 w-5 text-black" />
-            </Button>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 rounded-md p-2 -m-2 transition-colors">
-                {/* <span className="text-sm text-gray-500">Field Experts:</span> */}
-                <div className="flex -space-x-2">
-                  {(currentSession?.participants || []).map(
-                    (participant, index) => (
-                      <Avatar
-                        key={index}
-                        className="h-6 w-6 border-2 border-white"
-                      >
-                        <AvatarImage
-                          src={participant.avatar || '/placeholder.svg'}
-                        />
-                        <AvatarFallback className="bg-gray-200 text-black text-xs">
-                          {participant.initials}
-                        </AvatarFallback>
-                      </Avatar>
-                    )
-                  )}
-                </div>
-                <span className="text-xs text-gray-500 ml-1">
-                  {currentSession?.participants?.length || 4} helpers
-                </span>
-              </div>
             </div>
+            <div className="flex flex-col justify-end items-end">
+                      <Button variant="ghost" size="icon" className="hover:bg-gray-100">
+                        <MoreVertical className="h-5 w-5 text-black" />
+                      </Button>
+                      <div className="space-y-3">
+                        <Memebers participants={currentSession?.participants} />
+                      </div>
+                  </div>
           </div>
         </div>
-      </div>
+   
 
       {/* Message Area */}
       <ScrollArea className="flex-1 min-h-[400px] max-h-[calc(100vh-212px)]">
@@ -280,7 +260,7 @@ function MessageList({
 }: {
   messages: Message[];
   formatTime: (d: Date) => string;
-  messagesEndRef: React.RefObject<HTMLDivElement>;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
     <>

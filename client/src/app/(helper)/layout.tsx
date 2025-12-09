@@ -4,9 +4,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Learner Dashboard',
+  title: 'Helper Dashboard',
   description:
-    'Track your learning progress, manage active help sessions, and ask questions in real time with expert guidance.',
+    'the best place to get help with your questions',
 };
 
 export default function LearnerLayout({
