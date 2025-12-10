@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import( LoginView , RegisterView ,LogoutView , EmailVerificationView , OTPVerifyVIew , NewPasswordChangeView , GoogleLoginAPIView, GithubLoginAPIView
+from .views import( LoginView , RegisterView ,LogoutView , EmailVerificationView , OTPVerifyVIew , NewPasswordChangeView ,
+                   GoogleLoginAPIView, GithubLoginAPIView , SetUserRoleView
 )
 urlpatterns = [
     path("auth/register/", RegisterView.as_view(), name="register"),
@@ -10,5 +11,5 @@ urlpatterns = [
     path('auth/new-password/' , NewPasswordChangeView.as_view(), name="new-password"),
     path("auth/google/", GoogleLoginAPIView.as_view(), name="google-login"),
     path("auth/github/", GithubLoginAPIView.as_view(), name="google-login"),
-
+    path("user/set-role/<int:pk>/", SetUserRoleView.as_view(), name="set-role"),
 ]

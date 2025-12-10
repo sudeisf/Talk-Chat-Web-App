@@ -17,11 +17,17 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from django.conf import settings
 import requests
+from django.contrib.auth import get_user_model
+
+
 
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+User = get_user_model()
 
 
 class RegisterView(APIView):
@@ -305,3 +311,20 @@ class GithubLoginAPIView(APIView):
             "firstName": user.first_name,
             "lastName": user.last_name,
         }, status=status.HTTP_200_OK)
+        
+        
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SetUserRoleView(APIView):
+    def post(self, request):
+        
+        if not user_id or not role:
+            return Response({"error": "Missing user_id or role"}, status=400)
+
+        try:
+            user = User.objects.get(id=user_id)
+            user.role = role
+            user.save()
+            return Response({"message": "User role updated successfully"}, status=200)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)

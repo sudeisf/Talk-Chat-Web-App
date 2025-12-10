@@ -162,3 +162,25 @@ class reset_password_serializer(serializers.Serializer):
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found")
         
+class SetRoleSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(required=True)
+    role = serializers.ChoiceField(choices=[('learner', 'Learner'), ('helper', 'Helper')], required=True)
+
+    def validate_user_id(self, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            return user
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User with this ID does not exist.")
+
+    def validate_role(self, role):
+        valid_roles = ['learner', 'helper']
+        if role not in valid_roles:
+            raise serializers.ValidationError(f"Role must be one of {valid_roles}.")
+        return role
+
+    def update(self, instance, validated_data):
+        role = validated_data.get('role')
+        instance.role = role
+        instance.save()
+        return instance

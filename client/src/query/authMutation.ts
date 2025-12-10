@@ -15,8 +15,6 @@ import {
   verifyOTP,
 } from '@/lib/api/authApi';
 import { action } from '@/redux/slice/authSlice';
-import { error } from 'console';
-import { parseDjangoError } from '@/lib/utils';
 
 export const useLoginMutation = () => {
   const dispatch = useAppDispatch();
@@ -31,12 +29,19 @@ export const useLoginMutation = () => {
   });
 };
 export const useRegisterMutation = () => {
+  const dispatch = useAppDispatch();
   const router = useRouter();
   return useMutation({
     mutationKey: ['register'],
     mutationFn: (credentials: RegisterCredentials) => registerUser(credentials),
     onSuccess: (data) => {
       router.replace('/login');
+      dispatch(
+        action.setAuth({
+          id: data.user_id,
+        }),
+      );
+      
     },
   });
 };

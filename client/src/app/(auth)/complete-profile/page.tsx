@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import type React from "react"
 import { cn } from "@/lib/utils"
@@ -23,10 +23,10 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
       onClick={onClick}
       className={cn(
         "group relative overflow-hidden rounded-lg p-4 text-left",
-        "border-1",
-        "bg-white shadow-xs",
+        "border-1 border-gray-600",
+        "bg-white shadow-sm hover:shadow-[0_8px_10px_rgba(3,98,76,0.25)]",
         isSelected ? "border-[#03624C] bg-green-50" : "border-border",
-        "transition-all duration-200 hover:shadow-md"
+         "transition-all duration-200"
       )}
     >
       {/* Content wrapper */}
@@ -63,14 +63,17 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
 }
 
 export default function CompleteProfile() {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null)
+  
+
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  comst  = useAppSelector((state) => state.auth);
 
   const handleContinue = () => {
     if (selectedRole) {
-      console.log("Selected role:", selectedRole)
-      // Handle role selection - redirect or continue with flow
+        const 
     }
   }
+
 
   return (
     <div className="flex items-center mt-10 justify-center bg-white px-4 font-sans">
