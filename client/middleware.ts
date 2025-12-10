@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/login', '/register', '/api/auth'];
+const PUBLIC_PATHS = ['/login', '/register', '/complete-profile', '/api/auth'];
 
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
   learner: '/learner/dashboard',

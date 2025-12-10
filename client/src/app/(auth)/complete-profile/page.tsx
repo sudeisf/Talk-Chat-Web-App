@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { setUser } from "@/redux/slice/userSlice"
 import { useRouter } from "next/navigation"
 import axios from "axios"
+import { SpinnerInfinity } from "spinners-react"
 
 interface RoleCardProps {
   title: string
@@ -68,11 +69,13 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
 
 export default function CompleteProfile() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const auth = useAppSelector((state) => state.auth);
   const userId = auth.user?.id;
 
   const handleContinue = () => {
     if (!selectedRole || !userId) return;
+    setIsLoading(true);
     axios
       .post(
         `${process.env.NEXT_PUBLIC_API_URL}/users/user/set-role/${userId}/`,
@@ -83,13 +86,29 @@ export default function CompleteProfile() {
       )
       .then((res) => {
         console.log(res.data);
-        window.location.href = "/dashboard";
+        window.location.href = "/login";
       })
       .catch((err) => {
         console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <SpinnerInfinity
+          thickness={100}
+          secondaryColor="#f0f0f0"
+          color="#03624C"
+          size={90}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center mt-10 justify-center bg-white px-4 font-sans">
