@@ -3,29 +3,34 @@ import type { NextRequest } from 'next/server';
 
 const PUBLIC_PATHS = ['/login', '/register', '/api/auth'];
 
+const ROLE_DASHBOARD_MAP: Record<string, string> = {
+  learner: '/learner/dashboard',
+  helper: '/helper/dashboard',
+};
+
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hasSession = request.cookies.has('sessionid');
-
-  console.log('[MIDDLEWARE]', {
-    path,
-    cookies: Array.from(request.cookies).map(([name, value]) => ({
-      name,
-      value,
-    })),
-    hasSession,
-  });
-
+  const role = request.cookies.get('role')?.value; // set by Django
   const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
 
-  // If it's a protected route and no session
+  // Not logged in -> block protected routes
   if (!isPublic && !hasSession) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // If user is logged in and tries to visit login/register
-  if (isPublic && hasSession) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  // Logged in and hitting login/register -> send to their dashboard
+  if (isPublic && hasSession && role && ROLE_DASHBOARD_MAP[role]) {
+    return NextResponse.redirect(
+      new URL(ROLE_DASHBOARD_MAP[role], request.url),
+    );
+  }
+
+  // Generic dashboard entrypoint -> forward to role-specific dashboard
+  if (path === '/dashboard' && role && ROLE_DASHBOARD_MAP[role]) {
+    return NextResponse.redirect(
+      new URL(ROLE_DASHBOARD_MAP[role], request.url),
+    );
   }
 
   return NextResponse.next();

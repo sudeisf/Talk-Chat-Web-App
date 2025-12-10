@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from .serilizers import (
       RegisterUserSerilizer , LoginSerializer 
-      ,EmailVerifySerilizer ,OtpVerifySerializer, reset_password_serializer
+      ,EmailVerifySerilizer ,OtpVerifySerializer, SetRoleSerializer, reset_password_serializer
       )
 from rest_framework.response import Response
 from rest_framework import status
@@ -50,13 +50,17 @@ class LoginView(APIView):
             if serializer.is_valid():
                   user = serializer.validated_data["user"]
                   login(request,user)
-                  return Response({
-                        "user" : user.id,
-                        "email" : user.email,
-                        "username" : user.username,
-                        "firstName" : user.first_name,
-                        "lastName" : user.last_name
-                  },status=status.HTTP_200_OK)
+            response = Response({
+                "user" : user.id,
+                "email" : user.email,
+                "username" : user.username,
+                "firstName" : user.first_name,
+                "lastName" : user.last_name
+            },status=status.HTTP_200_OK)
+            # expose role to frontend via cookie for middleware-based redirects
+            if hasattr(user, "role") and user.role:
+                response.set_cookie("role", user.role)
+            return response
             return Response(serializer.errors, status=400)
 
 class LogoutView(APIView):
@@ -168,7 +172,7 @@ class GoogleLoginAPIView(APIView):
 
             login(request, user)
 
-            return Response({
+            response = Response({
                 "status": "success",
                 "user": {
                     "id": user.id,
@@ -178,6 +182,9 @@ class GoogleLoginAPIView(APIView):
                 },
                 "created": created
             })
+            if hasattr(user, "role") and user.role:
+                response.set_cookie("role", user.role)
+            return response
 
         except ValueError as e:
          
@@ -304,27 +311,40 @@ class GithubLoginAPIView(APIView):
             )
 
         login(request, user)
-        return Response({
+        response = Response({
             "user": user.id,
             "email": user.email,
             "username": user.username,
             "firstName": user.first_name,
             "lastName": user.last_name,
         }, status=status.HTTP_200_OK)
+        if hasattr(user, "role") and user.role:
+            response.set_cookie("role", user.role)
+        return response
         
         
-
 @method_decorator(csrf_exempt, name='dispatch')
 class SetUserRoleView(APIView):
-    def post(self, request):
-        
-        if not user_id or not role:
-            return Response({"error": "Missing user_id or role"}, status=400)
+    def post(self, request, pk):
+        serializer = SetRoleSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        role = serializer.validated_data['role']
 
         try:
-            user = User.objects.get(id=user_id)
-            user.role = role
-            user.save()
-            return Response({"message": "User role updated successfully"}, status=200)
+            user = User.objects.get(pk=pk)
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=404)
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user.role = role
+        user.save()
+
+        response = Response(
+            {"message": "User role updated successfully", "role": user.role},
+            status=status.HTTP_200_OK,
+        )
+        # update role cookie after role change
+        if hasattr(user, "role") and user.role:
+            response.set_cookie("role", user.role)
+        return response

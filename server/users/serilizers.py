@@ -6,6 +6,11 @@ from .models import Otp
 from django.utils import timezone
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
 class RegisterUserSerilizer(serializers.ModelSerializer):
@@ -163,24 +168,6 @@ class reset_password_serializer(serializers.Serializer):
             raise serializers.ValidationError("User not found")
         
 class SetRoleSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(required=True)
-    role = serializers.ChoiceField(choices=[('learner', 'Learner'), ('helper', 'Helper')], required=True)
+    role = serializers.ChoiceField(choices=[('learner', 'Learner'), ('helper', 'Helper')])
 
-    def validate_user_id(self, user_id):
-        try:
-            user = User.objects.get(id=user_id)
-            return user
-        except User.DoesNotExist:
-            raise serializers.ValidationError("User with this ID does not exist.")
 
-    def validate_role(self, role):
-        valid_roles = ['learner', 'helper']
-        if role not in valid_roles:
-            raise serializers.ValidationError(f"Role must be one of {valid_roles}.")
-        return role
-
-    def update(self, instance, validated_data):
-        role = validated_data.get('role')
-        instance.role = role
-        instance.save()
-        return instance

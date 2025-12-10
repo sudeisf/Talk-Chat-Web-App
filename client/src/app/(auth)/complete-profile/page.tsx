@@ -6,6 +6,10 @@ import type React from "react"
 import { cn } from "@/lib/utils"
 import { Arrow } from "@radix-ui/react-select"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
+import { useAppDispatch, useAppSelector } from "@/redux/hooks"
+import { setUser } from "@/redux/slice/userSlice"
+import { useRouter } from "next/navigation"
+import axios from "axios"
 
 interface RoleCardProps {
   title: string
@@ -63,16 +67,28 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
 }
 
 export default function CompleteProfile() {
-  
-
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  comst  = useAppSelector((state) => state.auth);
+  const auth = useAppSelector((state) => state.auth);
+  const userId = auth.user?.id;
 
   const handleContinue = () => {
-    if (selectedRole) {
-        const 
-    }
-  }
+    if (!selectedRole || !userId) return;
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/user/set-role/${userId}/`,
+        { role: selectedRole },
+        {
+          withCredentials: true,
+        },
+      )
+      .then((res) => {
+        console.log(res.data);
+        window.location.href = "/dashboard";
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
 
   return (
