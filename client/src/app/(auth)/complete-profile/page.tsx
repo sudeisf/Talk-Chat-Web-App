@@ -11,6 +11,7 @@ import { setUser } from "@/redux/slice/userSlice"
 import { useRouter } from "next/navigation"
 import axios from "axios"
 import { SpinnerInfinity } from "spinners-react"
+import {selectUserId} from "@/redux/slice/userSlice"
 
 interface RoleCardProps {
   title: string
@@ -71,7 +72,7 @@ export default function CompleteProfile() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const auth = useAppSelector((state) => state.auth);
-  const userId = auth.user?.id;
+  const userId =  selectUserId;
 
   const handleContinue = () => {
     if (!selectedRole || !userId) return;
