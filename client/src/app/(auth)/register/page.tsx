@@ -20,6 +20,9 @@ import { error } from 'console';
 import { parseDjangoError } from '@/lib/utils';
 import { useState } from 'react';
 import { SpinnerInfinity } from 'spinners-react';
+import { useAppDispatch } from '@/redux/hooks';
+import { useRouter } from 'next/navigation';
+import { setUser } from '@/redux/slice/userSlice';
 const formSchema = z
   .object({
     email: z.email(),
@@ -38,7 +41,9 @@ const formSchema = z
     path: ['confirmPassword'],
   });
 export default function Register() {
-  const Register = useRegisterMutation();
+  const registerMutation = useRegisterMutation();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -52,9 +57,16 @@ export default function Register() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const data = values;
     const { confirmPassword, ...payload } = values;
-    Register.mutate(payload, {
+    registerMutation.mutate(payload, {
+      onSuccess: (data) => {
+        dispatch(
+          setUser({
+            id: data.user_id,
+          }),
+        );
+        router.replace('/complete-profile');
+      },
       onError: (error) => {
         const err = parseDjangoError(error);
 
@@ -76,7 +88,7 @@ export default function Register() {
 
   return (
     <AuthLayoutContent pageType="Register">
-      {Register.isPending ? (
+      {registerMutation.isPending ? (
         <div className="flex items-center justify-center h-[60vh]">
           <SpinnerInfinity
             thickness={100}

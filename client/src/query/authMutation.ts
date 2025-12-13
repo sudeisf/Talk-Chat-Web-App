@@ -34,16 +34,6 @@ export const useRegisterMutation = () => {
   return useMutation({
     mutationKey: ['register'],
     mutationFn: (credentials: RegisterCredentials) => registerUser(credentials),
-    onSuccess: (data) => {
-      dispatch(
-        action.setAuth({
-          id: data.user_id,
-        }),
-      );
-      router.replace('/complete-profile');
-      
-      
-    },
   });
 };
 
