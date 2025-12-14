@@ -6,6 +6,7 @@ import {
   RegisterCredentials,
   VerifyEmailCredentials,
   VerifyOTPCredentials,
+  SetRoleCredentials
 } from '@/types/auth';
 
 export const loginUser = async (credentials: LoginCredentials) => {
@@ -14,6 +15,16 @@ export const loginUser = async (credentials: LoginCredentials) => {
 };
 export const registerUser = async (credentials: RegisterCredentials) => {
   const response = await API.post('/users/auth/register/', credentials);
+  return response.data;
+};
+
+export const setRole = async (credentials: SetRoleCredentials) => {
+  const response = await API.post(`/users/auth/set-role/`,
+    {
+      role : credentials.role
+    }, 
+    {withCredentials : true}
+  );
   return response.data;
 };
 

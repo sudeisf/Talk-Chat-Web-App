@@ -5,8 +5,8 @@ from .models import User, Otp
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     model = User
-    list_display = ("email", "username", "first_name", "last_name", "is_active", "is_staff", "is_superuser")
-    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
+    list_display = ("email", "username", "first_name", "last_name", "is_active", "is_staff", "is_superuser" , "login_method" , "role" )
+    list_filter = ("is_staff", "is_superuser", "is_active", "groups" , "login_method" , "role")
     search_fields = ("email", "username", "first_name", "last_name")
     ordering = ("-created_at",)
 

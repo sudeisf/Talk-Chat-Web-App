@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 from .serilizers import (
       RegisterUserSerilizer , LoginSerializer 
       ,EmailVerifySerilizer ,OtpVerifySerializer, SetRoleSerializer, reset_password_serializer
@@ -18,6 +19,7 @@ from google.auth.transport import requests as google_requests
 from django.conf import settings
 import requests
 from django.contrib.auth import get_user_model
+from django.middleware.csrf import get_token
 
 
 
@@ -29,27 +31,47 @@ load_dotenv()
 
 User = get_user_model()
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return  # To bypass CSRF check
 
+
+@method_decorator(csrf_exempt,name='dispatch')   
 class RegisterView(APIView):
       permission_classes = [AllowAny]
+      authentication_classes = [] 
       def post(self, request):
             serilizer = RegisterUserSerilizer(data=request.data)
             if serilizer.is_valid():
-                  serilizer.save()
-                  return Response({
-                        "message" : "user successfully registerd successfully.",
-                        "user_id": serilizer.instance.id
-                  },status=201)
+                user = serilizer.save()
+                login(request,user)
+                  
+                csrf_token = get_token(request)
+                return Response({
+                        "message": "User registered and logged in successfully",
+                        "user": user.id,            
+                        "email": user.email,
+                        "username": user.username,
+                        "firstName": user.first_name,
+                        "lastName": user.last_name, 
+                        "role": getattr(user, "role", None),
+                        "csrftoken": csrf_token
+                    }, status=status.HTTP_201_CREATED)
             return Response(serilizer.errors,status=400)
       
 @method_decorator(csrf_exempt,name='dispatch')    
 class LoginView(APIView):
       permission_classes = [AllowAny]
+      authentication_classes = []
+
       def post(self,request):
             serializer = LoginSerializer(data=request.data)
-            if serializer.is_valid():
-                  user = serializer.validated_data["user"]
-                  login(request,user)
+            if not serializer.is_valid():
+                  return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            user = serializer.validated_data["user"]
+            login(request,user)
+
             response = Response({
                 "user" : user.id,
                 "email" : user.email,
@@ -61,7 +83,6 @@ class LoginView(APIView):
             if hasattr(user, "role") and user.role:
                 response.set_cookie("role", user.role)
             return response
-            return Response(serializer.errors, status=400)
 
 class LogoutView(APIView):
       permission_classes = [IsAuthenticated]
@@ -325,6 +346,9 @@ class GithubLoginAPIView(APIView):
         
 @method_decorator(csrf_exempt, name='dispatch')
 class SetUserRoleView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [CsrfExemptSessionAuthentication] 
+    
     def post(self, request, pk):
         serializer = SetRoleSerializer(data=request.data)
         if not serializer.is_valid():
@@ -332,11 +356,7 @@ class SetUserRoleView(APIView):
 
         role = serializer.validated_data['role']
 
-        try:
-            user = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        user = request.user
         user.role = role
         user.save()
 
@@ -344,7 +364,5 @@ class SetUserRoleView(APIView):
             {"message": "User role updated successfully", "role": user.role},
             status=status.HTTP_200_OK,
         )
-        # update role cookie after role change
-        if hasattr(user, "role") and user.role:
-            response.set_cookie("role", user.role)
+        response.set_cookie("role", user.role)
         return response

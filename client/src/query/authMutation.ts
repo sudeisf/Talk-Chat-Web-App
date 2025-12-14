@@ -6,6 +6,7 @@ import {
   RegisterCredentials,
   VerifyEmailCredentials,
   VerifyOTPCredentials,
+  SetRoleCredentials
 } from '@/types/auth';
 import {
   loginUser,
@@ -13,6 +14,7 @@ import {
   resetPassword,
   VerifyEmail,
   verifyOTP,
+  setRole
 } from '@/lib/api/authApi';
 import { action } from '@/redux/slice/authSlice';
 
@@ -44,6 +46,16 @@ export const useVerifyEmailMutation = () => {
     mutationKey: ['verifyEmail'],
     mutationFn: (credentials: VerifyEmailCredentials) =>
       VerifyEmail(credentials),
+  });
+};
+
+export const useSetRoleMutation = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  return useMutation({
+    mutationKey: ['setRole'],
+    mutationFn: (credentials: SetRoleCredentials) =>
+      setRole(credentials),
   });
 };
 

@@ -11,5 +11,5 @@ urlpatterns = [
     path('auth/new-password/' , NewPasswordChangeView.as_view(), name="new-password"),
     path("auth/google/", GoogleLoginAPIView.as_view(), name="google-login"),
     path("auth/github/", GithubLoginAPIView.as_view(), name="google-login"),
-    path("user/set-role/<int:pk>/", SetUserRoleView.as_view(), name="set-role"),
+    path("auth/set-role/", SetUserRoleView.as_view(), name="set-role"),
 ]

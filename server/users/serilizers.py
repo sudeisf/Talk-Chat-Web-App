@@ -32,8 +32,9 @@ class RegisterUserSerilizer(serializers.ModelSerializer):
       
       def create(self, validated_data):
         # Ensure normal registration is marked as email/password login
+        login_method = getattr(User, "LoginMethod").EMAIL if hasattr(User, "LoginMethod") else "email"
         return User.objects.create_user(
-            login_method=getattr(User, "LoginMethod").EMAIL,
+            login_method=login_method,
             **validated_data,
         )
       

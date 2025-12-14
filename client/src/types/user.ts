@@ -10,4 +10,5 @@ export interface User {
   profile_image?: string | null;
   created_at?: string;
   updated_at?: string;
+  role: string | null;
 }

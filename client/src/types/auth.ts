@@ -25,3 +25,6 @@ export interface NewPasswordCredentials {
   new_password: string;
   confirm_password: string;
 }
+export interface SetRoleCredentials {
+  role: string;
+}

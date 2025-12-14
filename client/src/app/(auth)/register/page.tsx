@@ -62,7 +62,12 @@ export default function Register() {
       onSuccess: (data) => {
         dispatch(
           setUser({
-            id: data.user_id,
+            id: data.user,        
+            email: data.email,
+            username: data.username,
+            firstName: data.firstName, 
+            lastName: data.lastName,
+            role: data.role,      
           }),
         );
         router.replace('/complete-profile');

@@ -12,6 +12,9 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { SpinnerInfinity } from "spinners-react"
 import {selectUserId} from "@/redux/slice/userSlice"
+import { setRole } from "@/lib/api/authApi"
+import { useSetRoleMutation } from "@/query/authMutation"
+import { stat } from "fs"
 
 interface RoleCardProps {
   title: string
@@ -71,34 +74,27 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
 export default function CompleteProfile() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const auth = useAppSelector((state) => state.auth);
-  const userId =  selectUserId;
+  const userId =  useAppSelector(state => state.user.user?.id);
+  const setRoleMutation = useSetRoleMutation();
+  const router = useRouter();
 
   const handleContinue = () => {
     if (!selectedRole || !userId) return;
-    setIsLoading(true);
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/user/set-role/${userId}/`,
-        { role: selectedRole },
-        {
-          withCredentials: true,
-        },
-      )
-      .then((res) => {
-        console.log(res.data);
-        window.location.href = "/login";
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    setRoleMutation.mutate({ role: selectedRole },
+      {
+        onSuccess: (data) => {
+          if (selectedRole === "Learner") {
+            router.push("/learner-dashboard");
+          } else {
+            router.push("/dashboard");
+          }
+        }
+      }
+    )
   };
 
 
-  if (isLoading) {
+  if (setRoleMutation.isPending) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <SpinnerInfinity
