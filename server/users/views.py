@@ -349,7 +349,7 @@ class SetUserRoleView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [CsrfExemptSessionAuthentication] 
     
-    def post(self, request, pk):
+    def post(self, request):
         serializer = SetRoleSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
