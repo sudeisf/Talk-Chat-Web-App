@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from .models import User, Tag, UserTag
 
 User = get_user_model()
 class RegisterUserSerilizer(serializers.ModelSerializer):
@@ -172,3 +173,50 @@ class SetRoleSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=[('learner', 'Learner'), ('helper', 'Helper')])
 
 
+class UserTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['id', 'name', 'description']
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    
+    tags = UserTagSerializer(source='user_tags', read_only=True)
+    tags_id = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 
+            'username', 
+            'email', 
+            'first_name', 
+            'last_name', 
+            'profile_image',
+            'cover_image',
+            "phone_number",
+            "gender",
+            "birth_date",
+            "bio",
+            "profession",
+            "city",
+            "country",
+            "tags",
+            "tags_id",
+            ]
+        
+    def update(self, instance, validated_data):
+        tags_ids = validated_data.pop('tags_id', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if tags_ids is not None:
+            from .models import Tag,UserTag
+            UserTag.objects.filter(user=instance).delete()
+            tags = Tag.objects.filter(id__in=tags_ids)
+            UserTag.objects.bulk_create(
+                [UserTag(user=instance, tag=tag) for tag in tags]
+                )
+        return instance

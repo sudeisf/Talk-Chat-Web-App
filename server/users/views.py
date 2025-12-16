@@ -366,3 +366,38 @@ class SetUserRoleView(APIView):
         )
         response.set_cookie("role", user.role)
         return response
+    
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+   
+    def get(self, request):
+        user = request.user
+        return Response({
+            "user": user.id,
+            "email": user.email,
+            "username": user.username,
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+            "role": user.role,
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = ProfileSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        user.first_name = serializer.validated_data.get('firstName', user.first_name)
+        user.last_name = serializer.validated_data.get('lastName', user.last_name)
+        user.save()
+
+        return Response({
+            "user": user.id,
+            "email": user.email,
+            "username": user.username,
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+            "role": user.role,
+        }, status=status.HTTP_200_OK)
+
