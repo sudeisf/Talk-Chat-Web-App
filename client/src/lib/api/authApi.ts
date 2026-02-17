@@ -43,9 +43,9 @@ export const resetPassword = async (credentials: NewPasswordCredentials) => {
 };
 
 export const getCurrentUser = async () => {
-  const response = await API.get('/api/auth/user/');
+  const response = await API.get('/users/auth/me/');
   return response.data;
 };
 export const logoutUser = async () => {
-  await API.post('/api/auth/logout/');
+  await API.post('/users/auth/logout/');
 };

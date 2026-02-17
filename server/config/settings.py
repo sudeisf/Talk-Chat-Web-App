@@ -115,11 +115,18 @@ CSRF_TRUSTED_ORIGINS = [
 # Required for cookies/session
 CORS_ALLOW_CREDENTIALS = True
 
-# Security settings (development)
-SESSION_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SECURE = True  # False if not using HTTPS locally
-CSRF_COOKIE_SECURE = True     
+# Cookie settings
+# For local HTTP development, secure cookies are not stored by browsers.
+if DEBUG:
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+else:
+    SESSION_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
