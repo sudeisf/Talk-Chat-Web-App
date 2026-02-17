@@ -16,9 +16,13 @@ export default function GitHubCallback() {
 
     if (code) {
       API.post('/users/auth/github/', { code }, { withCredentials: true })
-        .then(() => {
+        .then((res) => {
           toast.success('Logged in via GitHub');
-          router.replace('/');
+          if (res.data?.created) {
+            router.replace('/complete-profile');
+          } else {
+            router.replace('/');
+          }
         })
         .catch((err) => {
           toast.error('GitHub login failed');

@@ -3,7 +3,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from .serilizers import (
       RegisterUserSerilizer , LoginSerializer 
-      ,EmailVerifySerilizer ,OtpVerifySerializer, SetRoleSerializer, reset_password_serializer
+    ,EmailVerifySerilizer ,OtpVerifySerializer, SetRoleSerializer, reset_password_serializer, ProfileSerializer
       )
 from rest_framework.response import Response
 from rest_framework import status
@@ -314,6 +314,7 @@ class GithubLoginAPIView(APIView):
         username = user_data.get("login", email.split("@")[0])
 
         User = get_user_model()
+        created = False
         try:
             user = User.objects.get(email=email)
             if not user.github_id:
@@ -330,6 +331,7 @@ class GithubLoginAPIView(APIView):
                 is_github_account=True,
                 login_method=User.LoginMethod.GITHUB,
             )
+            created = True
 
         login(request, user)
         response = Response({
@@ -338,6 +340,7 @@ class GithubLoginAPIView(APIView):
             "username": user.username,
             "firstName": user.first_name,
             "lastName": user.last_name,
+            "created": created,
         }, status=status.HTTP_200_OK)
         if hasattr(user, "role") and user.role:
             response.set_cookie("role", user.role)

@@ -15,7 +15,11 @@ export default function GoogleLoginButton() {
         { withCredentials: true }
       );
       toast.success('Logged in with Google');
-      router.replace('/');
+      if (res.data?.created) {
+        router.replace('/complete-profile');
+      } else {
+        router.replace('/');
+      }
     } catch (err) {
       toast.error('Google login failed');
     }
