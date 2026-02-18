@@ -15,7 +15,12 @@ export default function GoogleLoginButton() {
         { withCredentials: true }
       );
       toast.success('Logged in with Google');
-      if (res.data?.created) {
+      const mustCompleteProfile =
+        res.data?.next === '/complete-profile' ||
+        res.data?.profile_completed === false ||
+        (res.data?.created === true && res.data?.profile_completed !== true);
+
+      if (mustCompleteProfile) {
         router.replace('/complete-profile');
       } else {
         router.replace('/');

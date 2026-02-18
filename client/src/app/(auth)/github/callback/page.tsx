@@ -18,7 +18,12 @@ export default function GitHubCallback() {
       API.post('/users/auth/github/', { code }, { withCredentials: true })
         .then((res) => {
           toast.success('Logged in via GitHub');
-          if (res.data?.created) {
+          const mustCompleteProfile =
+            res.data?.next === '/complete-profile' ||
+            res.data?.profile_completed === false ||
+            (res.data?.created === true && res.data?.profile_completed !== true);
+
+          if (mustCompleteProfile) {
             router.replace('/complete-profile');
           } else {
             router.replace('/');

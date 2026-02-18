@@ -13,6 +13,7 @@ export function middleware(request: NextRequest) {
   const hasSession = request.cookies.has('sessionid');
   const role = request.cookies.get('role')?.value; // set by Django
   const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
+  const isCompleteProfilePath = path.startsWith('/complete-profile');
 
   // Not logged in -> block protected routes
   if (!isPublic && !hasSession) {
@@ -20,7 +21,13 @@ export function middleware(request: NextRequest) {
   }
 
   // Logged in and hitting login/register -> send to their dashboard
-  if (isPublic && hasSession && role && ROLE_DASHBOARD_MAP[role]) {
+  if (
+    isPublic &&
+    hasSession &&
+    role &&
+    ROLE_DASHBOARD_MAP[role] &&
+    !isCompleteProfilePath
+  ) {
     return NextResponse.redirect(
       new URL(ROLE_DASHBOARD_MAP[role], request.url),
     );

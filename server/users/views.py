@@ -201,9 +201,11 @@ class GoogleLoginAPIView(APIView):
                     "first_name": user.first_name,
                     "last_name": user.last_name,
                 },
-                "created": created
+                "created": created,
+                "profile_completed": user.profile_completed,
+                "next": "/" if user.profile_completed else "/complete-profile",
             })
-            if hasattr(user, "role") and user.role:
+            if user.profile_completed and hasattr(user, "role") and user.role:
                 response.set_cookie("role", user.role)
             return response
 
@@ -341,8 +343,10 @@ class GithubLoginAPIView(APIView):
             "firstName": user.first_name,
             "lastName": user.last_name,
             "created": created,
+            "profile_completed": user.profile_completed,
+            "next": "/" if user.profile_completed else "/complete-profile",
         }, status=status.HTTP_200_OK)
-        if hasattr(user, "role") and user.role:
+        if user.profile_completed and hasattr(user, "role") and user.role:
             response.set_cookie("role", user.role)
         return response
         
@@ -361,6 +365,7 @@ class SetUserRoleView(APIView):
 
         user = request.user
         user.role = role
+        user.profile_completed = True
         user.save()
 
         response = Response(
