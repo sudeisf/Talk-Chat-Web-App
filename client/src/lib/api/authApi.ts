@@ -46,6 +46,40 @@ export const getCurrentUser = async () => {
   const response = await API.get('/users/auth/me/');
   return response.data;
 };
+
+export const updateCurrentUserProfile = async (payload: Record<string, unknown>) => {
+  const response = await API.patch('/users/auth/me/', payload, {
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+export const uploadProfileImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append('profile_image', file);
+
+  const response = await API.post('/users/auth/profile-image/', formData, {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const uploadCoverImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append('cover_image', file);
+
+  const response = await API.post('/users/auth/cover-image/', formData, {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
 export const logoutUser = async () => {
   await API.post('/users/auth/logout/');
 };

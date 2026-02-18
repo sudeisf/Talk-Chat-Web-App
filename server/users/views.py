@@ -3,7 +3,8 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from .serilizers import (
       RegisterUserSerilizer , LoginSerializer 
-    ,EmailVerifySerilizer ,OtpVerifySerializer, SetRoleSerializer, reset_password_serializer, ProfileSerializer
+        ,EmailVerifySerilizer ,OtpVerifySerializer, SetRoleSerializer, reset_password_serializer, ProfileSerializer,
+        ProfileImageUploadSerializer, CoverImageUploadSerializer
       )
 from rest_framework.response import Response
 from rest_framework import status
@@ -384,32 +385,80 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
    
     def get(self, request):
-        user = request.user
-        return Response({
-            "user": user.id,
-            "email": user.email,
-            "username": user.username,
-            "firstName": user.first_name,
-            "lastName": user.last_name,
-            "role": user.role,
-        }, status=status.HTTP_200_OK)
+        serializer = ProfileSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        serializer = ProfileSerializer(data=request.data)
+        serializer = ProfileSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        serializer = ProfileSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProfileImageUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ProfileImageUploadSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = request.user
-        user.first_name = serializer.validated_data.get('firstName', user.first_name)
-        user.last_name = serializer.validated_data.get('lastName', user.last_name)
-        user.save()
+        serializer.save()
+        request.user.refresh_from_db()
+        response_serializer = ProfileImageUploadSerializer(request.user)
+        return Response(
+            {
+                "message": "Profile image uploaded successfully",
+                "profile_image": response_serializer.data.get("profile_image"),
+                "profile_image_public_id": response_serializer.data.get("profile_image_public_id"),
+                "profile_image_url": response_serializer.data.get("profile_image_url"),
+            },
+            status=status.HTTP_200_OK,
+        )
 
-        return Response({
-            "user": user.id,
-            "email": user.email,
-            "username": user.username,
-            "firstName": user.first_name,
-            "lastName": user.last_name,
-            "role": user.role,
-        }, status=status.HTTP_200_OK)
+
+class CoverImageUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CoverImageUploadSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        request.user.refresh_from_db()
+        response_serializer = CoverImageUploadSerializer(request.user)
+        return Response(
+            {
+                "message": "Cover image uploaded successfully",
+                "cover_image": response_serializer.data.get("cover_image"),
+                "cover_image_public_id": response_serializer.data.get("cover_image_public_id"),
+                "cover_image_url": response_serializer.data.get("cover_image_url"),
+            },
+            status=status.HTTP_200_OK,
+        )
 

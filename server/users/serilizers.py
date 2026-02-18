@@ -12,6 +12,7 @@ from rest_framework import status
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from .models import User, Tag, UserTag
+from cloudinary.utils import cloudinary_url
 
 User = get_user_model()
 class RegisterUserSerilizer(serializers.ModelSerializer):
@@ -180,9 +181,16 @@ class UserTagSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    
-    tags = UserTagSerializer(source='user_tags', read_only=True)
-    tags_id = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    tags = serializers.SerializerMethodField(read_only=True)
+    profile_image_url = serializers.SerializerMethodField(read_only=True)
+    cover_image_url = serializers.SerializerMethodField(read_only=True)
+    profile_image_public_id = serializers.SerializerMethodField(read_only=True)
+    cover_image_public_id = serializers.SerializerMethodField(read_only=True)
+    tags_id = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False,
+    )
     
     class Meta:
         model = User
@@ -194,6 +202,10 @@ class ProfileSerializer(serializers.ModelSerializer):
             'last_name', 
             'profile_image',
             'cover_image',
+            "profile_image_url",
+            "cover_image_url",
+            "profile_image_public_id",
+            "cover_image_public_id",
             "phone_number",
             "gender",
             "birth_date",
@@ -204,6 +216,34 @@ class ProfileSerializer(serializers.ModelSerializer):
             "tags",
             "tags_id",
             ]
+
+    def get_tags(self, obj):
+        tag_qs = Tag.objects.filter(user_tags__user=obj).distinct()
+        return UserTagSerializer(tag_qs, many=True).data
+
+    def _cloudinary_public_id(self, value):
+        if not value:
+            return None
+        return getattr(value, "public_id", None)
+
+    def _cloudinary_secure_url(self, value):
+        public_id = self._cloudinary_public_id(value)
+        if not public_id:
+            return None
+        secure_url, _ = cloudinary_url(public_id, secure=True)
+        return secure_url
+
+    def get_profile_image_public_id(self, obj):
+        return self._cloudinary_public_id(obj.profile_image)
+
+    def get_cover_image_public_id(self, obj):
+        return self._cloudinary_public_id(obj.cover_image)
+
+    def get_profile_image_url(self, obj):
+        return self._cloudinary_secure_url(obj.profile_image)
+
+    def get_cover_image_url(self, obj):
+        return self._cloudinary_secure_url(obj.cover_image)
         
     def update(self, instance, validated_data):
         tags_ids = validated_data.pop('tags_id', None)
@@ -220,3 +260,45 @@ class ProfileSerializer(serializers.ModelSerializer):
                 [UserTag(user=instance, tag=tag) for tag in tags]
                 )
         return instance
+
+
+class ProfileImageUploadSerializer(serializers.ModelSerializer):
+    profile_image_url = serializers.SerializerMethodField(read_only=True)
+    profile_image_public_id = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ["profile_image", "profile_image_url", "profile_image_public_id"]
+
+    def get_profile_image_public_id(self, obj):
+        if not obj.profile_image:
+            return None
+        return getattr(obj.profile_image, "public_id", None)
+
+    def get_profile_image_url(self, obj):
+        public_id = self.get_profile_image_public_id(obj)
+        if not public_id:
+            return None
+        secure_url, _ = cloudinary_url(public_id, secure=True)
+        return secure_url
+
+
+class CoverImageUploadSerializer(serializers.ModelSerializer):
+    cover_image_url = serializers.SerializerMethodField(read_only=True)
+    cover_image_public_id = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["cover_image", "cover_image_url", "cover_image_public_id"]
+
+    def get_cover_image_public_id(self, obj):
+        if not obj.cover_image:
+            return None
+        return getattr(obj.cover_image, "public_id", None)
+
+    def get_cover_image_url(self, obj):
+        public_id = self.get_cover_image_public_id(obj)
+        if not public_id:
+            return None
+        secure_url, _ = cloudinary_url(public_id, secure=True)
+        return secure_url

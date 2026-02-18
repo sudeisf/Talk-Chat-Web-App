@@ -14,7 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import cloudinary
 import os
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 # Load .env file, but Docker Compose environment variables will override
 load_dotenv(override=False)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,11 +40,20 @@ ASGI_APPLICATION = "config.asgi.application"
 
 
 
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-)
+cloudinary_url = os.getenv("CLOUDINARY_URL")
+if cloudinary_url:
+    parsed = urlparse(cloudinary_url)
+    cloudinary.config(
+        cloud_name=parsed.hostname,
+        api_key=parsed.username,
+        api_secret=parsed.password,
+    )
+else:
+    cloudinary.config(
+        cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.getenv("CLOUDINARY_API_KEY"),
+        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    )
 
 
 # Application definition

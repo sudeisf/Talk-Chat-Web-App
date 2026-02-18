@@ -21,7 +21,8 @@ import {
   Trash,
   User,
 } from 'lucide-react';
-import { use, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getCurrentUser } from '@/lib/api/authApi';
 
 const userInfo = {
   name: 'Sudeis Fedlu',
@@ -72,38 +73,53 @@ const timelineQuestions = [
 ];
 
 export default function ProfilePage() {
+  const [profile, setProfile] = useState<any>(null);
   const [coverImage, setCoverImage] = useState<string | null>(null);
-  const accuracy = Math.round(
-    (userInfo.correctAnswers / userInfo.totalQuestions) * 100
-  );
-  const nextLevelExp = 1500;
-  const avatarFileInputRef = useRef<HTMLInputElement>(null);
-  const progressToNextLevel = Math.round(
-    (userInfo.experience / nextLevelExp) * 100
-  );
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((data) => {
+        setProfile(data);
+        setCoverImage(data?.cover_image_url || null);
+        setProfileImage(data?.profile_image_url || null);
+      })
+      .catch((error) => {
+        console.error(error?.response?.data || error);
+      });
+  }, []);
+
+  const displayName =
+    `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() ||
+    profile?.username ||
+    userInfo.name;
+  const displayBio = profile?.bio || userInfo.bio;
+  const displayRole = profile?.profession || userInfo.role;
+  const currentRole = profile?.role || userInfo.role;
+  const displayLocation =
+    [profile?.city, profile?.country].filter(Boolean).join(', ') ||
+    userInfo.location;
+
   return (
     <div className=" max-w-6xl mx-auto p-4 mb-4 ">
       {/* cover image section */}
       <div className="relative h-[200px]  ">
         <div className="w-full h-full ">
           {coverImage ? (
-            <div className="relative">
+            <div className="relative w-full h-full rounded-t-md overflow-hidden bg-gray-100">
               <img
                 src={coverImage}
                 alt="cover image"
-                className="object-cover w-full h-full absolute inset-0"
+                className="block w-full h-full object-cover"
                 style={{ objectFit: 'cover' }}
               />
-              <Button className="absolute top-4 right-4">
-                <Edit className="w-4 h-4 text-white" />
-              </Button>
-              <Button className="absolute top-4 right-4 bg-red-500 hover:bg-red-600">
-                <Trash className="w-4 h-4 text-white" />
-              </Button>
+              <div className="absolute top-4 right-4">
+                <UploadCoverImage onUploaded={setCoverImage} />
+              </div>
             </div>
           ) : (
             <div className="w-full h-full rounded-t-md bg-[#03624C] flex justify-end p-4">
-            <UploadCoverImage />
+            <UploadCoverImage onUploaded={setCoverImage} />
           </div>
           )}
         </div>
@@ -112,23 +128,23 @@ export default function ProfilePage() {
         <div className="  rounded-lg px-4 py-6 w-full border-b ">
           <div className="absolute bottom-0  top-22 z-10 left-10 ">
             <Avatar className="w-[150px] h-[150px] border-8 border-white">
-              <AvatarImage src={userInfo.avatar} />
-              <AvatarFallback>{userInfo.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={profileImage || userInfo.avatar} />
+              <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
             </Avatar>
-            <UploadProfileImage/>
+            <UploadProfileImage onUploaded={setProfileImage} />
           </div>
 
           <div className="flex justify-between">
             <div className="pt-5  space-y-2">
-              <h1 className="text-2xl font-pt font-bold">{userInfo.name}</h1>
-              <p className="text-md text-gray-500">{userInfo.role}</p>
-              <p className="text-md text-gray-500">{userInfo.location}</p>
+              <h1 className="text-2xl font-pt font-bold">{displayName}</h1>
+              <p className="text-md text-gray-500">{displayRole}</p>
+              <p className="text-md text-gray-500">{displayLocation}</p>
               <div>
                 <h1 className="text-md py-2 font-medium flex items-center gap-2 text-gray-700">
                   Bio <Pen className="w-4 h-4" />
                 </h1>
                 <p className="text-md text-gray-500 max-w-md leading-relaxed">
-                  {userInfo.bio}
+                  {displayBio}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -147,7 +163,7 @@ export default function ProfilePage() {
                   Current role <Briefcase className="w-4 h-4" />
                 </h1>
                 <h2 className="rounded-full bg-gray-100 text-sm p-2 font-pt capitalize font-medium px-2">
-                  {userInfo.role}
+                  {currentRole}
                 </h2>
               </div>
               <div className=" flex flex-col items-end gap-2">

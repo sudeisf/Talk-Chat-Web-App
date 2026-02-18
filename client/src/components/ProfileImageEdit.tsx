@@ -28,6 +28,8 @@ import { Camera, Edit, File as FileIcon, User, X } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
+import { uploadProfileImage } from '@/lib/api/authApi';
+import { toast } from 'sonner';
 
 // Define the form schema with proper typing
 const formSchema = z.object({
@@ -45,7 +47,11 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function UploadProfileImage() {
+interface UploadProfileImageProps {
+  onUploaded?: (url: string) => void;
+}
+
+export default function UploadProfileImage({ onUploaded }: UploadProfileImageProps) {
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -109,8 +115,37 @@ export default function UploadProfileImage() {
   );
 
   const onSubmit = (data: FormData) => {
-    console.log('Form submitted with data:', data);
-    // Handle form submission, e.g., upload the file
+    uploadProfileImage(data.coverImage)
+      .then((response) => {
+        const uploadedUrl =
+          response?.profile_image_url ||
+          response?.profile_image?.secure_url ||
+          response?.profile_image?.url ||
+          (typeof response?.profile_image === 'string'
+            ? response.profile_image
+            : null);
+
+        if (uploadedUrl && onUploaded) {
+          const cacheBustedUrl = uploadedUrl.includes('?')
+            ? `${uploadedUrl}&t=${Date.now()}`
+            : `${uploadedUrl}?t=${Date.now()}`;
+          onUploaded(cacheBustedUrl);
+        }
+
+        if (!uploadedUrl) {
+          toast.error('Uploaded, but image URL was not returned by API');
+          return;
+        }
+
+        toast.success('Profile image uploaded successfully');
+        form.reset();
+        setDroppedFile(null);
+        setPreviewUrl(null);
+      })
+      .catch((error) => {
+        toast.error('Failed to upload profile image');
+        console.error(error?.response?.data || error);
+      });
   };
 
   return (

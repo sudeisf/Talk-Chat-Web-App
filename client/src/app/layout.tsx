@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={fontVariables}>
-      <body className={`antialiased  ${inter.className}`}>
+      <body suppressHydrationWarning className={`antialiased  ${inter.className}`}>
         <ReduxProvider>
           <QueryProvider>
             <GoogleProvider>

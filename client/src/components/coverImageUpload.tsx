@@ -27,6 +27,8 @@ import {
 import { Edit, File as FileIcon, X } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from './ui/button';
+import { uploadCoverImage } from '@/lib/api/authApi';
+import { toast } from 'sonner';
 
 // Define the form schema with proper typing
 const formSchema = z.object({
@@ -44,7 +46,11 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function UploadCoverImage() {
+interface UploadCoverImageProps {
+  onUploaded?: (url: string) => void;
+}
+
+export default function UploadCoverImage({ onUploaded }: UploadCoverImageProps) {
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -108,8 +114,35 @@ export default function UploadCoverImage() {
   );
 
   const onSubmit = (data: FormData) => {
-    console.log('Form submitted with data:', data);
-    // Handle form submission, e.g., upload the file
+    uploadCoverImage(data.coverImage)
+      .then((response) => {
+        const uploadedUrl =
+          response?.cover_image_url ||
+          response?.cover_image?.secure_url ||
+          response?.cover_image?.url ||
+          (typeof response?.cover_image === 'string' ? response.cover_image : null);
+
+        if (uploadedUrl && onUploaded) {
+          const cacheBustedUrl = uploadedUrl.includes('?')
+            ? `${uploadedUrl}&t=${Date.now()}`
+            : `${uploadedUrl}?t=${Date.now()}`;
+          onUploaded(cacheBustedUrl);
+        }
+
+        if (!uploadedUrl) {
+          toast.error('Uploaded, but image URL was not returned by API');
+          return;
+        }
+
+        toast.success('Cover image uploaded successfully');
+        form.reset();
+        setDroppedFile(null);
+        setPreviewUrl(null);
+      })
+      .catch((error) => {
+        toast.error('Failed to upload cover image');
+        console.error(error?.response?.data || error);
+      });
   };
 
   return (
