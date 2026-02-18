@@ -55,6 +55,8 @@ class RegisterView(APIView):
                         "firstName": user.first_name,
                         "lastName": user.last_name, 
                         "role": getattr(user, "role", None),
+                    "profile_completed": user.profile_completed,
+                    "next": "/" if user.profile_completed else "/complete-profile",
                         "csrftoken": csrf_token
                     }, status=status.HTTP_201_CREATED)
             return Response(serilizer.errors,status=400)
@@ -77,10 +79,12 @@ class LoginView(APIView):
                 "email" : user.email,
                 "username" : user.username,
                 "firstName" : user.first_name,
-                "lastName" : user.last_name
+                "lastName" : user.last_name,
+                "profile_completed": user.profile_completed,
+                "next": "/" if user.profile_completed else "/complete-profile",
             },status=status.HTTP_200_OK)
             # expose role to frontend via cookie for middleware-based redirects
-            if hasattr(user, "role") and user.role:
+            if user.profile_completed and hasattr(user, "role") and user.role:
                 response.set_cookie("role", user.role)
             return response
 

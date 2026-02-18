@@ -26,7 +26,10 @@ export const useLoginMutation = () => {
     mutationFn: (credentials: LoginCredentials) => loginUser(credentials),
     onSuccess: (data) => {
       dispatch(action.setAuth(data));
-      router.replace('/');
+      const nextPath =
+        data?.next ||
+        (data?.profile_completed === false ? '/complete-profile' : '/');
+      router.replace(nextPath);
     },
   });
 };

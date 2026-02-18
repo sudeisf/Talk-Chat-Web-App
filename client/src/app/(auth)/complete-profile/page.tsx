@@ -1,20 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import type React from "react"
 import { cn } from "@/lib/utils"
-import { Arrow } from "@radix-ui/react-select"
-import { ArrowRight, ArrowUpRight } from "lucide-react"
-import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { setUser } from "@/redux/slice/userSlice"
+import { ArrowUpRight } from "lucide-react"
 import { useRouter } from "next/navigation"
-import axios from "axios"
 import { SpinnerInfinity } from "spinners-react"
-import {selectUserId} from "@/redux/slice/userSlice"
-import { setRole } from "@/lib/api/authApi"
 import { useSetRoleMutation } from "@/query/authMutation"
-import { stat } from "fs"
+import { toast } from "sonner"
 
 interface RoleCardProps {
   title: string
@@ -73,21 +67,22 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
 
 export default function CompleteProfile() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const userId =  useAppSelector(state => state.user.user?.id);
   const setRoleMutation = useSetRoleMutation();
   const router = useRouter();
 
   const handleContinue = () => {
-    if (!selectedRole || !userId) return;
+    if (!selectedRole) return;
     setRoleMutation.mutate({ role: selectedRole },
       {
-        onSuccess: (data) => {
-          if (selectedRole === "Learner") {
-            router.push("/learner-dashboard");
+        onSuccess: () => {
+          if (selectedRole === "learner") {
+            router.replace("/learner-dashboard");
           } else {
-            router.push("/dashboard");
+            router.replace("/dashboard");
           }
+        },
+        onError: () => {
+          toast.error("Could not update role. Please try again.");
         }
       }
     )
