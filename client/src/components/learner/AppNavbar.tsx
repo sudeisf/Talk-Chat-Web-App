@@ -9,9 +9,40 @@ import { SearchBar } from './searchBar';
 import { useNotifications } from '@/contexts/NotificationContext';
 import Link from 'next/link';
 import AskQuestion from './AskQuestionDialog';
+import { useEffect, useState } from 'react';
+import { getCurrentUser } from '@/lib/api/authApi';
 
 export function AppNavbar() {
   const { unreadCount } = useNotifications();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState('U');
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((data) => {
+        setAvatarUrl(data?.profile_image_url || null);
+        const name =
+          `${data?.first_name || ''} ${data?.last_name || ''}`.trim() ||
+          data?.username ||
+          'U';
+        setDisplayName(name);
+      })
+      .catch(() => {
+        setAvatarUrl(null);
+      });
+
+    const onProfileImageUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<{ url?: string }>;
+      if (customEvent?.detail?.url) {
+        setAvatarUrl(customEvent.detail.url);
+      }
+    };
+
+    window.addEventListener('profile-image-updated', onProfileImageUpdated);
+    return () => {
+      window.removeEventListener('profile-image-updated', onProfileImageUpdated);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 border-b  items-center justify-between  bg-white px-4  dark:bg-gray-950">
@@ -43,8 +74,8 @@ export function AppNavbar() {
         <div className="flex items-center gap-4 px-2">
           <Link href="/profile">
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage src={avatarUrl || undefined} />
+              <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
             </Avatar>
           </Link>
 

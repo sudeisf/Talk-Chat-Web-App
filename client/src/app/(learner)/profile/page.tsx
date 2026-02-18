@@ -87,6 +87,25 @@ export default function ProfilePage() {
       .catch((error) => {
         console.error(error?.response?.data || error);
       });
+
+    const onProfileUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<{ profile?: any }>;
+      const updated = customEvent?.detail?.profile;
+      if (!updated) return;
+
+      setProfile(updated);
+      if (updated?.cover_image_url) {
+        setCoverImage(updated.cover_image_url);
+      }
+      if (updated?.profile_image_url) {
+        setProfileImage(updated.profile_image_url);
+      }
+    };
+
+    window.addEventListener('profile-updated', onProfileUpdated);
+    return () => {
+      window.removeEventListener('profile-updated', onProfileUpdated);
+    };
   }, []);
 
   const displayName =
@@ -99,6 +118,12 @@ export default function ProfilePage() {
   const displayLocation =
     [profile?.city, profile?.country].filter(Boolean).join(', ') ||
     userInfo.location;
+  const displaySkills: string[] =
+    Array.isArray(profile?.tags) && profile.tags.length > 0
+      ? profile.tags
+          .map((tag: any) => tag?.name)
+          .filter((name: string | undefined): name is string => Boolean(name))
+      : userInfo.skills;
 
   return (
     <div className=" max-w-6xl mx-auto p-4 mb-4 ">
@@ -171,7 +196,7 @@ export default function ProfilePage() {
                   skills <Star className="w-4 h-4" />
                 </h1>
                 <div className="flex flex-wrap gap-2 items-">
-                  {userInfo.skills.map((skill, index) => (
+                  {displaySkills.map((skill: string, index: number) => (
                     <div key={index}>
                       <p className="bg-gray-100 p-2 text-sm w-fit rounded-full font-pt font-medium">
                         {skill}

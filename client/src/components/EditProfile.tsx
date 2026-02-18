@@ -7,80 +7,137 @@ import {
 } from '@/components/ui/dialog';
 
 import { Button } from './ui/button';
-import {
-  Briefcase,
-  Cog,
-  Edit3,
-  LocationEdit,
-  LockIcon,
-  Plus,
-  X,
-} from 'lucide-react';
+import { Edit3 } from 'lucide-react';
 import { Form, FormDescription, FormMessage } from './ui/form';
-import { array, z } from 'zod';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormControl, FormField, FormItem, FormLabel } from './ui/form';
 import { Input } from './ui/input';
-import { useSelector } from 'react-redux';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { Textarea } from './ui/textarea';
+import { getCurrentUser, updateCurrentUserProfile } from '@/lib/api/authApi';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { SkillsInput } from './helper/skillsTagInput';
+import { useAppSelector } from '@/redux/hooks';
 
 const formSchema = z
   .object({
-    email: z.email(),
-    currentRole: z.string().min(10, 'the field accepts at least 10 chars'),
+    first_name: z.string().min(1, 'First name is required').max(50),
+    last_name: z.string().min(1, 'Last name is required').max(50),
+    profession: z.string().max(100).optional().or(z.literal('')),
+    bio: z.string().max(500).optional().or(z.literal('')),
+    phone_number: z.string().max(20).optional().or(z.literal('')),
     city: z
       .string()
-      .min(2, 'City must be at least 2 characters')
+      .min(1, 'City is required')
       .max(50, 'City name is too long')
       .regex(/^[a-zA-Z\s\-']+$/, 'Please enter a valid city name'),
     country: z
       .string()
-      .min(2, 'Country must be at least 2 characters')
+      .min(1, 'Country is required')
       .max(50, 'Country name is too long')
       .regex(/^[a-zA-Z\s\-']+$/, 'Please enter a valid country name'),
-    password: z
-      .string()
-      .min(8, 'Password must contain at least 8 characters.')
-      .regex(/[A-Z]/, 'Password must contain at least one capital letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number'),
-    confirmPassword: z.string(),
-    skills: z
-      .string()
-      .min(1, 'select at least one skill')
-      .max(100, 'Skills list is too long.'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Password does not match',
-    path: ['confirmPassword'],
   });
 
 type FormData = z.infer<typeof formSchema>;
 
 export function EditProfile() {
-  const proTags = useAppSelector((state) => state.proTags);
-  const dispatch = useAppDispatch();
+  const [open, setOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [profileTagMap, setProfileTagMap] = useState<Record<string, number>>({});
+
+  const reduxTagMap = useAppSelector((state) => {
+    const map: Record<string, number> = {};
+    Object.values(state.proTags).forEach((container: any) => {
+      container.forEach((tag: any) => {
+        const parsedId = Number(tag?.id);
+        if (!Number.isNaN(parsedId) && tag?.label) {
+          map[String(tag.label)] = parsedId;
+        }
+      });
+    });
+    return map;
+  });
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      currentRole: '',
+      first_name: '',
+      last_name: '',
+      profession: '',
+      bio: '',
+      phone_number: '',
       city: '',
       country: '',
-      password: '',
-      confirmPassword: '',
-      skills: '',
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  useEffect(() => {
+    if (!open) return;
+
+    getCurrentUser()
+      .then((data) => {
+        const incomingTags = Array.isArray(data?.tags) ? data.tags : [];
+        const incomingTagMap: Record<string, number> = {};
+        incomingTags.forEach((tag: any) => {
+          if (tag?.name && tag?.id) {
+            incomingTagMap[String(tag.name)] = Number(tag.id);
+          }
+        });
+
+        setSelectedSkills(incomingTags.map((tag: any) => String(tag?.name)).filter(Boolean));
+        setProfileTagMap(incomingTagMap);
+
+        form.reset({
+          first_name: data?.first_name || '',
+          last_name: data?.last_name || '',
+          profession: data?.profession || '',
+          bio: data?.bio || '',
+          phone_number: data?.phone_number || '',
+          city: data?.city || '',
+          country: data?.country || '',
+        });
+      })
+      .catch((error) => {
+        console.error(error?.response?.data || error);
+        toast.error('Failed to load profile data');
+      });
+  }, [open, form]);
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsSaving(true);
+
+      const tagIds = selectedSkills
+        .map((name) => reduxTagMap[name] || profileTagMap[name])
+        .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id));
+
+      const updated = await updateCurrentUserProfile({
+        ...data,
+        tags_id: tagIds,
+      });
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('profile-updated', {
+            detail: { profile: updated },
+          })
+        );
+      }
+      toast.success('Profile updated successfully');
+      setOpen(false);
+    } catch (error: any) {
+      console.error(error?.response?.data || error);
+      toast.error('Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="bg-gradient-to-r text-sm font-pt bg-[#03624C] px-4 text-white  rounded-full mt-2 shadow-xs ">
         Edit Profile
       </DialogTrigger>
@@ -92,167 +149,137 @@ export function EditProfile() {
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             autoComplete="off"
-            className="flex gap-4"
+            className="space-y-4"
           >
-            <div className="w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="email"
+                name="first_name"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col gap-2">
-                    <FormLabel>E-mail</FormLabel>
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
-                        placeholder="sudeisfed@gmail.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      you can change your email here.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="currentRole"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col gap-2 mt-3">
-                    <FormLabel>
-                      Current role <Briefcase className="w-4 h-4" />
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
-                        type="text"
-                        placeholder="senior backend developer"
-                        {...field}
-                      />
+                      <Input placeholder="First name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
-                name="skills"
+                name="last_name"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col gap-2 mt-3">
-                    <FormLabel>
-                      Skills <Cog className="w-4 h-4" />
-                    </FormLabel>
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
                     <FormControl>
-                      <SkillsInput
-                        value={[]}
-                        onChange={function (skills: String[]): void {
-                          throw new Error('Function not implemented.');
-                        }}
-                      />
+                      <Input placeholder="Last name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="profession"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Profession</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Software engineer" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+251..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Addis Ababa" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ethiopia" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="md:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="bio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bio</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Tell us about yourself"
+                          className="min-h-[110px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Maximum 500 characters.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <FormItem>
+                  <FormLabel>Skills / Tags</FormLabel>
+                  <FormControl>
+                    <SkillsInput
+                      value={selectedSkills}
+                      onChange={(skills) => setSelectedSkills(skills as string[])}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Add tags to update your profile skills.
+                  </FormDescription>
+                </FormItem>
+              </div>
             </div>
-
-            <div className="w-full">
-              <div className="">
-                <p className="text-sm font-medium flex gap-2">
-                  Adress <LocationEdit className="w-4 h-4" />
-                </p>
-                <div className="flex gap-4 py-2">
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col gap-2">
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input
-                            className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
-                            type="text"
-                            placeholder="Addis Abeba"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col gap-2">
-                        <FormLabel>Country</FormLabel>
-                        <FormControl>
-                          <Input
-                            className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
-                            type="text"
-                            placeholder="Ethiopia"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 mt-2">
-                <p className="text-sm py-2  flex gap-3 font-medium">
-                  Change your Password
-                  <LockIcon className="w-4 h-4" />
-                </p>
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-2">
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
-                          type="Password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-2">
-                      <FormLabel>Confirm password</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="shadow-none rounded-sm border focus-visible:ring-0 right-0"
-                          type="Password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={isSaving}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="rounded-sm bg-[#03624C]" disabled={isSaving}>
+                {isSaving ? 'Saving...' : 'Update Information'}
+              </Button>
             </div>
           </form>
         </Form>
-        <div className="flex justify-end-safe">
-          <Button className="rounded-sm bg-[#03624C] ">
-            Update Information
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   );

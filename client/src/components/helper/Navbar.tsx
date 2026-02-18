@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { SearchBar } from '../learner/searchBar';
 import { Bell, NotebookTabsIcon, Search, Settings } from 'lucide-react';
 import { Input } from '../ui/input';
+import { useEffect, useState } from 'react';
+import { getCurrentUser } from '@/lib/api/authApi';
 
 const Pages = [
   {
@@ -22,12 +24,37 @@ const Pages = [
   },
 ];
 
-const userInfo = {
-  name: 'sudeis',
-  avatar: 'https://github.com/shadcn.png',
-};
-
 export default function Navbar() {
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState('U');
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((data) => {
+        setAvatarUrl(data?.profile_image_url || null);
+        const name =
+          `${data?.first_name || ''} ${data?.last_name || ''}`.trim() ||
+          data?.username ||
+          'U';
+        setDisplayName(name);
+      })
+      .catch(() => {
+        setAvatarUrl(null);
+      });
+
+    const onProfileImageUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<{ url?: string }>;
+      if (customEvent?.detail?.url) {
+        setAvatarUrl(customEvent.detail.url);
+      }
+    };
+
+    window.addEventListener('profile-image-updated', onProfileImageUpdated);
+    return () => {
+      window.removeEventListener('profile-image-updated', onProfileImageUpdated);
+    };
+  }, []);
+
   return (
     <nav className="flex  justify-between px-4 py-2 ">
       <div className="flex items-center gap-3 ">
@@ -60,8 +87,8 @@ export default function Navbar() {
           </Link>
           <Link href={'/helper-profile'}>
             <Avatar className="w-7 h-7">
-              <AvatarImage src={userInfo.avatar} />
-              <AvatarFallback>{userInfo.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={avatarUrl || undefined} />
+              <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
             </Avatar>
           </Link>
         </div>

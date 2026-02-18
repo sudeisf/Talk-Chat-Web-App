@@ -130,6 +130,13 @@ export default function UploadProfileImage({ onUploaded }: UploadProfileImagePro
             ? `${uploadedUrl}&t=${Date.now()}`
             : `${uploadedUrl}?t=${Date.now()}`;
           onUploaded(cacheBustedUrl);
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('profile-image-updated', {
+                detail: { url: cacheBustedUrl },
+              })
+            );
+          }
         }
 
         if (!uploadedUrl) {
