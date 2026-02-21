@@ -19,9 +19,10 @@ export default function GitHubCallback() {
         .then((res) => {
           toast.success('Logged in via GitHub');
           const mustCompleteProfile =
+            res.data?.created === true ||
             res.data?.next === '/complete-profile' ||
             res.data?.profile_completed === false ||
-            (res.data?.created === true && res.data?.profile_completed !== true);
+            res.data?.user?.role == null;
 
           if (mustCompleteProfile) {
             router.replace('/complete-profile');

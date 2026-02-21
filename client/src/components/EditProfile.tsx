@@ -16,28 +16,30 @@ import { FormControl, FormField, FormItem, FormLabel } from './ui/form';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { getCurrentUser, updateCurrentUserProfile } from '@/lib/api/authApi';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { SkillsInput } from './helper/skillsTagInput';
 import { useAppSelector } from '@/redux/hooks';
 
 const formSchema = z
   .object({
-    first_name: z.string().min(1, 'First name is required').max(50),
-    last_name: z.string().min(1, 'Last name is required').max(50),
+      first_name: z.string().max(50).optional().or(z.literal('')),
+    last_name: z.string().max(50).optional().or(z.literal('')),
     profession: z.string().max(100).optional().or(z.literal('')),
     bio: z.string().max(500).optional().or(z.literal('')),
     phone_number: z.string().max(20).optional().or(z.literal('')),
     city: z
       .string()
-      .min(1, 'City is required')
       .max(50, 'City name is too long')
-      .regex(/^[a-zA-Z\s\-']+$/, 'Please enter a valid city name'),
+      .regex(/^[a-zA-Z\s\-']*$/, 'Please enter a valid city name')
+      .optional()
+      .or(z.literal('')),
     country: z
       .string()
-      .min(1, 'Country is required')
       .max(50, 'Country name is too long')
-      .regex(/^[a-zA-Z\s\-']+$/, 'Please enter a valid country name'),
+      .regex(/^[a-zA-Z\s\-']*$/, 'Please enter a valid country name')
+      .optional()
+      .or(z.literal('')),
   });
 
 type FormData = z.infer<typeof formSchema>;
@@ -46,7 +48,15 @@ export function EditProfile() {
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const selectedSkillsRef = useRef<string[]>([]);
   const [profileTagMap, setProfileTagMap] = useState<Record<string, number>>({});
+
+  const handleSkillsChange = (skills: string[]) => {
+    selectedSkillsRef.current = skills;
+    setSelectedSkills(skills);
+  };
+
+  const normalizeTagKey = (value: string) => value.trim().toLowerCase();
 
   const reduxTagMap = useAppSelector((state) => {
     const map: Record<string, number> = {};
@@ -54,7 +64,7 @@ export function EditProfile() {
       container.forEach((tag: any) => {
         const parsedId = Number(tag?.id);
         if (!Number.isNaN(parsedId) && tag?.label) {
-          map[String(tag.label)] = parsedId;
+          map[normalizeTagKey(String(tag.label))] = parsedId;
         }
       });
     });
@@ -81,13 +91,29 @@ export function EditProfile() {
       .then((data) => {
         const incomingTags = Array.isArray(data?.tags) ? data.tags : [];
         const incomingTagMap: Record<string, number> = {};
+        const incomingSkillNames: string[] = [];
         incomingTags.forEach((tag: any) => {
-          if (tag?.name && tag?.id) {
-            incomingTagMap[String(tag.name)] = Number(tag.id);
+          if (typeof tag === 'string') {
+            const cleanName = tag.trim();
+            if (cleanName) {
+              incomingSkillNames.push(cleanName);
+            }
+            return;
+          }
+
+          const tagName = typeof tag?.name === 'string' ? tag.name.trim() : '';
+          if (tagName) {
+            incomingSkillNames.push(tagName);
+          }
+
+          if (tagName && tag?.id) {
+            incomingTagMap[normalizeTagKey(tagName)] = Number(tag.id);
           }
         });
 
-        setSelectedSkills(incomingTags.map((tag: any) => String(tag?.name)).filter(Boolean));
+        const dedupedIncomingSkills = Array.from(new Set(incomingSkillNames));
+        selectedSkillsRef.current = dedupedIncomingSkills;
+        setSelectedSkills(dedupedIncomingSkills);
         setProfileTagMap(incomingTagMap);
 
         form.reset({
@@ -110,14 +136,23 @@ export function EditProfile() {
     try {
       setIsSaving(true);
 
-      const tagIds = selectedSkills
-        .map((name) => reduxTagMap[name] || profileTagMap[name])
+      const normalizedSelectedSkills = selectedSkillsRef.current
+        .map((name) => String(name).trim())
+        .filter((name) => name.length > 0);
+
+      const uniqueSelectedSkills = Array.from(new Set(normalizedSelectedSkills));
+
+      const tagIds = uniqueSelectedSkills
+        .map((name) => reduxTagMap[normalizeTagKey(name)] || profileTagMap[normalizeTagKey(name)])
         .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id));
 
-      const updated = await updateCurrentUserProfile({
+      await updateCurrentUserProfile({
         ...data,
         tags_id: tagIds,
+        tags_name: uniqueSelectedSkills,
       });
+
+      const updated = await getCurrentUser();
 
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
@@ -256,7 +291,7 @@ export function EditProfile() {
                   <FormControl>
                     <SkillsInput
                       value={selectedSkills}
-                      onChange={(skills) => setSelectedSkills(skills as string[])}
+                      onChange={handleSkillsChange}
                     />
                   </FormControl>
                   <FormDescription>

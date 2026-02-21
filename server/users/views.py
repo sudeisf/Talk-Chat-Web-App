@@ -32,6 +32,10 @@ load_dotenv()
 
 User = get_user_model()
 
+
+def _needs_profile_completion(user):
+    return (not bool(getattr(user, "profile_completed", False))) or (not bool(getattr(user, "role", None)))
+
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # To bypass CSRF check
@@ -48,6 +52,7 @@ class RegisterView(APIView):
                 login(request,user)
                   
                 csrf_token = get_token(request)
+                needs_profile_completion = _needs_profile_completion(user)
                 return Response({
                         "message": "User registered and logged in successfully",
                         "user": user.id,            
@@ -56,8 +61,8 @@ class RegisterView(APIView):
                         "firstName": user.first_name,
                         "lastName": user.last_name, 
                         "role": getattr(user, "role", None),
-                    "profile_completed": user.profile_completed,
-                    "next": "/" if user.profile_completed else "/complete-profile",
+                    "profile_completed": not needs_profile_completion,
+                    "next": "/complete-profile" if needs_profile_completion else "/",
                         "csrftoken": csrf_token
                     }, status=status.HTTP_201_CREATED)
             return Response(serilizer.errors,status=400)
@@ -74,6 +79,7 @@ class LoginView(APIView):
 
             user = serializer.validated_data["user"]
             login(request,user)
+            needs_profile_completion = _needs_profile_completion(user)
 
             response = Response({
                 "user" : user.id,
@@ -81,11 +87,11 @@ class LoginView(APIView):
                 "username" : user.username,
                 "firstName" : user.first_name,
                 "lastName" : user.last_name,
-                "profile_completed": user.profile_completed,
-                "next": "/" if user.profile_completed else "/complete-profile",
+                "profile_completed": not needs_profile_completion,
+                "next": "/complete-profile" if needs_profile_completion else "/",
             },status=status.HTTP_200_OK)
             # expose role to frontend via cookie for middleware-based redirects
-            if user.profile_completed and hasattr(user, "role") and user.role:
+            if not needs_profile_completion:
                 response.set_cookie("role", user.role)
             return response
 
@@ -197,6 +203,7 @@ class GoogleLoginAPIView(APIView):
 
 
             login(request, user)
+            needs_profile_completion = _needs_profile_completion(user)
 
             response = Response({
                 "status": "success",
@@ -207,10 +214,10 @@ class GoogleLoginAPIView(APIView):
                     "last_name": user.last_name,
                 },
                 "created": created,
-                "profile_completed": user.profile_completed,
-                "next": "/" if user.profile_completed else "/complete-profile",
+                "profile_completed": not needs_profile_completion,
+                "next": "/complete-profile" if needs_profile_completion else "/",
             })
-            if user.profile_completed and hasattr(user, "role") and user.role:
+            if not needs_profile_completion:
                 response.set_cookie("role", user.role)
             return response
 
@@ -341,6 +348,7 @@ class GithubLoginAPIView(APIView):
             created = True
 
         login(request, user)
+        needs_profile_completion = _needs_profile_completion(user)
         response = Response({
             "user": user.id,
             "email": user.email,
@@ -348,10 +356,10 @@ class GithubLoginAPIView(APIView):
             "firstName": user.first_name,
             "lastName": user.last_name,
             "created": created,
-            "profile_completed": user.profile_completed,
-            "next": "/" if user.profile_completed else "/complete-profile",
+            "profile_completed": not needs_profile_completion,
+            "next": "/complete-profile" if needs_profile_completion else "/",
         }, status=status.HTTP_200_OK)
-        if user.profile_completed and hasattr(user, "role") and user.role:
+        if not needs_profile_completion:
             response.set_cookie("role", user.role)
         return response
         

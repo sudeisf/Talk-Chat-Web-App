@@ -120,12 +120,13 @@ export default function HelperProfilePage() {
   const displayLocation =
     [profile?.city, profile?.country].filter(Boolean).join(', ') ||
     userInfo.location;
-  const displaySkills: string[] =
-    Array.isArray(profile?.tags) && profile.tags.length > 0
-      ? profile.tags
-          .map((tag: any) => tag?.name)
-          .filter((name: string | undefined): name is string => Boolean(name))
-      : userInfo.skills;
+  const displaySkills: string[] = Array.isArray(profile?.tags)
+    ? profile.tags
+        .map((tag: any) =>
+          typeof tag === 'string' ? tag : (tag?.name as string | undefined)
+        )
+        .filter((name: string | undefined): name is string => Boolean(name))
+    : [];
 
   return (
     <div className=" max-w-6xl mx-auto p-4 mb-4 ">
@@ -158,15 +159,7 @@ export default function HelperProfilePage() {
               <AvatarImage src={profileImage || userInfo.avatar} />
               <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
             </Avatar>
-            {/* <Button
-              id="edit-avatar"
-              size="sm"
-              variant="outline"
-              onClick={() => avatarFileInputRef.current?.click()}
-              className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50"
-            >
-              <Camera className="h-5 w-5" />
-            </Button> */}
+           
             <UploadProfileImage onUploaded={setProfileImage} />
           </div>
 
@@ -209,13 +202,17 @@ export default function HelperProfilePage() {
                   skills <Star className="w-4 h-4" />
                 </h1>
                 <div className="flex flex-wrap gap-2 items-">
-                  {displaySkills.map((skill: string, index: number) => (
-                    <div key={index}>
-                      <p className="bg-gray-100 p-2 text-sm w-fit rounded-full font-pt font-medium">
-                        {skill}
-                      </p>
-                    </div>
-                  ))}
+                  {displaySkills.length > 0 ? (
+                    displaySkills.map((skill: string, index: number) => (
+                      <div key={index}>
+                        <p className="bg-gray-100 p-2 text-sm w-fit rounded-full font-pt font-medium">
+                          {skill}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No skills added yet</p>
+                  )}
                 </div>
               </div>
             </div>

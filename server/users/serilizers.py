@@ -191,6 +191,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False,
     )
+    tags_name = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True,
+        required=False,
+    )
     
     class Meta:
         model = User
@@ -215,6 +220,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "country",
             "tags",
             "tags_id",
+            "tags_name",
             ]
 
     def get_tags(self, obj):
@@ -247,17 +253,37 @@ class ProfileSerializer(serializers.ModelSerializer):
         
     def update(self, instance, validated_data):
         tags_ids = validated_data.pop('tags_id', None)
+        tags_names = validated_data.pop('tags_name', None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        if tags_ids is not None:
-            from .models import Tag,UserTag
+        if tags_ids is not None or tags_names is not None:
+            from .models import Tag, UserTag
             UserTag.objects.filter(user=instance).delete()
-            tags = Tag.objects.filter(id__in=tags_ids)
+
+            tags = list(Tag.objects.filter(id__in=(tags_ids or [])))
+
+            for raw_name in (tags_names or []):
+                clean_name = str(raw_name).strip()
+                if not clean_name:
+                    continue
+                tag = Tag.objects.filter(name__iexact=clean_name).first()
+                if not tag:
+                    tag = Tag.objects.create(name=clean_name)
+                tags.append(tag)
+
+            unique_tags = []
+            seen_ids = set()
+            for tag in tags:
+                if tag.id in seen_ids:
+                    continue
+                seen_ids.add(tag.id)
+                unique_tags.append(tag)
+
             UserTag.objects.bulk_create(
-                [UserTag(user=instance, tag=tag) for tag in tags]
+                [UserTag(user=instance, tag=tag) for tag in unique_tags]
                 )
         return instance
 
