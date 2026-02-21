@@ -11,41 +11,28 @@ interface SkillsInputProps {
   onChange: (skills: string[]) => void;
 }
 
-export const SkillsInput: React.FC<SkillsInputProps> = ({
-  value,
-  onChange,
-}) => {
+export const SkillsInput: React.FC<SkillsInputProps> = ({ value, onChange }) => {
   const [inputValue, setInputValue] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  /** ----------------------------------------
-   * Normalize helper (single source of truth)
-   * ---------------------------------------- */
+  /** Normalize helper */
   const normalize = (v: string) => v.trim().toLowerCase();
 
-  /** ----------------------------------------
-   * Get existing tags from redux
-   * ---------------------------------------- */
+  /** Get existing tags from redux (memoized) */
   const existingTags = useAppSelector((state) => {
     const set = new Set<string>();
-
     Object.values(state.proTags).forEach((container: any) => {
       if (!Array.isArray(container)) return;
-
       container.forEach((tag: any) => {
-        const label =
-          typeof tag?.label === 'string' ? tag.label.trim() : '';
+        const label = typeof tag?.label === 'string' ? tag.label.trim() : '';
         if (label) set.add(label);
       });
     });
-
     return Array.from(set);
   });
 
-  /** ----------------------------------------
-   * Suggestions (memoized)
-   * ---------------------------------------- */
+  /** Suggestions (memoized) */
   const suggestions = useMemo(() => {
     if (!inputValue.trim()) return [];
 
@@ -60,52 +47,48 @@ export const SkillsInput: React.FC<SkillsInputProps> = ({
       .slice(0, 5);
   }, [existingTags, inputValue, value]);
 
-  /** ----------------------------------------
-   * Add skill (deduped + trimmed)
-   * ---------------------------------------- */
+  /** Add skill (deduplicated + trimmed) */
   const addSkill = (skill: string) => {
     const trimmed = skill.trim();
     if (!trimmed) return;
-
     const normalizedSet = new Set(value.map(normalize));
     if (normalizedSet.has(normalize(trimmed))) return;
-
     onChange([...value, trimmed]);
     setInputValue('');
-    setShowSuggestions(false);
   };
 
-  /** ----------------------------------------
-   * Remove skill
-   * ---------------------------------------- */
+  /** Remove skill */
   const removeSkill = (skillToRemove: string) => {
     onChange(value.filter((skill) => skill !== skillToRemove));
   };
 
-  /** ----------------------------------------
-   * Keyboard handling
-   * ---------------------------------------- */
+  /** Handle keyboard events */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       addSkill(inputValue);
     }
-
     if (e.key === 'Backspace' && !inputValue && value.length > 0) {
       removeSkill(value[value.length - 1]);
     }
   };
 
-  const handleInputBlur = () => {
-    if (inputValue.trim()) {
-      addSkill(inputValue);
-      return;
+  /** Handle clicks outside for blur */
+  const handleClickOutside = (e: MouseEvent) => {
+    if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      setIsFocused(false);
+      if (inputValue.trim()) addSkill(inputValue);
     }
-    setTimeout(() => setShowSuggestions(false), 200);
   };
 
+  // Attach / detach click outside listener
+  useState(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  });
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" ref={containerRef}>
       {/* Selected skills */}
       {value.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -131,15 +114,10 @@ export const SkillsInput: React.FC<SkillsInputProps> = ({
       <div className="relative">
         <div className="flex gap-2">
           <Input
-            ref={inputRef}
             value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              setShowSuggestions(true);
-            }}
-            onFocus={() => setShowSuggestions(true)}
+            onChange={(e) => setInputValue(e.target.value)}
+            onFocus={() => setIsFocused(true)}
             onKeyDown={handleKeyDown}
-            onBlur={handleInputBlur}
             placeholder={
               value.length === 0
                 ? 'Add skills (React, TypeScript, etc.)'
@@ -149,7 +127,7 @@ export const SkillsInput: React.FC<SkillsInputProps> = ({
           />
 
           <Button
-            type="button" // ✅ CRITICAL
+            type="button"
             onClick={() => addSkill(inputValue)}
             disabled={!inputValue.trim()}
             className="bg-[#03624C] text-white rounded-sm hover:bg-[#03624C]/90 disabled:bg-gray-400"
@@ -160,25 +138,27 @@ export const SkillsInput: React.FC<SkillsInputProps> = ({
         </div>
 
         {/* Suggestions */}
-        {showSuggestions && suggestions.length > 0 && (
+        {isFocused && suggestions.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
             {suggestions.map((suggestion) => (
-              <Button
+              <button
                 key={suggestion}
-                type="button" // ✅ CRITICAL
-                onMouseDown={(e) => e.preventDefault()} // prevent blur
-                onClick={() => addSkill(suggestion)}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault(); // prevent blur
+                  addSkill(suggestion);
+                }}
                 className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
               >
                 {suggestion}
-              </Button>
+              </button>
             ))}
           </div>
         )}
       </div>
 
       {/* Quick suggestions */}
-      {inputValue === '' && (
+      {inputValue.trim() === '' && (
         <div className="flex flex-wrap gap-2">
           {['React', 'JavaScript', 'TypeScript', 'Node.js', 'Python'].map(
             (skill) => (

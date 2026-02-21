@@ -1,11 +1,11 @@
 'use client';
+
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-
 import { Button } from './ui/button';
 import { Edit3 } from 'lucide-react';
 import { Form, FormDescription, FormMessage } from './ui/form';
@@ -16,31 +16,30 @@ import { FormControl, FormField, FormItem, FormLabel } from './ui/form';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { getCurrentUser, updateCurrentUserProfile } from '@/lib/api/authApi';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { SkillsInput } from './helper/skillsTagInput';
 import { useAppSelector } from '@/redux/hooks';
 
-const formSchema = z
-  .object({
-      first_name: z.string().max(50).optional().or(z.literal('')),
-    last_name: z.string().max(50).optional().or(z.literal('')),
-    profession: z.string().max(100).optional().or(z.literal('')),
-    bio: z.string().max(500).optional().or(z.literal('')),
-    phone_number: z.string().max(20).optional().or(z.literal('')),
-    city: z
-      .string()
-      .max(50, 'City name is too long')
-      .regex(/^[a-zA-Z\s\-']*$/, 'Please enter a valid city name')
-      .optional()
-      .or(z.literal('')),
-    country: z
-      .string()
-      .max(50, 'Country name is too long')
-      .regex(/^[a-zA-Z\s\-']*$/, 'Please enter a valid country name')
-      .optional()
-      .or(z.literal('')),
-  });
+const formSchema = z.object({
+  first_name: z.string().max(50).optional().or(z.literal('')),
+  last_name: z.string().max(50).optional().or(z.literal('')),
+  profession: z.string().max(100).optional().or(z.literal('')),
+  bio: z.string().max(500).optional().or(z.literal('')),
+  phone_number: z.string().max(20).optional().or(z.literal('')),
+  city: z
+    .string()
+    .max(50, 'City name is too long')
+    .regex(/^[a-zA-Z\s\-']*$/, 'Please enter a valid city name')
+    .optional()
+    .or(z.literal('')),
+  country: z
+    .string()
+    .max(50, 'Country name is too long')
+    .regex(/^[a-zA-Z\s\-']*$/, 'Please enter a valid country name')
+    .optional()
+    .or(z.literal('')),
+});
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -51,20 +50,13 @@ export function EditProfile() {
   const selectedSkillsRef = useRef<string[]>([]);
   const [profileTagMap, setProfileTagMap] = useState<Record<string, number>>({});
 
-  const handleSkillsChange = (skills: string[]) => {
-    selectedSkillsRef.current = skills;
-    setSelectedSkills(skills);
-  };
-
-  const normalizeTagKey = (value: string) => value.trim().toLowerCase();
-
   const reduxTagMap = useAppSelector((state) => {
     const map: Record<string, number> = {};
     Object.values(state.proTags).forEach((container: any) => {
       container.forEach((tag: any) => {
         const parsedId = Number(tag?.id);
         if (!Number.isNaN(parsedId) && tag?.label) {
-          map[normalizeTagKey(String(tag.label))] = parsedId;
+          map[tag.label.trim().toLowerCase()] = parsedId;
         }
       });
     });
@@ -84,6 +76,14 @@ export function EditProfile() {
     },
   });
 
+  const handleSkillsChange = useCallback((skills: string[]) => {
+    const deduped = Array.from(new Set(skills.map((s) => s.trim()))).filter(Boolean);
+    selectedSkillsRef.current = deduped;
+    setSelectedSkills(deduped);
+  }, []);
+
+  const normalizeTagKey = (value: string) => value.trim().toLowerCase();
+
   useEffect(() => {
     if (!open) return;
 
@@ -92,22 +92,18 @@ export function EditProfile() {
         const incomingTags = Array.isArray(data?.tags) ? data.tags : [];
         const incomingTagMap: Record<string, number> = {};
         const incomingSkillNames: string[] = [];
-        incomingTags.forEach((tag: any) => {
-          if (typeof tag === 'string') {
-            const cleanName = tag.trim();
-            if (cleanName) {
-              incomingSkillNames.push(cleanName);
-            }
-            return;
-          }
 
-          const tagName = typeof tag?.name === 'string' ? tag.name.trim() : '';
+        incomingTags.forEach((tag: any) => {
+          const tagName =
+            typeof tag === 'string'
+              ? tag.trim()
+              : typeof tag?.name === 'string'
+              ? tag.name.trim()
+              : '';
+
           if (tagName) {
             incomingSkillNames.push(tagName);
-          }
-
-          if (tagName && tag?.id) {
-            incomingTagMap[normalizeTagKey(tagName)] = Number(tag.id);
+            if (tag?.id) incomingTagMap[normalizeTagKey(tagName)] = Number(tag.id);
           }
         });
 
@@ -136,31 +132,33 @@ export function EditProfile() {
     try {
       setIsSaving(true);
 
-      const normalizedSelectedSkills = selectedSkillsRef.current
-        .map((name) => String(name).trim())
+      const normalizedSkills = selectedSkillsRef.current
+        .map((name) => name.trim())
         .filter((name) => name.length > 0);
 
-      const uniqueSelectedSkills = Array.from(new Set(normalizedSelectedSkills));
+      const uniqueSkills = Array.from(new Set(normalizedSkills));
 
-      const tagIds = uniqueSelectedSkills
-        .map((name) => reduxTagMap[normalizeTagKey(name)] || profileTagMap[normalizeTagKey(name)])
+      const tagIds = uniqueSkills
+        .map(
+          (name) =>
+            reduxTagMap[normalizeTagKey(name)] ||
+            profileTagMap[normalizeTagKey(name)]
+        )
         .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id));
 
       await updateCurrentUserProfile({
         ...data,
         tags_id: tagIds,
-        tags_name: uniqueSelectedSkills,
+        tags_name: uniqueSkills,
       });
 
       const updated = await getCurrentUser();
-
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
-          new CustomEvent('profile-updated', {
-            detail: { profile: updated },
-          })
+          new CustomEvent('profile-updated', { detail: { profile: updated } })
         );
       }
+
       toast.success('Profile updated successfully');
       setOpen(false);
     } catch (error: any) {
@@ -173,20 +171,18 @@ export function EditProfile() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="bg-gradient-to-r text-sm font-pt bg-[#03624C] px-4 text-white  rounded-full mt-2 shadow-xs ">
+      <DialogTrigger className="bg-gradient-to-r text-sm font-pt bg-[#03624C] px-4 text-white rounded-full mt-2 shadow-xs">
         Edit Profile
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl">
         <DialogTitle className="text-sm font-sans font-medium flex gap-3">
           Edit Your Profile <Edit3 className="w-4 h-4" />
         </DialogTitle>
+
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            autoComplete="off"
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* First Name */}
               <FormField
                 control={form.control}
                 name="first_name"
@@ -200,6 +196,8 @@ export function EditProfile() {
                   </FormItem>
                 )}
               />
+
+              {/* Last Name */}
               <FormField
                 control={form.control}
                 name="last_name"
@@ -213,6 +211,8 @@ export function EditProfile() {
                   </FormItem>
                 )}
               />
+
+              {/* Profession */}
               <FormField
                 control={form.control}
                 name="profession"
@@ -220,12 +220,14 @@ export function EditProfile() {
                   <FormItem>
                     <FormLabel>Profession</FormLabel>
                     <FormControl>
-                      <Input placeholder="Software engineer" {...field} />
+                      <Input placeholder="Software Engineer" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* Phone */}
               <FormField
                 control={form.control}
                 name="phone_number"
@@ -239,6 +241,8 @@ export function EditProfile() {
                   </FormItem>
                 )}
               />
+
+              {/* City */}
               <FormField
                 control={form.control}
                 name="city"
@@ -252,6 +256,8 @@ export function EditProfile() {
                   </FormItem>
                 )}
               />
+
+              {/* Country */}
               <FormField
                 control={form.control}
                 name="country"
@@ -265,6 +271,8 @@ export function EditProfile() {
                   </FormItem>
                 )}
               />
+
+              {/* Bio */}
               <div className="md:col-span-2">
                 <FormField
                   control={form.control}
@@ -273,11 +281,7 @@ export function EditProfile() {
                     <FormItem>
                       <FormLabel>Bio</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Tell us about yourself"
-                          className="min-h-[110px]"
-                          {...field}
-                        />
+                        <Textarea placeholder="Tell us about yourself" className="min-h-[110px]" {...field} />
                       </FormControl>
                       <FormDescription>Maximum 500 characters.</FormDescription>
                       <FormMessage />
@@ -285,28 +289,22 @@ export function EditProfile() {
                   )}
                 />
               </div>
+
+              {/* Skills */}
               <div className="md:col-span-2">
                 <FormItem>
                   <FormLabel>Skills / Tags</FormLabel>
                   <FormControl>
-                    <SkillsInput
-                      value={selectedSkills}
-                      onChange={handleSkillsChange}
-                    />
+                    <SkillsInput value={selectedSkills} onChange={handleSkillsChange} />
                   </FormControl>
-                  <FormDescription>
-                    Add tags to update your profile skills.
-                  </FormDescription>
+                  <FormDescription>Add tags to update your profile skills.</FormDescription>
                 </FormItem>
               </div>
             </div>
+
+            {/* Buttons */}
             <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isSaving}
-              >
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isSaving}>
                 Cancel
               </Button>
               <Button type="submit" className="rounded-sm bg-[#03624C]" disabled={isSaving}>
