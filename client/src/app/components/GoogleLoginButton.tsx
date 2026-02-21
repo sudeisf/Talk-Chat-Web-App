@@ -14,15 +14,21 @@ export default function GoogleLoginButton() {
         { id_token: idToken },
         { withCredentials: true }
       );
+
       toast.success('Logged in with Google');
-      const mustCompleteProfile =
-        res.data?.created === true ||
-        res.data?.next === '/complete-profile' ||
-        res.data?.profile_completed === false ||
-        res.data?.user?.role == null;
+
+      // Use profile completion + role to decide navigation
+      const mustCompleteProfile = res.data?.profile_completed === false;
+      const role = res.data?.user?.role;
+      const roleDashboardMap: Record<string, string> = {
+        learner: '/learner-dashboard',
+        helper: '/dashboard',
+      };
 
       if (mustCompleteProfile) {
         router.replace('/complete-profile');
+      } else if (role && roleDashboardMap[role]) {
+        router.replace(roleDashboardMap[role]);
       } else {
         router.replace('/');
       }

@@ -34,7 +34,8 @@ User = get_user_model()
 
 
 def _needs_profile_completion(user):
-    return (not bool(getattr(user, "profile_completed", False))) or (not bool(getattr(user, "role", None)))
+    required_fields = ["first_name", "last_name", "role"]
+    return any(not getattr(user, field, None) for field in required_fields)
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
@@ -92,7 +93,7 @@ class LoginView(APIView):
             },status=status.HTTP_200_OK)
             # expose role to frontend via cookie for middleware-based redirects
             if not needs_profile_completion:
-                response.set_cookie("role", user.role)
+                response.set_cookie("role", user.role, max_age=60 * 60 * 24)
             return response
 
 class LogoutView(APIView):
@@ -212,13 +213,12 @@ class GoogleLoginAPIView(APIView):
                     "email": user.email,
                     "first_name": user.first_name,
                     "last_name": user.last_name,
+                    "role": user.role,
                 },
                 "created": created,
-                "profile_completed": not needs_profile_completion,
-                "next": "/complete-profile" if needs_profile_completion else "/",
+                "profile_completed": not _needs_profile_completion(user),  # True if all required fields exist
             })
-            if not needs_profile_completion:
-                response.set_cookie("role", user.role)
+            response.set_cookie("role", user.role, max_age=60 * 60 * 24)
             return response
 
         except ValueError as e:
@@ -236,32 +236,34 @@ class GoogleLoginAPIView(APIView):
     def get_or_create_user(self, email, google_sub, first_name, last_name):
         User = get_user_model()
 
-        # If user already linked by google_id
+        # Already linked by Google
         user = User.objects.filter(google_id=google_sub).first()
         if user:
-            # make sure login_method is correct
-            if user.login_method != User.LoginMethod.GOOGLE:
-                user.login_method = User.LoginMethod.GOOGLE
-                user.is_google_account = True
-                user.save()
+            user.login_method = User.LoginMethod.GOOGLE
+            user.is_google_account = True
+            if not user.first_name and first_name:
+                user.first_name = first_name
+            if not user.last_name and last_name:
+                user.last_name = last_name
+            user.save()
             return user, False
 
-        # If user exists by email, link Google
+        # Existing email user
         user = User.objects.filter(email=email).first()
         if user:
             user.google_id = google_sub
             user.is_google_account = True
             user.login_method = User.LoginMethod.GOOGLE
-            if not user.first_name:
+            if not user.first_name and first_name:
                 user.first_name = first_name
-            if not user.last_name:
+            if not user.last_name and last_name:
                 user.last_name = last_name
             user.save()
             return user, False
 
         # New Google-only user
         username = self.generate_unique_username(email)
-        return User.objects.create_user(
+        user = User.objects.create_user(
             username=username,
             email=email,
             google_id=google_sub,
@@ -269,7 +271,9 @@ class GoogleLoginAPIView(APIView):
             login_method=User.LoginMethod.GOOGLE,
             first_name=first_name,
             last_name=last_name,
-        ), True
+            # role is NOT set
+        )
+        return user, True
 
     def generate_unique_username(self, email):
         base_username = email.split('@')[0]
@@ -360,7 +364,7 @@ class GithubLoginAPIView(APIView):
             "next": "/complete-profile" if needs_profile_completion else "/",
         }, status=status.HTTP_200_OK)
         if not needs_profile_completion:
-            response.set_cookie("role", user.role)
+            response.set_cookie("role", user.role, max_age=60 * 60 * 24)
         return response
         
         
@@ -385,7 +389,7 @@ class SetUserRoleView(APIView):
             {"message": "User role updated successfully", "role": user.role},
             status=status.HTTP_200_OK,
         )
-        response.set_cookie("role", user.role)
+        response.set_cookie("role", user.role, max_age=60 * 60 * 24)
         return response
     
 
