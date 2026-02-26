@@ -21,6 +21,7 @@ from django.conf import settings
 import requests
 from django.contrib.auth import get_user_model
 from django.middleware.csrf import get_token
+from django.db import IntegrityError
 
 
 
@@ -292,36 +293,117 @@ class GithubLoginAPIView(APIView):
     permission_classes = []
     authentication_classes = []
 
+    def generate_unique_username(self, email):
+        base_username = email.split('@')[0]
+        username = base_username
+        User = get_user_model()
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+        return username
+
+    def get_or_create_user(self, email, github_id, first_name, last_name, github_login):
+        User = get_user_model()
+
+        # Already linked by GitHub
+        user = User.objects.filter(github_id=github_id).first()
+        if user:
+            user.login_method = User.LoginMethod.GITHUB
+            user.is_github_account = True
+            if not user.first_name and first_name:
+                user.first_name = first_name
+            if not user.last_name and last_name:
+                user.last_name = last_name
+            user.save()
+            return user, False
+
+        # Existing email user
+        user = User.objects.filter(email=email).first()
+        if user:
+            user.github_id = github_id
+            user.is_github_account = True
+            user.login_method = User.LoginMethod.GITHUB
+            if not user.first_name and first_name:
+                user.first_name = first_name
+            if not user.last_name and last_name:
+                user.last_name = last_name
+            user.save()
+            return user, False
+
+        # New GitHub-only user
+        username_candidate = github_login or self.generate_unique_username(email)
+        try:
+            user = User.objects.create_user(
+                username=username_candidate,
+                email=email,
+                github_id=github_id,
+                is_github_account=True,
+                login_method=User.LoginMethod.GITHUB,
+                first_name=first_name,
+                last_name=last_name,
+            )
+        except IntegrityError:
+            user = User.objects.create_user(
+                username=self.generate_unique_username(email),
+                email=email,
+                github_id=github_id,
+                is_github_account=True,
+                login_method=User.LoginMethod.GITHUB,
+                first_name=first_name,
+                last_name=last_name,
+            )
+        return user, True
+
     def post(self, request):
         code = request.data.get("code")
         if not code:
             return Response({"error": "Missing GitHub code"}, status=400)
-        
+
+        client_id = os.environ.get("GITHUB_CLIENT_ID")
+        client_secret = os.environ.get("GITHUB_CLIENT_SECRET")
+        if not client_id or not client_secret:
+            return Response({"error": "GitHub OAuth is not configured"}, status=500)
+
         token_response = requests.post(
-             "https://github.com/login/oauth/access_token",
-             headers={"Accept" : "application/json"},
-             data={
-                "client_id": os.environ["GITHUB_CLIENT_ID"],
-                "client_secret": os.environ["GITHUB_CLIENT_SECRET"],
+            "https://github.com/login/oauth/access_token",
+            headers={"Accept": "application/json"},
+            data={
+                "client_id": client_id,
+                "client_secret": client_secret,
                 "code": code,
-             }
+            },
+            timeout=10,
         )
+
+        if token_response.status_code != 200:
+            return Response({"error": "GitHub token exchange failed"}, status=400)
 
         token_data = token_response.json()
         access_token = token_data.get("access_token")
         if not access_token:
-             return Response({"error": "GitHub token exchange failed"}, status=400)
-        
+            return Response({"error": "GitHub token exchange failed"}, status=400)
+
         user_response = requests.get(
             "https://api.github.com/user",
-            headers={"Authorization": f"token {access_token}"}
+            headers={"Authorization": f"token {access_token}"},
+            timeout=10,
         )
+
+        if user_response.status_code != 200:
+            return Response({"error": "Could not fetch GitHub user profile"}, status=400)
+
         user_data = user_response.json()
 
         email_res = requests.get(
             "https://api.github.com/user/emails",
-            headers={"Authorization": f"token {access_token}"}
+            headers={"Authorization": f"token {access_token}"},
+            timeout=10,
         )
+
+        if email_res.status_code != 200:
+            return Response({"error": "Could not fetch GitHub emails"}, status=400)
+
         emails = email_res.json()
         email = next((e["email"] for e in emails if e.get("primary") and e.get("verified")), None)
 
@@ -329,41 +411,36 @@ class GithubLoginAPIView(APIView):
             return Response({"error": "Could not fetch verified GitHub email"}, status=400)
 
         github_id = str(user_data["id"])
-        username = user_data.get("login", email.split("@")[0])
+        full_name = (user_data.get("name") or "").strip()
+        first_name = full_name.split(" ")[0] if full_name else ""
+        last_name = " ".join(full_name.split(" ")[1:]) if full_name and len(full_name.split(" ")) > 1 else ""
 
-        User = get_user_model()
-        created = False
-        try:
-            user = User.objects.get(email=email)
-            if not user.github_id:
-                user.github_id = github_id
-                user.is_github_account = True
-            # ensure correct login method
-            user.login_method = User.LoginMethod.GITHUB
-            user.save()
-        except User.DoesNotExist:
-            user = User.objects.create(
-                email=email,
-                username=username,
-                github_id=github_id,
-                is_github_account=True,
-                login_method=User.LoginMethod.GITHUB,
-            )
-            created = True
+        user, created = self.get_or_create_user(
+            email=email,
+            github_id=github_id,
+            first_name=first_name,
+            last_name=last_name,
+            github_login=user_data.get("login", ""),
+        )
 
         login(request, user)
         needs_profile_completion = _needs_profile_completion(user)
+        role_missing = not bool(getattr(user, "role", None))
+        must_complete_profile = needs_profile_completion or role_missing
         response = Response({
-            "user": user.id,
-            "email": user.email,
-            "username": user.username,
-            "firstName": user.first_name,
-            "lastName": user.last_name,
+            "status": "success",
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "role": user.role,
+            },
             "created": created,
-            "profile_completed": not needs_profile_completion,
-            "next": "/complete-profile" if needs_profile_completion else "/",
+            "profile_completed": not must_complete_profile,
+            "next": "/complete-profile" if must_complete_profile else "/",
         }, status=status.HTTP_200_OK)
-        if not needs_profile_completion:
+        if not must_complete_profile:
             response.set_cookie("role", user.role, max_age=60 * 60 * 24)
         return response
         

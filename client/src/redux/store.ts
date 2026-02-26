@@ -5,7 +5,6 @@ import protagsReducer from './slice/professional-tags-slice/proTagSlice';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import userReducer  from './slice/userSlice';
-import { use } from 'react';
 
 const rootReducer = combineReducers({
   auth: authReducer,

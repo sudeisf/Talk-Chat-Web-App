@@ -3,11 +3,18 @@ import Link from 'next/link';
 import Logo from '../../../public/svg/logo.svg';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { SearchBar } from '../learner/searchBar';
-import { Bell, NotebookTabsIcon, Search, Settings } from 'lucide-react';
+import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useEffect, useState } from 'react';
-import { getCurrentUser } from '@/lib/api/authApi';
+import { getCurrentUser, logoutUser } from '@/lib/api/authApi';
+import { useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Pages = [
   {
@@ -25,8 +32,18 @@ const Pages = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('U');
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
 
   useEffect(() => {
     getCurrentUser()
@@ -85,12 +102,35 @@ export default function Navbar() {
           <Link href={'/helper-notfications'}>
             <Bell className="w-5 h-5 text-gray-500" />
           </Link>
-          <Link href={'/helper-profile'}>
-            <Avatar className="w-7 h-7">
-              <AvatarImage src={avatarUrl || undefined} />
-              <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
-            </Avatar>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className="rounded-full">
+                <Avatar className="w-7 h-7">
+                  <AvatarImage src={avatarUrl || undefined} />
+                  <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem asChild>
+                <Link href="/helper-profile" className="cursor-pointer">
+                  <User className="w-4 h-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings" className="cursor-pointer">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} variant="destructive">
+                <LogOut className="w-4 h-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </nav>

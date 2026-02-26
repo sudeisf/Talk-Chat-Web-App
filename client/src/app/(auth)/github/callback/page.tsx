@@ -2,7 +2,6 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import axios from 'axios';
 import { toast } from 'sonner';
 import API from '@/lib/api/axiosInstance';
 import { SpinnerInfinity } from 'spinners-react';
@@ -13,29 +12,52 @@ export default function GitHubCallback() {
 
   useEffect(() => {
     const code = params.get('code');
+    const oauthError = params.get('error');
+    const state = params.get('state');
 
-    if (code) {
-      API.post('/users/auth/github/', { code }, { withCredentials: true })
-        .then((res) => {
-          toast.success('Logged in via GitHub');
-          const mustCompleteProfile =
-            res.data?.created === true ||
-            res.data?.next === '/complete-profile' ||
-            res.data?.profile_completed === false ||
-            res.data?.user?.role == null;
-
-          if (mustCompleteProfile) {
-            router.replace('/complete-profile');
-          } else {
-            router.replace('/');
-          }
-        })
-        .catch((err) => {
-          toast.error('GitHub login failed');
-          console.error(err.response?.data || err.message);
-        });
+    if (oauthError) {
+      toast.error('GitHub authorization was canceled or failed');
+      router.replace('/login');
+      return;
     }
-  }, [params]);
+
+    const expectedState = sessionStorage.getItem('github_oauth_state');
+    sessionStorage.removeItem('github_oauth_state');
+
+    if (!code || !state || !expectedState || state !== expectedState) {
+      toast.error('Invalid GitHub OAuth state. Please try again.');
+      router.replace('/login');
+      return;
+    }
+
+    API.post('/users/auth/github/', { code }, { withCredentials: true })
+      .then((res) => {
+        toast.success('Logged in via GitHub');
+        const mustCompleteProfile =
+          res.data?.created === true ||
+          res.data?.next === '/complete-profile' ||
+          res.data?.profile_completed === false ||
+          res.data?.user?.role == null;
+        const role = res.data?.user?.role;
+        const roleDashboardMap: Record<string, string> = {
+          learner: '/learner-dashboard',
+          helper: '/dashboard',
+        };
+
+        if (mustCompleteProfile) {
+          router.replace('/complete-profile');
+        } else if (role && roleDashboardMap[role]) {
+          router.replace(roleDashboardMap[role]);
+        } else {
+          router.replace('/');
+        }
+      })
+      .catch((err) => {
+        toast.error('GitHub login failed');
+        console.error(err.response?.data || err.message);
+        router.replace('/login');
+      });
+  }, [params, router]);
 
   return (
     <>

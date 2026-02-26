@@ -1,5 +1,7 @@
 import type { IStaticMethods } from 'preline/dist';
 
+declare module '@dnd-kit/core';
+
 declare global {
   interface Window {
     noUiSlider: typeof noUiSlider;
