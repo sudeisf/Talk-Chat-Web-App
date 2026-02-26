@@ -175,15 +175,19 @@ class GoogleLoginAPIView(APIView):
                 google_requests.Request(),
                 settings.GOOGLE_CLIENT_ID 
             )
+        except ValueError as e:
+            return Response(
+                {"error": "Invalid token", "details": str(e)},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
-            # Validate issuer
+        try:
             if idinfo.get("iss") not in ["accounts.google.com", "https://accounts.google.com"]:
                 return Response(
                     {"error": "Invalid issuer"}, 
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # Extract user data
             email = idinfo.get("email")
             if not email:
                 return Response(
@@ -195,14 +199,15 @@ class GoogleLoginAPIView(APIView):
             first_name = idinfo.get("given_name", "")
             last_name = idinfo.get("family_name", "")
 
-            User = get_user_model()
-            user, created = self.get_or_create_user(
-                email=email,
-                google_sub=google_sub,
-                first_name=first_name,
-                last_name=last_name
-            )
-
+            try:
+                user, created = self.get_or_create_user(
+                    email=email,
+                    google_sub=google_sub,
+                    first_name=first_name,
+                    last_name=last_name
+                )
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
             login(request, user)
             needs_profile_completion = _needs_profile_completion(user)
@@ -217,17 +222,12 @@ class GoogleLoginAPIView(APIView):
                     "role": user.role,
                 },
                 "created": created,
-                "profile_completed": not _needs_profile_completion(user),  # True if all required fields exist
+                "profile_completed": not needs_profile_completion,
             })
-            response.set_cookie("role", user.role, max_age=60 * 60 * 24)
+            if not needs_profile_completion:
+                response.set_cookie("role", user.role, max_age=60 * 60 * 24)
             return response
 
-        except ValueError as e:
-         
-            return Response(
-                {"error": "Invalid token", "details": str(e)},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
         except Exception as e:
             return Response(
                 {"error": "Authentication failed", "details": str(e)},
@@ -237,7 +237,6 @@ class GoogleLoginAPIView(APIView):
     def get_or_create_user(self, email, google_sub, first_name, last_name):
         User = get_user_model()
 
-        # Already linked by Google
         user = User.objects.filter(google_id=google_sub).first()
         if user:
             user.login_method = User.LoginMethod.GOOGLE
@@ -249,32 +248,28 @@ class GoogleLoginAPIView(APIView):
             user.save()
             return user, False
 
-        # Existing email user
-        user = User.objects.filter(email=email).first()
-        if user:
-            user.google_id = google_sub
-            user.is_google_account = True
-            user.login_method = User.LoginMethod.GOOGLE
-            if not user.first_name and first_name:
-                user.first_name = first_name
-            if not user.last_name and last_name:
-                user.last_name = last_name
-            user.save()
-            return user, False
+        existing_email_user = User.objects.filter(email=email).first()
+        if existing_email_user:
+            provider = getattr(existing_email_user, 'login_method', 'Email/GitHub')
+            raise ValueError(
+                f"An account with this email already exists using {provider}. "
+                "Please log in with that provider."
+            )
 
-        # New Google-only user
-        username = self.generate_unique_username(email)
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            google_id=google_sub,
-            is_google_account=True,
-            login_method=User.LoginMethod.GOOGLE,
-            first_name=first_name,
-            last_name=last_name,
-            # role is NOT set
-        )
-        return user, True
+        try:
+            username = self.generate_unique_username(email)
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                google_id=google_sub,
+                is_google_account=True,
+                login_method=User.LoginMethod.GOOGLE,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            return user, True
+        except IntegrityError:
+            raise ValueError("Error creating account. Username or Email collision.")
 
     def generate_unique_username(self, email):
         base_username = email.split('@')[0]
@@ -306,36 +301,22 @@ class GithubLoginAPIView(APIView):
     def get_or_create_user(self, email, github_id, first_name, last_name, github_login):
         User = get_user_model()
 
-        # Already linked by GitHub
         user = User.objects.filter(github_id=github_id).first()
         if user:
-            user.login_method = User.LoginMethod.GITHUB
-            user.is_github_account = True
-            if not user.first_name and first_name:
-                user.first_name = first_name
-            if not user.last_name and last_name:
-                user.last_name = last_name
-            user.save()
             return user, False
 
-        # Existing email user
-        user = User.objects.filter(email=email).first()
-        if user:
-            user.github_id = github_id
-            user.is_github_account = True
-            user.login_method = User.LoginMethod.GITHUB
-            if not user.first_name and first_name:
-                user.first_name = first_name
-            if not user.last_name and last_name:
-                user.last_name = last_name
-            user.save()
-            return user, False
+        existing_email_user = User.objects.filter(email=email).first()
+        if existing_email_user:
+            provider = getattr(existing_email_user, 'login_method', 'Email/Google')
+            raise ValueError(
+                f"An account with this email already exists using {provider}. "
+                "Please log in with that provider."
+            )
 
-        # New GitHub-only user
-        username_candidate = github_login or self.generate_unique_username(email)
         try:
+            username = self.generate_unique_username(email)
             user = User.objects.create_user(
-                username=username_candidate,
+                username=username,
                 email=email,
                 github_id=github_id,
                 is_github_account=True,
@@ -343,17 +324,9 @@ class GithubLoginAPIView(APIView):
                 first_name=first_name,
                 last_name=last_name,
             )
+            return user, True
         except IntegrityError:
-            user = User.objects.create_user(
-                username=self.generate_unique_username(email),
-                email=email,
-                github_id=github_id,
-                is_github_account=True,
-                login_method=User.LoginMethod.GITHUB,
-                first_name=first_name,
-                last_name=last_name,
-            )
-        return user, True
+            raise ValueError("Error creating account. Username or Email collision.")
 
     def post(self, request):
         code = request.data.get("code")
@@ -415,13 +388,16 @@ class GithubLoginAPIView(APIView):
         first_name = full_name.split(" ")[0] if full_name else ""
         last_name = " ".join(full_name.split(" ")[1:]) if full_name and len(full_name.split(" ")) > 1 else ""
 
-        user, created = self.get_or_create_user(
-            email=email,
-            github_id=github_id,
-            first_name=first_name,
-            last_name=last_name,
-            github_login=user_data.get("login", ""),
-        )
+        try:
+            user, created = self.get_or_create_user(
+                email=email,
+                github_id=github_id,
+                first_name=first_name,
+                last_name=last_name,
+                github_login=user_data.get("login", ""),
+            )
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         login(request, user)
         needs_profile_completion = _needs_profile_completion(user)

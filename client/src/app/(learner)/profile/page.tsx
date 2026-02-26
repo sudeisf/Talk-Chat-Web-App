@@ -114,7 +114,7 @@ export default function ProfilePage() {
     userInfo.name;
   const displayBio = profile?.bio || userInfo.bio;
   const displayRole = profile?.profession || userInfo.role;
-  const currentRole = profile?.role || userInfo.role;
+  const currentRole = profile?.profession || userInfo.role;
   const displayLocation =
     [profile?.city, profile?.country].filter(Boolean).join(', ') ||
     userInfo.location;
