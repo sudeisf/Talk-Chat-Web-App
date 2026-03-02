@@ -3,6 +3,7 @@ import API from '@/lib/api/axiosInstance';
 import { toast } from 'sonner';
 import { GoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/navigation';
+import { parseDjangoError } from '@/lib/utils';
 
 export default function GoogleLoginButton() {
   const router = useRouter();
@@ -33,7 +34,13 @@ export default function GoogleLoginButton() {
         router.replace('/');
       }
     } catch (err) {
-      toast.error('Google login failed');
+      const parsedError = parseDjangoError(err);
+      const backendMessage =
+        parsedError.global?.[0] ||
+        Object.values(parsedError.fieldErrors || {})?.[0]?.[0] ||
+        'Google login failed';
+
+      toast.error(backendMessage);
     }
   };
 

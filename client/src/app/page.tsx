@@ -25,7 +25,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import L from '../../public/svg/wave-haikei.svg';
 import Lottie from 'lottie-react';
 import animationData from '../../public/animate/manifest.json';
 import { useEffect, useState } from 'react';
@@ -159,13 +158,7 @@ export default function Home() {
   </div>
 </nav>
       <main>
-        <div className="relative min-h-screen space-y-8 py-5 px-4 sm:px-6">
-          <Image
-            src={L}
-            alt="decorative blob"
-            fill
-            className="object-cover absolute opacity-30 -top-10 -z-10 pointer-events-none select-none"
-          />
+        <div className="relative min-h-screen space-y-8 py-5 px-4 sm:px-6 bg-[url('/svg/wave-haikei-gray.svg')] bg-no-repeat bg-cover bg-bottom">
 
           {/* Main heading */}
           <div className="mx-auto text-center">

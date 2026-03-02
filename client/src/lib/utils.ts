@@ -31,6 +31,8 @@ export function parseDjangoError(error: unknown): ParsedError {
     parsed.global = data.non_field_errors;
   } else if (typeof data.detail === 'string') {
     parsed.global = [data.detail];
+  } else if (typeof data.error === 'string') {
+    parsed.global = [data.error];
   }
 
   // Handle field-specific errors

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { toast } from 'sonner';
 import API from '@/lib/api/axiosInstance';
 import { SpinnerInfinity } from 'spinners-react';
+import { parseDjangoError } from '@/lib/utils';
 
 export default function GitHubCallback() {
   const params = useSearchParams();
@@ -53,7 +54,13 @@ export default function GitHubCallback() {
         }
       })
       .catch((err) => {
-        toast.error('GitHub login failed');
+        const parsedError = parseDjangoError(err);
+        const backendMessage =
+          parsedError.global?.[0] ||
+          Object.values(parsedError.fieldErrors || {})?.[0]?.[0] ||
+          'GitHub login failed';
+
+        toast.error(backendMessage);
         console.error(err.response?.data || err.message);
         router.replace('/login');
       });
