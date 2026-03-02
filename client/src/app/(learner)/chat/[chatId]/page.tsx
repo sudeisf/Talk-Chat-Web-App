@@ -171,17 +171,17 @@ export default function ChatBox() {
   }, [messages]);
 
   return (
-    <div className="flex rounded-lg border mt-2 mx-4 shadow-xs flex-col h-[calc(96vh-50px)]">
+    <div className="flex rounded-lg border border-border bg-background mt-2 mx-4 shadow-xs flex-col h-[calc(96vh-50px)]">
       {/* Message Header */}
-      <div className="px-4 py-2 border-b border-gray-200 bg-white shrink-0">
+      <div className="px-4 py-2 border-b border-border bg-card shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Avatar className="w-15 h-15 border-8 border-white">
+            <Avatar className="w-15 h-15 border-8 border-background">
               <AvatarImage src={userInfo.avatar} />
               <AvatarFallback>{userInfo.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="space-y-2">
-              <h2 className="font-medium text-md font-sans text-black">
+              <h2 className="font-medium text-md font-sans text-foreground">
                 {currentSession?.title ||
                   'How to integrate payment gateway in React?'}
               </h2>
@@ -189,7 +189,7 @@ export default function ChatBox() {
                 {currentSession?.category.map((cat, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs rounded-full"
+                    className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-full"
                   >
                     {cat}
                   </span>
@@ -198,8 +198,8 @@ export default function ChatBox() {
             </div>
           </div>
           <div className="flex flex-col justify-end items-end">
-            <Button variant="ghost" size="icon" className="hover:bg-gray-100">
-              <MoreVertical className="h-5 w-5 text-black" />
+            <Button variant="ghost" size="icon" className="hover:bg-muted">
+              <MoreVertical className="h-5 w-5 text-foreground" />
             </Button>
             <div className="space-y-3">
               <Memebers participants={currentSession?.participants} />
@@ -211,20 +211,20 @@ export default function ChatBox() {
       {/* Message Area */}
       <ScrollArea className="flex-1 min-h-[400px] max-h-[calc(100vh-212px)]">
         <div
-          className="flex-1 p-4 space-y-4 bg-gray-50 overflow-y-auto"
+          className="flex-1 p-4 space-y-4 bg-muted/30 overflow-y-auto"
           style={{ scrollBehavior: 'smooth' }}
         >
           {currentSession?.description && (
-            <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+            <div className="bg-card border border-border rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#03624c] flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                   <BookOpen className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-black mb-2">
+                  <h4 className="font-medium text-foreground mb-2">
                     Question Description
                   </h4>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {currentSession.description}
                   </p>
                 </div>
@@ -248,7 +248,7 @@ export default function ChatBox() {
                       : '/placeholder.svg?height=32&width=32&query=professional woman avatar'
                   }
                 />
-                <AvatarFallback className="bg-gray-200 text-black text-xs">
+                <AvatarFallback className="bg-muted text-foreground text-xs">
                   {message.sender === 'user' ? 'YU' : 'SC'}
                 </AvatarFallback>
               </Avatar>
@@ -272,8 +272,8 @@ export default function ChatBox() {
                       className={cn(
                         'rounded-lg px-4 py-2 max-w-md break-words',
                         message.sender === 'user'
-                          ? 'bg-[#03624c] text-white'
-                          : 'bg-white text-black border border-gray-200'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-card text-card-foreground border border-border'
                       )}
                     >
                       <p className="text-sm leading-relaxed">{message.text}</p>
@@ -288,7 +288,7 @@ export default function ChatBox() {
                   </audio>
                 )}
 
-                <span className="text-xs text-gray-500 px-1">
+                <span className="text-xs text-muted-foreground px-1">
                   {formatTime(message.timestamp)}
                 </span>
               </div>

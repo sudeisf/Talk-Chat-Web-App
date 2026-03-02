@@ -8,7 +8,7 @@ export default function SearchSessions() {
       <Input
         type="text"
         placeholder="Search sessions..."
-        className="pl-10 shadow-none border border-gray-300 rounded-sm "
+        className="pl-10 shadow-none border border-border rounded-sm"
       />
     </div>
   );

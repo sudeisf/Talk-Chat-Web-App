@@ -53,8 +53,8 @@ export default function ChatTabs() {
             className={`relative flex items-center gap-2 rounded-none border-b-2 px-4 py-3 text-sm font-medium transition-colors
               ${
                 tab.active
-                  ? 'border-[#03624c] text-[#03624c]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
           >
             <Icon className="w-5 h-5" />
@@ -63,8 +63,8 @@ export default function ChatTabs() {
               <span
                 className={`ml-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                   tab.active
-                    ? 'bg-[#03624c]/10 text-[#03624c]'
-                    : 'bg-gray-200 text-gray-700'
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {tab.count}

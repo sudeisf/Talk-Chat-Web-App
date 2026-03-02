@@ -1,28 +1,22 @@
 import {
-  Calendar,
   Home,
   Inbox,
-  Search,
   Bookmark,
   CircleQuestionMark,
   LogOut,
-  Ghost,
   Bell,
   Settings,
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { Button } from './ui/button';
 import logo from './../../public/svg/logo.svg';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -57,11 +51,11 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarContent className="bg-white flex flex-col h-full justify-between">
+      <SidebarContent className="bg-sidebar text-sidebar-foreground flex h-full flex-col justify-between">
         <SidebarGroup>
           <div className="flex p-2 gap-2 pl-6">
             <Image src={logo} alt="" width={25} height={25} />
-            <h1 className="text-lg font-pt text-[#03624c] rounded-full">
+            <h1 className="text-lg font-pt text-sidebar-foreground rounded-full">
               Talkit
             </h1>
           </div>
