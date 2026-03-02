@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Home,
   Inbox,
@@ -20,6 +22,11 @@ import {
 import logo from './../../public/svg/logo.svg';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { logoutUser } from '@/lib/api/authApi';
+import { useAppDispatch } from '@/redux/hooks';
+import { action as authAction } from '@/redux/slice/authSlice';
 const items = [
   {
     title: 'Dashboard',
@@ -49,6 +56,27 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+    try {
+      await logoutUser();
+      dispatch(authAction.clearAuth());
+      dispatch(authAction.clearEmail());
+      router.replace('/login');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout failed', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <Sidebar>
       <SidebarContent className="bg-sidebar text-sidebar-foreground flex h-full flex-col justify-between">
@@ -79,8 +107,14 @@ export function AppSidebar() {
             <Settings className="w-4 h-4" />
             Settings
           </Link>
-          <button className="flex items-center font-pt font-medium gap-2">
-            <LogOut className="w-4 h-4" /> logout
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="flex items-center font-pt font-medium gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <LogOut className="w-4 h-4" />
+            {isLoggingOut ? 'logging out...' : 'logout'}
           </button>
         </SidebarFooter>
       </SidebarContent>

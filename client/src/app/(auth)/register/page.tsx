@@ -6,17 +6,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { ArrowBigLeft, ArrowBigRight, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import AuthLayoutContent from '@/app/components/AuthLayoutContent';
 import { useRegisterMutation } from '@/query/authMutation';
-import { error } from 'console';
 import { parseDjangoError } from '@/lib/utils';
 import { useState } from 'react';
 import { SpinnerInfinity } from 'spinners-react';
@@ -105,10 +103,10 @@ export default function Register() {
       ) : (
         <div className="  mx-auto mt-10">
           <div className="flex flex-col items-center">
-            <h1 className="font-sans font-medium text-2xl text-shadow-2xs">
+            <h1 className="font-sans font-medium text-2xl text-foreground text-shadow-2xs">
               Welcome to Talkit
             </h1>
-            <p className="font-sans text-gray-500 text-md">
+            <p className="font-sans text-muted-foreground text-md">
               Please enter your details to sign up your details
             </p>
           </div>
@@ -201,7 +199,7 @@ export default function Register() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-[#03624C] to-[#03624C]/80 font-sans text-white py-5 text-sm "
+                className="w-full bg-primary hover:bg-primary/90 font-sans text-primary-foreground py-5 text-sm"
               >
                 Sign up <ArrowRight />
               </Button>

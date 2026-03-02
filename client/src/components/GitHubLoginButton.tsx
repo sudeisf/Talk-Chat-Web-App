@@ -39,9 +39,15 @@ export default function GitHubLoginButton() {
     <button
       type="button" 
       onClick={handleGitHubLogin}
-      className="bg-white flex h-10 w-[380px] max-w-full items-center justify-center gap-2 rounded-md border px-4 text-sm text-black hover:bg-gray-50 transition-colors"
+      className="bg-card flex h-11 w-[380px] max-w-full items-center justify-center gap-2 rounded-md border-2 border-border px-4 text-sm font-medium text-foreground shadow-sm hover:bg-muted hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
     >
-      <Image src={github} width={20} height={20} alt={'github-logo'} />
+      <Image
+        src={github}
+        width={20}
+        height={20}
+        alt={'github-logo'}
+        className="dark:invert"
+      />
       Continue with GitHub
     </button>
   );

@@ -13,24 +13,24 @@ export default function AuthLayoutContent({
     <>
       {pageType === 'Login' ? (
         <div className="flex justify-between p-4">
-          <h1 className="bg-gradient-to-r from-[#03624C] font-sans to-[#03624C]/80 bg-clip-text text-transparent text-xl">
+          <h1 className="bg-gradient-to-r from-primary font-sans to-primary/80 bg-clip-text text-transparent text-xl">
             Talkit
           </h1>
-          <div className="flex space-x-0.5 text-md">
+          <div className="flex space-x-0.5 text-md text-muted-foreground">
             <p className="font-sans">Don't have an account?</p>
-            <Link href="/register" className="font-sans underline">
+            <Link href="/register" className="font-sans underline text-foreground">
               Sign up
             </Link>
           </div>
         </div>
       ) : (
         <div className="flex justify-between p-4">
-          <h1 className="bg-gradient-to-r from-[#03624C] font-sans to-[#03624C]/80 bg-clip-text text-transparent text-xl">
+          <h1 className="bg-gradient-to-r from-primary font-sans to-primary/80 bg-clip-text text-transparent text-xl">
             Talkit
           </h1>
-          <div className="flex space-x-0.5 text-md">
+          <div className="flex space-x-0.5 text-md text-muted-foreground">
             <p className="font-sans">Already have an account?</p>
-            <Link href="/login" className="font-sans underline">
+            <Link href="/login" className="font-sans underline text-foreground">
               Sign in{' '}
             </Link>
           </div>

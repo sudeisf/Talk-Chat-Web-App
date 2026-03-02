@@ -12,6 +12,8 @@ import {
   PhoneCall,
   PhoneIncoming,
   PinIcon,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import {
   MessageCircle,
@@ -28,6 +30,12 @@ import Lottie from 'lottie-react';
 import animationData from '../../public/animate/manifest.json';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import {
+  selectThemePreference,
+  setTheme,
+  type ThemePreference,
+} from '@/redux/slice/appearanceSlice';
 
 const features = [
   {
@@ -70,31 +78,75 @@ const features = [
 
 export default function Home() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector(selectThemePreference);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
   }, []);
 
+  useEffect(() => {
+    const resolveTheme = () => {
+      if (theme === 'system') {
+        setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        return;
+      }
+      setIsDarkMode(theme === 'dark');
+    };
+
+    resolveTheme();
+
+    if (theme !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (event: MediaQueryListEvent) => {
+      setIsDarkMode(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', onChange);
+    return () => mediaQuery.removeEventListener('change', onChange);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const nextTheme: ThemePreference = isDarkMode ? 'light' : 'dark';
+    dispatch(setTheme(nextTheme));
+  };
+
   return (
-    <div>
-      <nav className="flex items-center justify-between p-4 *:font-sans">
+    <div className="bg-background text-foreground min-h-screen">
+      <nav className="flex items-center justify-between p-4 border-b border-border bg-background/95 *:font-sans">
   <div className="flex items-center gap-2">
     <Image src={Logo} width={30} height={30} alt="logo" />
-    <p className="text-lg text-[#03624C] text-shadow-xs">Talkit</p>
+    <p className="text-lg text-primary text-shadow-xs">Talkit</p>
   </div>
 
   <div className="flex items-center gap-2">
     <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleTheme}
+      aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="h-9 w-9"
+    >
+      {isDarkMode ? (
+        <Sun className="h-5 w-5" />
+      ) : (
+        <Moon className="h-5 w-5" />
+      )}
+    </Button>
+    <Button
       onClick={() => router.push('/register')}
       variant="ghost"
-      className="text-sm md:text-md px-3 md:px-4"
+      className="text-sm md:text-md px-3 md:px-4 text-foreground hover:bg-muted"
     >
       Sign up
     </Button>
     <Button
       onClick={() => router.push('/login')}
-      className="rounded-sm text-sm md:text-md shadow-xs bg-[#03624C] text-white px-4 md:px-6"
+      className="rounded-sm text-sm md:text-md shadow-xs bg-primary text-primary-foreground px-4 md:px-6 hover:bg-primary/90"
     >
       Sign in
     </Button>
@@ -111,7 +163,7 @@ export default function Home() {
 
           {/* Main heading */}
           <div className="mx-auto text-center">
-            <h1 className="inline-block text-[#03624C] bg-[#03624C]/5 text-sm sm:text-base md:text-lg py-2 px-6 rounded-full">
+            <h1 className="inline-block text-primary bg-primary/10 text-sm sm:text-base md:text-lg py-2 px-6 rounded-full">
               Ask smarter. Learn faster. Never get stuck again.
             </h1>
           </div>
@@ -120,28 +172,28 @@ export default function Home() {
           <div className="max-w-5xl mx-auto space-y-8">
             <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-center font-rubik  leading-tight">
               Whether you're debugging a tricky function, confused by async
-              behavior, or just need a second brain<span className="text-[#085543]"> - this platform connects you
+              behavior, or just need a second brain<span className="text-primary"> - this platform connects you
               with real people, in real time.</span>
             </p>
 
-            <p className="text-base sm:text-lg md:text-xl text-[#03624C]/90 text-center leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground text-center leading-relaxed">
               No more endless Googling. No more waiting for forum replies.
               <br />
               Just ask, get matched instantly, and learn through live chat — one
               question at a time.
             </p>
 
-            <p className="text-sm sm:text-base text-gray-500 text-center underline">
+            <p className="text-sm sm:text-base text-muted-foreground text-center underline">
               Start learning the way you always wanted:
-              <span className="text-[#085543] mx-1">fast</span>,
-              <span className="text-[#085543] mx-1">focused</span>, and
-              <span className="text-[#085543] mx-1 animate-in">human</span>.
+              <span className="text-primary mx-1">fast</span>,
+              <span className="text-primary mx-1">focused</span>, and
+              <span className="text-primary mx-1 animate-in">human</span>.
             </p>
           </div>
 
           {/* CTA button */}
           <div className="flex justify-center mt-12">
-            <Button className="bg-[#085543] hover:bg-[#085543]/90 text-sm sm:text-base max-w-4xl rounded-md shadow-xs flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base max-w-4xl rounded-md shadow-xs flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3">
               Ask a Question & Get Help <ArrowUpRight size={18} />
             </Button>
           </div>
@@ -151,7 +203,7 @@ export default function Home() {
     <h1 className="font-pt font-medium text-2xl sm:text-3xl md:text-4xl text-center md:text-left">
       Why Choose Us & <br /> What You Get
     </h1>
-    <Button className="w-full sm:w-auto font-pt text-sm sm:text-base bg-[#085543] py-3 sm:py-4 px-6 sm:px-8 rounded-md shadow-xs hover:bg-[#085543]/90">
+    <Button className="w-full sm:w-auto font-pt text-sm sm:text-base bg-primary text-primary-foreground py-3 sm:py-4 px-6 sm:px-8 rounded-md shadow-xs hover:bg-primary/90">
       <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
       <span className="ml-2">Let's start learning</span>
     </Button>
@@ -160,11 +212,11 @@ export default function Home() {
             {features.map((feature, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-md  hover:shadow-lg hover:border transition-shadow animation-duration-initial duration-500 bg-white text-left"
+                className="p-4 rounded-md border border-border hover:shadow-lg hover:border-border transition-shadow animation-duration-initial duration-500 bg-card text-left"
               >
-                <feature.icon className="w-8 h-8 text-[#085543] mb-5" />
+                <feature.icon className="w-8 h-8 text-primary mb-5" />
                 <h3 className="text-lg sm:text-xl font-pt font-medium">{feature.title}</h3>
-                <p className="text-sm sm:text-base text-gray-600 mt-2">
+                <p className="text-sm sm:text-base text-muted-foreground mt-2">
                   {feature.description}
                 </p>
               </div>
@@ -173,19 +225,19 @@ export default function Home() {
         </div>
 
         <div className="min-h-screen p-3 sm:p-5 w-full">
-          <div className="p-3 sm:p-4 bg-[#085543] rounded-md space-y-5">
-            <h1 className="text-center uppercase font-medium text-white text-xl sm:text-2xl font-pt mt-6">
+          <div className="p-3 sm:p-4 bg-muted rounded-md space-y-5 border border-border">
+            <h1 className="text-center uppercase font-medium text-primary text-xl sm:text-2xl font-pt mt-6">
               contact us
             </h1>
-            <p className="text-center text-white text-xl sm:text-3xl md:text-4xl font-pt">
+            <p className="text-center text-foreground text-xl sm:text-3xl md:text-4xl font-pt">
               We'd love to talk to you
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 sm:max-w-[80%] mx-auto mt-6">
-              <div className="py-8 border space-y-3 bg-white px-6 rounded-md shadow-2xs">
+              <div className="py-8 border border-border space-y-3 bg-card text-card-foreground px-6 rounded-md shadow-2xs">
                 <div className="flex gap-4">
-                  <PhoneIncoming className="w-8 h-8 stroke-[#085543]/80" />
+                  <PhoneIncoming className="w-8 h-8 text-primary" />
                   <div className="flex flex-col align-baseline">
-                    <h1 className="uppercase font-pt text-gray-500 text-xs sm:text-sm font-medium">
+                    <h1 className="uppercase font-pt text-muted-foreground text-xs sm:text-sm font-medium">
                       Call us
                     </h1>
                     <p className="font-sans font-medium text-base sm:text-lg">
@@ -194,11 +246,11 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="py-8 border space-y-3 bg-white px-3 px-6 rounded-md shadow-2xs">
+              <div className="py-8 border border-border space-y-3 bg-card text-card-foreground px-6 rounded-md shadow-2xs">
                 <div className="flex gap-4">
-                  <Mail className="w-8 h-8 stroke-[#085543]/80" />
+                  <Mail className="w-8 h-8 text-primary" />
                   <div className="flex flex-col align-baseline">
-                    <h1 className="uppercase text-gray-500 font-pt text-sm font-medium">
+                    <h1 className="uppercase text-muted-foreground font-pt text-sm font-medium">
                       Email us
                     </h1>
                     <p className="font-sans font-medium text-md sm:text-lg">
@@ -207,11 +259,11 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="py-8 border space-y-3 bg-white px-6 rounded-md shadow-2xs">
+              <div className="py-8 border border-border space-y-3 bg-card text-card-foreground px-6 rounded-md shadow-2xs">
                 <div className="flex gap-4">
-                  <MapPin className="w-8 h-8 stroke-[#085543]/80" />
+                  <MapPin className="w-8 h-8 text-primary" />
                   <div className="flex flex-col align-baseline">
-                    <h1 className="uppercase text-sm text-gray-500 font-medium font-pt">
+                    <h1 className="uppercase text-sm text-muted-foreground font-medium font-pt">
                       Head Quarters
                     </h1>
                     <p className="font-sans font-medium text-lg">
@@ -224,13 +276,13 @@ export default function Home() {
           </div>
           <div className="flex flex-col lg:flex-row gap-6 mt-10 p-4 max-w-6xl mx-auto">
             <div className="w-full lg:w-2/5 flex flex-col justify-center gap-2">
-              <p className="bg-[#085543]/5 text-[#085543] shadow-2xs rounded-full py-2 px-4 text-xs sm:text-sm font-pt">
+              <p className="bg-primary/10 text-primary shadow-2xs rounded-full py-2 px-4 text-xs sm:text-sm font-pt">
                 Our success number
               </p>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium">
                 Lets Work Togather
               </h1>
-              <p className="font-pt text-gray-400 text-sm sm:text-base md:text-lg font-medium">
+              <p className="font-pt text-muted-foreground text-sm sm:text-base md:text-lg font-medium">
                 share us improvements , features too add feedback , please
                 contact us for basic questions. we're here to help!
               </p>
@@ -259,42 +311,41 @@ export default function Home() {
                 </fieldset>
                 <fieldset className="w-full">
                   <textarea
-                    className="w-full border p-2 rounded-sm"
+                    className="w-full border border-border bg-background text-foreground p-2 rounded-sm placeholder:text-muted-foreground"
                     rows={8}
                     placeholder="Tell us about your feedback , idea  , improvements..."
                   />
                 </fieldset>
-                <Button className="w-full py-3 sm:py-6 rounded-sm bg-[#085543] text-sm sm:text-base md:text-lg font-sans">
+                <Button className="w-full py-3 sm:py-6 rounded-sm bg-primary text-primary-foreground text-sm sm:text-base md:text-lg font-sans hover:bg-primary/90">
                   Submit
                 </Button>
               </form>
             </div>
           </div>
-          -
         </div>
       </main>
-      <footer className="mt-16 py-10 px-4 sm:px-6 text-sm text-black *:font-pt *:font-medium">
+      <footer className="mt-16 py-10 px-4 sm:px-6 text-sm text-foreground *:font-pt *:font-medium">
         <div className="max-w-6xl mx-auto text-center space-y-4">
-          <p className="text-base sm:text-lg italic text-black max-w-xl mx-auto">
+          <p className="text-base sm:text-lg italic text-foreground max-w-xl mx-auto">
             "The right question asked at the right time can change everything."
           </p>
 
-          <div className="flex justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-black font-medium">
-            <a href="/terms" className="hover:text-red-500 transition">
+          <div className="flex justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-foreground font-medium">
+            <a href="/terms" className="hover:text-primary transition">
               Terms
             </a>
-            <a href="/privacy" className="hover:text-red-500 transition">
+            <a href="/privacy" className="hover:text-primary transition">
               Privacy
             </a>
-            <a href="/about" className="hover:text-red-500 transition">
+            <a href="/about" className="hover:text-primary transition">
               About
             </a>
-            <a href="/contact" className="hover:text-red-500 transition">
+            <a href="/contact" className="hover:text-primary transition">
               Contact
             </a>
           </div>
 
-          <p className="text-[11px] sm:text-xs text-black">
+          <p className="text-[11px] sm:text-xs text-muted-foreground">
             &copy; {currentYear || ''} Talktit. Built for learners. All rights reserved.
           </p>
         </div>

@@ -6,7 +6,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +18,7 @@ import AuthLayoutContent from '@/app/components/AuthLayoutContent';
 import { useLoginMutation } from '@/query/authMutation';
 import { SpinnerInfinity } from 'spinners-react';
 import { parseDjangoError } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import GoogleLoginButton from '@/app/components/GoogleLoginButton';
 import GitHubLoginButton from '@/components/GitHubLoginButton';
 
@@ -78,10 +77,10 @@ export default function Login() {
       ) : (
         <div className="mx-auto mt-20">
           <div className="flex flex-col items-center">
-            <h1 className="font-sans font-medium text-2xl text-shadow-2xs">
+            <h1 className="font-sans font-medium text-2xl text-foreground text-shadow-2xs">
               Welcome back to Talkit
             </h1>
-            <p className="font-sans text-gray-500 text-md">
+            <p className="font-sans text-muted-foreground text-md">
               Please enter your details to sign in
             </p>
           </div>
@@ -92,11 +91,11 @@ export default function Login() {
           </div>
 
           <div className="flex items-center my-4 max-w-[380px] mx-auto">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-500 text-md font-sans">
+            <div className="flex-grow border-t border-border"></div>
+            <span className="mx-4 text-muted-foreground text-md font-sans">
               Or sign in with
             </span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow border-t border-border"></div>
           </div>
 
           {globalError && (
@@ -150,13 +149,13 @@ export default function Login() {
               />
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-[#03624C] to-[#085543] py-5 text-sm"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-5 text-sm"
               >
                 Sign in <ArrowRight />
               </Button>
               <Link
                 href={'/forgot-password'}
-                className="font-sans font-medium underline w-fit mx-auto"
+                className="font-sans font-medium underline text-foreground w-fit mx-auto"
               >
                 Forget password?
               </Link>

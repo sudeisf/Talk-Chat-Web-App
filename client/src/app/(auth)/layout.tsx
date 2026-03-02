@@ -11,7 +11,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex w-ful min-h-screen bg-background">
+    <div className="flex w-ful min-h-screen bg-background text-foreground">
       <div className="bg-gradient-to-tr flex flex-col justify-end-safe items-center from-black via-gray-800 to-[#03624C] w-[45%] rounded-lg m-2 p-4">
         <div>
           <h2 className="text-white text-4xl font-bold">TalkIt</h2>
@@ -24,9 +24,9 @@ export default function AuthLayout({
           </p>
         </div>
       </div>
-      <div className="w-[55%] m-2 bg-white rounded-md  flex flex-col justify-between">
+      <div className="w-[55%] m-2 bg-card text-card-foreground border border-border rounded-md flex flex-col justify-between">
         <div>{children}</div>
-        <div className="flex justify-between py-2 px-4 font-sans font-medium text-md  ">
+        <div className="flex justify-between py-2 px-4 font-sans font-medium text-md text-muted-foreground">
           <p>2025</p>
           <p>Support</p>
         </div>
