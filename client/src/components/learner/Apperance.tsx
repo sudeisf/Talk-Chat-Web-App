@@ -4,7 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Palette, Sun, Moon, Monitor, Text } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import {
+  setFontSize,
+  setTheme,
+  ThemePreference,
+  FontSizePreference,
+  selectThemePreference,
+  selectFontSizePreference,
+} from '@/redux/slice/appearanceSlice';
 
 const themeOptions = [
   { value: 'light', label: 'Light', icon: Sun },
@@ -19,8 +27,9 @@ const fontSizeOptions = [
 ];
 
 export default function AppearanceSettings() {
-  const [theme, setTheme] = useState('system');
-  const [fontSize, setFontSize] = useState('medium');
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector(selectThemePreference);
+  const fontSize = useAppSelector(selectFontSizePreference);
 
   return (
     <Card className="shadow-none border-b border-x-0 border-t-0 rounded-none">
@@ -40,15 +49,17 @@ export default function AppearanceSettings() {
               return (
                 <button
                   key={option.value}
-                  onClick={() => setTheme(option.value)}
+                  onClick={() =>
+                    dispatch(setTheme(option.value as ThemePreference))
+                  }
                   className={cn(
                     'flex flex-col items-center justify-center p-4 border rounded-lg transition hover:shadow-md',
                     theme === option.value
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200'
+                      ? 'border-primary bg-accent text-accent-foreground'
+                      : 'border-border bg-card text-card-foreground'
                   )}
                 >
-                  <Icon className="h-6 w-6 mb-2 text-gray-700" />
+                  <Icon className="h-6 w-6 mb-2" />
                   <span className="text-sm font-medium">{option.label}</span>
                 </button>
               );
@@ -65,15 +76,17 @@ export default function AppearanceSettings() {
               return (
                 <button
                   key={option.value}
-                  onClick={() => setFontSize(option.value)}
+                  onClick={() =>
+                    dispatch(setFontSize(option.value as FontSizePreference))
+                  }
                   className={cn(
                     'flex flex-col items-center justify-center p-4 border rounded-lg transition hover:shadow-md',
                     fontSize === option.value
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200'
+                      ? 'border-primary bg-accent text-accent-foreground'
+                      : 'border-border bg-card text-card-foreground'
                   )}
                 >
-                  <Icon className="h-6 w-6 mb-2 text-gray-700" />
+                  <Icon className="h-6 w-6 mb-2" />
                   <span className="text-sm font-medium">{option.label}</span>
                 </button>
               );

@@ -21,18 +21,19 @@ import {
   Trash,
   User,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/api/authApi';
 
 const userInfo = {
-  name: 'Sudeis Fedlu',
-  email: 'sudeisfed@gmail.com',
+  name: 'User',
+  email: '',
   avatar: 'https://github.com/shadcn.png',
-  bio: 'Passionate learner focused on mastering programming and technology. Always eager to explore new concepts and improve my skills.',
-  location: 'Addis Ababa, Ethiopia',
-  role: 'Software engineer',
-  username: 'sudeisfed',
-  phone: '+251 912 345 678',
+  bio: '',
+  location: '',
+  role: '',
+  username: '',
+  phone: '',
   coverImage:
     'https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1925&q=80',
   skills: ['React', 'Typescript', 'python', 'ML', 'Tailwindcss', 'NodeJs'],
@@ -112,12 +113,12 @@ export default function ProfilePage() {
     `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() ||
     profile?.username ||
     userInfo.name;
-  const displayBio = profile?.bio || userInfo.bio;
-  const displayRole = profile?.profession || userInfo.role;
-  const currentRole = profile?.profession || userInfo.role;
+  const displayBio = profile?.bio || 'Add bio to your profile';
+  const displayRole = profile?.profession || 'Add profession to your profile';
+  const currentRole = profile?.profession || 'Add profession to your profile';
   const displayLocation =
     [profile?.city, profile?.country].filter(Boolean).join(', ') ||
-    userInfo.location;
+    'Add location to your profile';
   const displaySkills: string[] = Array.isArray(profile?.tags)
     ? profile.tags
         .map((tag: any) =>
@@ -127,12 +128,12 @@ export default function ProfilePage() {
     : [];
 
   return (
-    <div className=" max-w-6xl mx-auto p-4 mb-4 ">
+    <div className="max-w-6xl mx-auto p-4 mb-4 text-foreground">
       {/* cover image section */}
       <div className="relative h-[200px]  ">
         <div className="w-full h-full ">
           {coverImage ? (
-            <div className="relative w-full h-full rounded-t-md overflow-hidden bg-gray-100">
+            <div className="relative w-full h-full rounded-t-md overflow-hidden bg-muted">
               <img
                 src={coverImage}
                 alt="cover image"
@@ -153,7 +154,7 @@ export default function ProfilePage() {
         {/* profile Card */}
         <div className="  rounded-lg px-4 py-6 w-full border-b ">
           <div className="absolute bottom-0  top-22 z-10 left-10 ">
-            <Avatar className="w-[150px] h-[150px] border-8 border-white">
+            <Avatar className="w-[150px] h-[150px] border-8 border-background">
               <AvatarImage src={profileImage || userInfo.avatar} />
               <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
             </Avatar>
@@ -163,50 +164,52 @@ export default function ProfilePage() {
           <div className="flex justify-between">
             <div className="pt-5  space-y-2">
               <h1 className="text-2xl font-pt font-bold">{displayName}</h1>
-              <p className="text-md text-gray-500">{displayRole}</p>
-              <p className="text-md text-gray-500">{displayLocation}</p>
+              <p className="text-md text-muted-foreground">{displayRole}</p>
+              <p className="text-md text-muted-foreground">{displayLocation}</p>
               <div>
-                <h1 className="text-md py-2 font-medium flex items-center gap-2 text-gray-700">
+                <h1 className="text-md py-2 font-medium flex items-center gap-2 text-foreground">
                   Bio <Pen className="w-4 h-4" />
                 </h1>
-                <p className="text-md text-gray-500 max-w-md leading-relaxed">
+                <p className="text-md text-muted-foreground max-w-md leading-relaxed">
                   {displayBio}
                 </p>
               </div>
               <div className="flex gap-2">
                <EditProfile/> 
-                <Button
-                  variant={'outline'}
-                  className=" border p-5 text-md text-balck rounded-full mt-2 shadow-xs "
-                >
-                  Settings
-                </Button>
+                <Link href={'/settings'}>
+                  <Button
+                    variant={'outline'}
+                    className="border-[#03624C] border p-5 text-md text-[#03624C] rounded-full mt-2 shadow-xs "
+                  >
+                    Settings
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="flex flex-col gap-2 justify-between">
               <div className="flex flex-col items-end gap-2">
-                <h1 className="font-pt text-md flex text-gray-500 gap-2 w-fit">
+                <h1 className="font-pt text-md flex text-muted-foreground gap-2 w-fit">
                   Current role <Briefcase className="w-4 h-4" />
                 </h1>
-                <h2 className="rounded-full bg-gray-100 text-sm p-2 font-pt capitalize font-medium px-2">
+                <h2 className="rounded-full bg-muted text-foreground text-sm p-2 font-pt capitalize font-medium px-2">
                   {currentRole}
                 </h2>
               </div>
               <div className=" flex flex-col items-end gap-2">
-                <h1 className="capitalize flex gap-2 items-center text-gray-500">
+                <h1 className="capitalize flex gap-2 items-center text-muted-foreground">
                   skills <Star className="w-4 h-4" />
                 </h1>
                 <div className="flex flex-wrap gap-2 items-">
                   {displaySkills.length > 0 ? (
                     displaySkills.map((skill: string, index: number) => (
                       <div key={index}>
-                        <p className="bg-gray-100 p-2 text-sm w-fit rounded-full font-pt font-medium">
+                        <p className="bg-muted text-foreground p-2 text-sm w-fit rounded-full font-pt font-medium">
                           {skill}
                         </p>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">No skills added yet</p>
+                    <p className="text-sm text-muted-foreground">No skills added yet</p>
                   )}
                 </div>
               </div>
@@ -243,50 +246,50 @@ export default function ProfilePage() {
             */}
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t p-4">
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
                   <BookOpen className="h-8 w-8 text-blue-600 mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-bold text-foreground">
                     {userInfo.totalQuestions}
                   </h3>
-                  <p className="text-sm text-gray-600">Questions Asked</p>
+                  <p className="text-sm text-muted-foreground">Questions Asked</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
                   <User className="h-8 w-8 text-green-600 mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-bold text-foreground">
                     {userInfo.sessionsJoined || 24}
                   </h3>
-                  <p className="text-sm text-gray-600">Sessions Joined</p>
+                  <p className="text-sm text-muted-foreground">Sessions Joined</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
                   <Clock className="h-8 w-8 text-orange-600 mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-bold text-foreground">
                     {userInfo.ongoingSessions || 3}
                   </h3>
-                  <p className="text-sm text-gray-600">Ongoing Sessions</p>
+                  <p className="text-sm text-muted-foreground">Ongoing Sessions</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
                   <Bookmark className="h-8 w-8 text-purple-600 mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-bold text-foreground">
                     {userInfo.bookmarksSaved || 18}
                   </h3>
-                  <p className="text-sm text-gray-600">Bookmarks Saved</p>
+                  <p className="text-sm text-muted-foreground">Bookmarks Saved</p>
                 </div>
               </CardContent>
             </Card>

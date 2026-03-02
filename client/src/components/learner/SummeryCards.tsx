@@ -20,16 +20,16 @@ export default function SummaryCard({
   percentage,
 }: SummaryCardProps) {
   return (
-    <div className="flex flex-row border p-6 gap-4 bg-white rounded-md ">
-      <div className={`p-2 rounded-full bg-gray-100 h-fit ${color}`}>
+    <div className="flex flex-row border border-border p-6 gap-4 bg-card rounded-md">
+      <div className={`p-2 rounded-full bg-muted h-fit ${color}`}>
         {icon}
       </div>
       <div className="space-y-2">
-        <p className="text-md font-sans text-gray-500">{title}</p>
+        <p className="text-md font-sans text-muted-foreground">{title}</p>
         <div className="flex gap-2">
           <h3 className={`text-2xl font-semibold ${color}`}>{value}</h3>
           <div
-            className={`flex ${color} bg-gray-50 w-20 rounded-full justify-center text-md font-medium items-center`}
+            className={`flex ${color} bg-muted w-20 rounded-full justify-center text-md font-medium items-center`}
           >
             <ArrowUp className="w-4 h-4" />
             {percentage} %

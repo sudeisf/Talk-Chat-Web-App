@@ -9,7 +9,7 @@ import { Clock, Bookmark, CheckCircle, MessageSquare } from 'lucide-react';
 
 export default function DashBoard() {
   return (
-    <div className="w-full max-w-6xl mx-auto min-h-screen bg-white p-4">
+    <div className="w-full max-w-6xl mx-auto min-h-screen bg-background text-foreground p-4">
       <GreetingCard btnName="Ask Questions" name="sudeis" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
         <SummaryCard

@@ -50,10 +50,23 @@ export function EditProfile() {
   const selectedSkillsRef = useRef<string[]>([]);
   const [profileTagMap, setProfileTagMap] = useState<Record<string, number>>({});
 
-  const reduxTagMap = useAppSelector((state) => {
+  interface Tag {
+    id: number | string;
+    label: string;
+  }
+
+  interface ProTagsState {
+    [key: string]: Tag[];
+  }
+
+  interface RootState {
+    proTags: ProTagsState;
+  }
+
+  const reduxTagMap = useAppSelector((state: RootState) => {
     const map: Record<string, number> = {};
-    Object.values(state.proTags).forEach((container: any) => {
-      container.forEach((tag: any) => {
+    Object.values(state.proTags).forEach((container: Tag[]) => {
+      container.forEach((tag: Tag) => {
         const parsedId = Number(tag?.id);
         if (!Number.isNaN(parsedId) && tag?.label) {
           map[tag.label.trim().toLowerCase()] = parsedId;

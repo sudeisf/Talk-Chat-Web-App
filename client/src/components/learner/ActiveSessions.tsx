@@ -46,37 +46,37 @@ export default function AskedTopicsTimeline() {
       {topicsData.map((section, i) => (
         <div key={i}>
           <div className="ps-2 my-2">
-            <h3 className="text-xs font-medium uppercase text-gray-500 dark:text-neutral-400">
+            <h3 className="text-xs font-medium uppercase text-muted-foreground">
               {section.date}
             </h3>
           </div>
 
           {section.topics.map((topic, index) => (
             <div key={index} className="flex gap-x-3">
-              <div className="relative after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-neutral-700">
+              <div className="relative after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-border">
                 <div className="z-10 size-7 flex justify-center items-center">
                   <div className="size-2 rounded-full bg-orange-500"></div>
                 </div>
               </div>
 
               <div className="grow pb-8">
-                <h3 className="text-md font-pt  font-medium text-gray-800 dark:text-white">
+                <h3 className="text-md font-pt font-medium text-foreground">
                   {topic.title}
                 </h3>
-                <p className="mt-0.5 text-sm text-gray-500 dark:text-neutral-400">
+                <p className="mt-0.5 text-sm text-muted-foreground">
                   {topic.time}
                 </p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {topic.tags.map((tag, i) => (
                     <span
                       key={i}
-                      className="bg-gray-100 text-gray-600 text-sm font-medium px-2 py-0.5 rounded dark:bg-neutral-700 dark:text-neutral-300"
+                      className="bg-muted text-muted-foreground text-sm font-medium px-2 py-0.5 rounded"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <button className="flex items-center gap-1 mt-2 text-sm text-blue-600 font-medium decoration-2 hover:underline focus:outline-none focus:underline font-sans dark:text-blue-500">
+                <button className="flex items-center gap-1 mt-2 text-sm text-primary font-medium decoration-2 hover:underline focus:outline-none focus:underline font-sans">
                   Continue Sessions <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -90,7 +90,7 @@ export default function AskedTopicsTimeline() {
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="text-start inline-flex items-center gap-x-1 text-sm text-blue-600 font-medium decoration-2 hover:underline focus:outline-none focus:underline dark:text-blue-500"
+          className="text-start inline-flex items-center gap-x-1 text-sm text-primary font-medium decoration-2 hover:underline focus:outline-none focus:underline"
         >
           <svg
             className="shrink-0 size-3.5"
@@ -112,7 +112,7 @@ export default function AskedTopicsTimeline() {
 
       {isOpen && (
         <div className="mt-4">
-          <h3 className="text-xs font-medium uppercase text-gray-500 dark:text-neutral-400">
+          <h3 className="text-xs font-medium uppercase text-muted-foreground">
             1 Aug, 2025
           </h3>
           <div className="flex gap-x-3 mt-2">
@@ -122,15 +122,15 @@ export default function AskedTopicsTimeline() {
               </div>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-800 dark:text-white">
+              <h3 className="text-sm font-medium text-foreground">
                 Using Prisma with PostgreSQL
               </h3>
-              <p className="text-xs text-gray-500">4:15 PM</p>
+              <p className="text-xs text-muted-foreground">4:15 PM</p>
               <div className="flex gap-1 mt-1">
-                <span className="text-[10px] px-2 py-0.5 bg-gray-100 rounded dark:bg-neutral-700 dark:text-neutral-300">
+                <span className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded">
                   Prisma
                 </span>
-                <span className="text-[10px] px-2 py-0.5 bg-gray-100 rounded dark:bg-neutral-700 dark:text-neutral-300">
+                <span className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded">
                   SQL
                 </span>
               </div>

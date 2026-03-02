@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Settings, User, Bell, Shield, Palette, Globe } from 'lucide-react';
+import { Settings, User, Bell, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,15 +14,15 @@ export default function SettingsPage() {
   const [studyReminders, setStudyReminders] = useState(true);
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto p-6 max-w-4xl text-foreground">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <div className="p-2  rounded-lg">
-          <Settings className="h-6 w-6 text-black" />
+          <Settings className="h-6 w-6 text-foreground" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600">Customize your learning experience</p>
+          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground">Customize your learning experience</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export default function SettingsPage() {
                 <Label className="text-sm font-medium">
                   Email Notifications
                 </Label>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Receive notifications via email
                 </p>
               </div>
@@ -72,7 +72,7 @@ export default function SettingsPage() {
                 type="checkbox"
                 checked={emailNotifications}
                 onChange={(e) => setEmailNotifications(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 rounded"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -80,7 +80,7 @@ export default function SettingsPage() {
                 <Label className="text-sm font-medium">
                   Push Notifications
                 </Label>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Receive notifications on your device
                 </p>
               </div>
@@ -88,13 +88,13 @@ export default function SettingsPage() {
                 type="checkbox"
                 checked={pushNotifications}
                 onChange={(e) => setPushNotifications(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 rounded"
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Study Reminders</Label>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Daily reminders to study
                 </p>
               </div>
@@ -102,7 +102,7 @@ export default function SettingsPage() {
                 type="checkbox"
                 checked={studyReminders}
                 onChange={(e) => setStudyReminders(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 rounded"
               />
             </div>
           </CardContent>
@@ -121,7 +121,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="daily-goal">Daily Study Goal</Label>
-              <select className="w-full p-2 border border-gray-300 rounded-md">
+              <select className="w-full p-2 border border-input rounded-md bg-background text-foreground">
                 <option value="5">5 questions per day</option>
                 <option value="10">10 questions per day</option>
                 <option value="15">15 questions per day</option>
@@ -132,14 +132,14 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label className="text-sm font-medium">Sound Effects</Label>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Play sounds during study sessions
                 </p>
               </div>
               <input
                 type="checkbox"
                 defaultChecked
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 rounded"
               />
             </div>
           </CardContent>
