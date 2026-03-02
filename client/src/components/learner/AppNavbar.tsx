@@ -1,7 +1,7 @@
 // components/app-navbar.tsx
 'use client';
 
-import { Menu, Bell, User, Settings, Plus, PlusCircle } from 'lucide-react';
+import { Menu, Bell, Settings, PlusCircle, Moon, Sun } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -11,11 +11,47 @@ import Link from 'next/link';
 import AskQuestion from './AskQuestionDialog';
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/api/authApi';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import {
+  selectThemePreference,
+  setTheme,
+  type ThemePreference,
+} from '@/redux/slice/appearanceSlice';
 
 export function AppNavbar() {
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector(selectThemePreference);
   const { unreadCount } = useNotifications();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('U');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const resolveTheme = () => {
+      if (theme === 'system') {
+        setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        return;
+      }
+      setIsDarkMode(theme === 'dark');
+    };
+
+    resolveTheme();
+
+    if (theme !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (event: MediaQueryListEvent) => {
+      setIsDarkMode(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', onChange);
+    return () => mediaQuery.removeEventListener('change', onChange);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const nextTheme: ThemePreference = isDarkMode ? 'light' : 'dark';
+    dispatch(setTheme(nextTheme));
+  };
 
   useEffect(() => {
     getCurrentUser()
@@ -45,7 +81,7 @@ export function AppNavbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 border-b  items-center justify-between  bg-white px-4  dark:bg-gray-950">
+    <header className="sticky top-0 z-30 flex h-16 border-b border-border items-center justify-between bg-background px-4">
       <div className="flex items-center gap-2">
         <SidebarTrigger>
           <Button variant="ghost" size="icon">
@@ -56,20 +92,33 @@ export function AppNavbar() {
       </div>
 
       <div className="flex items-center gap-2 max-w-4xl">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {isDarkMode ? (
+            <Sun className="h-6 w-6 stroke-2" />
+          ) : (
+            <Moon className="h-6 w-6 stroke-2" />
+          )}
+        </Button>
         <Button variant="ghost" asChild className="relative">
-          <a href="/notifications">
+          <Link href="/notifications">
             <Bell className="h-10 w-10 stroke-2 " />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-[#03624c] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
-          </a>
+          </Link>
         </Button>
         <Button variant="ghost" asChild>
-          <a href="/settings">
+          <Link href="/settings">
             <Settings className="h-6 w-6 stroke-2" />
-          </a>
+          </Link>
         </Button>
         <div className="flex items-center gap-4 px-2">
           <Link href="/profile">
