@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -13,9 +14,15 @@ export default function AuthLayoutContent({
     <>
       {pageType === 'Login' ? (
         <div className="flex justify-between p-4">
-          <h1 className="bg-gradient-to-r from-primary font-sans to-primary/80 bg-clip-text text-transparent text-xl">
-            Talkit
-          </h1>
+          <Link href="/" aria-label="Go to home page">
+            <Image
+              src="/svg/logo.svg"
+              width={34}
+              height={34}
+              alt="Talkit logo"
+              className="dark:brightness-0 dark:invert"
+            />
+          </Link>
           <div className="flex space-x-0.5 text-md text-muted-foreground">
             <p className="font-sans">Don't have an account?</p>
             <Link href="/register" className="font-sans underline text-foreground">
@@ -25,9 +32,15 @@ export default function AuthLayoutContent({
         </div>
       ) : (
         <div className="flex justify-between p-4">
-          <h1 className="bg-gradient-to-r from-primary font-sans to-primary/80 bg-clip-text text-transparent text-xl">
-            Talkit
-          </h1>
+          <Link href="/" aria-label="Go to home page">
+            <Image
+              src="/svg/logo.svg"
+              width={34}
+              height={34}
+              alt="Talkit logo"
+              className="dark:brightness-0 dark:invert"
+            />
+          </Link>
           <div className="flex space-x-0.5 text-md text-muted-foreground">
             <p className="font-sans">Already have an account?</p>
             <Link href="/login" className="font-sans underline text-foreground">

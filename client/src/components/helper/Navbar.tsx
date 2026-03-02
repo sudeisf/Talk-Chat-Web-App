@@ -76,7 +76,11 @@ export default function Navbar() {
     <nav className="flex  justify-between px-4 py-2 ">
       <div className="flex items-center gap-3 ">
         <div className="flex flex-col gap-1 items-center">
-          <Image alt="Logo" src={Logo} className="w-7 h-7" />
+          <Image
+            alt="Logo"
+            src={Logo}
+            className="w-7 h-7 dark:brightness-0 dark:invert"
+          />
           {/* <p className="font-plus-jakarta capitalize text-xs ">Talkit</p> */}
         </div>
         <div className="flex gap-4   px-2 font-main capitalize text-[.92rem] items-center  text-gray-600 ">

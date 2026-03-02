@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Authentication',
@@ -13,8 +14,17 @@ export default function AuthLayout({
   return (
     <div className="flex w-ful min-h-screen bg-background text-foreground">
       <div className="bg-gradient-to-tr flex flex-col justify-end-safe items-center from-black via-gray-800 to-[#03624C] w-[45%] rounded-lg m-2 p-4">
-        <div>
-          <h2 className="text-white text-4xl font-bold">TalkIt</h2>
+        <div className="w-full max-w-md">
+          <div className="mb-4 flex items-center gap-3">
+            <Image
+              src="/svg/logo.svg"
+              alt="Talkit logo"
+              width={44}
+              height={44}
+              className="rounded-md brightness-0 invert"
+            />
+            <h2 className="text-white text-4xl font-bold">TalkIt</h2>
+          </div>
           <p className="text-white text-md mt-1 text-wrap font-sans">
             Connect and chat with friends in real-time. <br />
             Share ideas, laugh together, and stay close —

@@ -118,7 +118,13 @@ export default function Home() {
     <div className="bg-background text-foreground min-h-screen">
       <nav className="flex items-center justify-between p-4 border-b border-border bg-background/95 *:font-sans">
   <div className="flex items-center gap-2">
-    <Image src={Logo} width={30} height={30} alt="logo" />
+    <Image
+      src={Logo}
+      width={30}
+      height={30}
+      alt="logo"
+      className="dark:brightness-0 dark:invert"
+    />
     <p className="text-lg text-primary text-shadow-xs">Talkit</p>
   </div>
 

@@ -46,7 +46,7 @@ export default function GitHubLoginButton() {
         width={20}
         height={20}
         alt={'github-logo'}
-        className="dark:invert"
+        className="grayscale contrast-200 dark:invert"
       />
       Continue with GitHub
     </button>

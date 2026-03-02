@@ -82,7 +82,13 @@ export function AppSidebar() {
       <SidebarContent className="bg-sidebar text-sidebar-foreground flex h-full flex-col justify-between">
         <SidebarGroup>
           <div className="flex p-2 gap-2 pl-6">
-            <Image src={logo} alt="" width={25} height={25} />
+            <Image
+              src={logo}
+              alt=""
+              width={25}
+              height={25}
+              className="dark:brightness-0 dark:invert"
+            />
             <h1 className="text-lg font-pt text-sidebar-foreground rounded-full">
               Talkit
             </h1>
