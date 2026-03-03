@@ -9,6 +9,8 @@ from urllib3 import request
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from .serializers import QuestionSerializer
+from rest_framework import generics, permissions
 
 from .models import Question , QuestionInvite
 
@@ -74,3 +76,8 @@ class AcceptInvitation(APIView):
         
         return Response({"status": "joined", "session_id": chat_session.id})
 	
+class CreateQuestionView(generics.CreateAPIView):
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    # DRF passes 'request' context to serializer automatically
