@@ -1,11 +1,16 @@
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timesince import timesince
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from urllib3 import request
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
-from .models import Question
+
+from .models import Question , QuestionInvite
 
 
 class RecentActivityView(APIView):
@@ -38,3 +43,34 @@ class RecentActivityView(APIView):
 			)
 
 		return Response({"items": data})
+
+
+class AcceptInvitation(APIView):
+    def post(self, request , invite_id):
+        invite = get_object_or_404(QuestionInvite,id=invite_id, expert= request.user)
+        
+        if invite.status != 'PENDING':
+            return Response({"error": "Invite no longer valid"}, status=400)
+        
+        chat_session = invite.question.chat_session
+        if chat_session.participants.count() >= chat_session.max_participants:
+             return Response({"error": "Room is full!"}, status=400)
+         
+        invite.status = 'ACCEPTED'
+        invite.save()
+        
+        chat_session.participants.add(request.user)
+        
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'chat_{invite.question.id}', 
+            {
+                'type': 'chat_message',
+                'message': f"{request.user.username} joined the session.",
+                'sender_id': None, 
+                'is_system': True
+            }
+        )
+        
+        return Response({"status": "joined", "session_id": chat_session.id})
+	
