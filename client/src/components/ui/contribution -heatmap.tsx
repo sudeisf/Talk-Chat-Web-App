@@ -2,19 +2,26 @@
 
 import { useEffect, useState } from 'react';
 import HeatMap from '@uiw/react-heat-map';
+import { useHelperContributionsQuery } from '@/query/questionMutation';
+
+const HeatMapComponent = HeatMap as any;
 
 interface ContributionData {
   date: string;
   count: number;
 }
 
-export function ContributionHeatmap({ userId }: { userId: string }) {
+export function ContributionHeatmap() {
   const [data, setData] = useState<{ date: string; count: number }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const {
+    data: contributionResponse,
+    isLoading: loading,
+    error,
+  } = useHelperContributionsQuery();
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -41,34 +48,10 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
   }, []);
 
   useEffect(() => {
-    async function fetchContributions() {
-      try {
-        setError(null);
-        const response = await fetch(`/api/contributions?userId=${userId}`);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const contributions: ContributionData[] = await response.json();
-
-        // Fill missing dates with count: 0
-        const filledData = fillMissingDates(contributions);
-        setData(filledData);
-      } catch (error) {
-        console.error('Failed to fetch contributions:', error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : 'Failed to fetch contributions'
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchContributions();
-  }, [userId]);
+    const contributions: ContributionData[] = contributionResponse?.items ?? [];
+    const filledData = fillMissingDates(contributions);
+    setData(filledData);
+  }, [contributionResponse, currentYear]);
 
   function fillMissingDates(contributions: ContributionData[]) {
     const startDate = new Date('2020-01-01');
@@ -120,6 +103,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
     (sum, item) => sum + item.count,
     0
   );
+  const hasContributionData = totalContributions > 0;
 
   const panelColors = isDarkMode
     ? {
@@ -146,11 +130,14 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
   }
 
   if (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to fetch contributions';
+
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-[#03624C] text-center">
           <div className="font-medium mb-2">Failed to load contributions</div>
-          <div className="text-sm text-muted-foreground">{error}</div>
+          <div className="text-sm text-muted-foreground">{errorMessage}</div>
         </div>
       </div>
     );
@@ -183,35 +170,47 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
           ))}
         </div>
 
+        {!hasContributionData && (
+          <div className="mb-4 text-sm text-muted-foreground">
+            No contributions yet for {selectedYear}.
+          </div>
+        )}
+
         <div className="flex-1 overflow-x-auto">
-          <HeatMap
-            value={filteredData}
-            width="100%"
-            startDate={startDate}
-            endDate={endDate}
-            rectSize={14}
-            space={2}
-            rectProps={{
-              rx: 2,
-            }}
-            legendCellSize={0}
-            panelColors={panelColors}
-            weekLabels={['', 'Mon', '', 'Wed', '', 'Fri', '']}
-            monthLabels={[
-              'Jan',
-              'Feb',
-              'Mar',
-              'Apr',
-              'May',
-              'Jun',
-              'Jul',
-              'Aug',
-              'Sep',
-              'Oct',
-              'Nov',
-              'Dec',
-            ]}
-          />
+          {hasContributionData ? (
+            <HeatMapComponent
+              value={filteredData}
+              width="100%"
+              startDate={startDate}
+              endDate={endDate}
+              rectSize={14}
+              space={2}
+              rectProps={{
+                rx: 2,
+              }}
+              legendCellSize={0}
+              panelColors={panelColors}
+              weekLabels={['', 'Mon', '', 'Wed', '', 'Fri', '']}
+              monthLabels={[
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ]}
+            />
+          ) : (
+            <div className="h-[180px] flex items-center justify-center text-sm text-muted-foreground border border-dashed border-border rounded-md">
+              No contributions yet.
+            </div>
+          )}
         </div>
       </div>
     </div>

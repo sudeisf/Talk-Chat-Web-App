@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timesince import timesince
@@ -19,13 +20,16 @@ from .serializers import (
 	ModifiedQuestionDescriptionResponseSerializer,
 	MyQuestionListSerializer,
 	HelperDashboardStatsSerializer,
+	HelperSessionsChartSerializer,
+	HelperContributionsSerializer,
+	HelperProfileOverviewSerializer,
 	QuestionSerializer,
 )
 from rest_framework import generics, permissions
 
 from .models import Question , QuestionInvite
 from notifications.models import Notification
-from chat.models import ChatSession, MessageReaction
+from chat.models import ChatMessage, ChatSession, MessageReaction
 
 
 logger = logging.getLogger(__name__)
@@ -101,18 +105,18 @@ class RecentActivityView(APIView):
 
 
 class AcceptInvitation(APIView):
-    def post(self, request , invite_id):
-        invite = get_object_or_404(QuestionInvite,id=invite_id, expert= request.user)
-        
-        if invite.status != 'PENDING':
-            return Response({"error": "Invite no longer valid"}, status=400)
-        
-        chat_session = invite.question.chat_session
-        if chat_session.participants.count() >= chat_session.max_participants:
-             return Response({"error": "Room is full!"}, status=400)
-         
-        invite.status = 'ACCEPTED'
-        invite.save()
+	def post(self, request, invite_id):
+		invite = get_object_or_404(QuestionInvite, id=invite_id, expert=request.user)
+
+		if invite.status != 'PENDING':
+			return Response({"error": "Invite no longer valid"}, status=400)
+
+		chat_session = invite.question.chat_session
+		if chat_session.participants.count() >= chat_session.max_participants:
+			return Response({"error": "Room is full!"}, status=400)
+
+		invite.status = 'ACCEPTED'
+		invite.save()
 
 		Notification.objects.create(
 			user=invite.question.asked_by,
@@ -121,21 +125,21 @@ class AcceptInvitation(APIView):
 			message=f'{request.user.username} joined your question: "{invite.question.title}"',
 			question=invite.question,
 		)
-        
-        chat_session.participants.add(request.user)
-        
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f'chat_{invite.question.id}', 
-            {
-                'type': 'chat_message',
-                'message': f"{request.user.username} joined the session.",
-                'sender_id': None, 
-                'is_system': True
-            }
-        )
-        
-        return Response({"status": "joined", "session_id": chat_session.id})
+
+		chat_session.participants.add(request.user)
+
+		channel_layer = get_channel_layer()
+		async_to_sync(channel_layer.group_send)(
+			f'chat_{invite.question.id}',
+			{
+				'type': 'chat_message',
+				'message': f"{request.user.username} joined the session.",
+				'sender_id': None,
+				'is_system': True,
+			},
+		)
+
+		return Response({"status": "joined", "session_id": chat_session.id})
 	
 class CreateQuestionView(generics.CreateAPIView):
     serializer_class = QuestionSerializer
@@ -347,5 +351,147 @@ class HelperDashboardStatsView(APIView):
 		}
 
 		serializer = HelperDashboardStatsSerializer(data=payload)
+		serializer.is_valid(raise_exception=True)
+		return Response(serializer.validated_data)
+
+
+class HelperSessionsChartView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	@staticmethod
+	def _month_start(date_value):
+		return date_value.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+	def get(self, request):
+		now = timezone.now()
+		current_month_start = self._month_start(now)
+
+		month_starts = []
+		for index in range(5, -1, -1):
+			reference = current_month_start - timedelta(days=32 * index)
+			month_starts.append(self._month_start(reference))
+
+		session_counts = []
+		for month_start in month_starts:
+			if month_start.month == 12:
+				next_month = month_start.replace(year=month_start.year + 1, month=1)
+			else:
+				next_month = month_start.replace(month=month_start.month + 1)
+
+			count = ChatSession.objects.filter(
+				participants=request.user,
+				created_at__gte=month_start,
+				created_at__lt=next_month,
+			).count()
+
+			session_counts.append(
+				{
+					'month': month_start.strftime('%B'),
+					'sessions': count,
+				}
+			)
+
+		last_month_start = month_starts[-1]
+		if last_month_start.month == 1:
+			previous_month_start = last_month_start.replace(year=last_month_start.year - 1, month=12)
+		else:
+			previous_month_start = last_month_start.replace(month=last_month_start.month - 1)
+
+		if last_month_start.month == 12:
+			next_month_start = last_month_start.replace(year=last_month_start.year + 1, month=1)
+		else:
+			next_month_start = last_month_start.replace(month=last_month_start.month + 1)
+
+		current_month_count = ChatSession.objects.filter(
+			participants=request.user,
+			created_at__gte=last_month_start,
+			created_at__lt=next_month_start,
+		).count()
+
+		previous_month_count = ChatSession.objects.filter(
+			participants=request.user,
+			created_at__gte=previous_month_start,
+			created_at__lt=last_month_start,
+		).count()
+
+		if previous_month_count == 0:
+			trend_percentage = 100.0 if current_month_count > 0 else 0.0
+		else:
+			trend_percentage = round(
+				((current_month_count - previous_month_count) / previous_month_count) * 100,
+				2,
+			)
+
+		payload = {
+			'period_label': f"{month_starts[0].strftime('%B')} - {month_starts[-1].strftime('%B %Y')}",
+			'trend_percentage': trend_percentage,
+			'sessions': session_counts,
+		}
+
+		serializer = HelperSessionsChartSerializer(data=payload)
+		serializer.is_valid(raise_exception=True)
+		return Response(serializer.validated_data)
+
+
+class HelperContributionsView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	def get(self, request):
+		from chat.models import ChatMessage as ChatMessageModel
+
+		start_date = timezone.datetime(2020, 1, 1, tzinfo=timezone.get_current_timezone())
+
+		rows = (
+			ChatMessageModel.objects.filter(sender=request.user, created_at__gte=start_date)
+			.annotate(day=TruncDate('created_at'))
+			.values('day')
+			.annotate(count=Count('id'))
+			.order_by('day')
+		)
+
+		items = [
+			{
+				'date': row['day'].strftime('%Y/%m/%d'),
+				'count': row['count'],
+			}
+			for row in rows
+		]
+
+		serializer = HelperContributionsSerializer(data={'items': items})
+		serializer.is_valid(raise_exception=True)
+		return Response(serializer.validated_data)
+
+
+class HelperProfileOverviewView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	def get(self, request):
+		helped_learners = (
+			QuestionInvite.objects.filter(expert=request.user, status='ACCEPTED')
+			.values('question__asked_by')
+			.distinct()
+			.count()
+		)
+
+		sessions_joined = ChatSession.objects.filter(participants=request.user).count()
+
+		ongoing_sessions = ChatSession.objects.filter(
+			participants=request.user,
+			is_active=True,
+			question__status='ongoing',
+		).count()
+
+		average_response_minutes = HelperDashboardStatsView._average_response_time_minutes(
+			request.user
+		)
+
+		payload = {
+			'helped_learners': helped_learners,
+			'sessions_joined': sessions_joined,
+			'ongoing_sessions': ongoing_sessions,
+			'average_response_minutes': average_response_minutes,
+		}
+
+		serializer = HelperProfileOverviewSerializer(data=payload)
 		serializer.is_valid(raise_exception=True)
 		return Response(serializer.validated_data)

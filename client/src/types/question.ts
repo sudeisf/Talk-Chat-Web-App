@@ -42,3 +42,30 @@ export interface HelperDashboardStatsResponse {
   average_response_time: DashboardMetric;
   feedback_rating: DashboardMetric;
 }
+
+export interface HelperMonthlySessionItem {
+  month: string;
+  sessions: number;
+}
+
+export interface HelperSessionsChartResponse {
+  period_label: string;
+  trend_percentage: number;
+  sessions: HelperMonthlySessionItem[];
+}
+
+export interface ContributionDayItem {
+  date: string;
+  count: number;
+}
+
+export interface HelperContributionsResponse {
+  items: ContributionDayItem[];
+}
+
+export interface HelperProfileOverviewResponse {
+  helped_learners: number;
+  sessions_joined: number;
+  ongoing_sessions: number;
+  average_response_minutes: number;
+}

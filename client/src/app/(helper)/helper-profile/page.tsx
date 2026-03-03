@@ -25,6 +25,7 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/api/authApi';
+import { useHelperProfileOverviewQuery } from '@/query/questionMutation';
 
 const userInfo = {
   name: 'Sudeis Fedlu',
@@ -78,6 +79,7 @@ export default function HelperProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const { data: overview } = useHelperProfileOverviewQuery();
 
   useEffect(() => {
     getCurrentUser()
@@ -253,7 +255,7 @@ export default function HelperProfilePage() {
                 <div className="flex flex-col items-center">
                   <BookOpen className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-foreground">
-                    {userInfo.HelpedLearners}
+                    {overview?.helped_learners ?? userInfo.HelpedLearners}
                   </h3>
                   <p className="text-sm text-muted-foreground">Helped Learners</p>
                 </div>
@@ -265,7 +267,7 @@ export default function HelperProfilePage() {
                 <div className="flex flex-col items-center">
                   <User className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-foreground">
-                    {userInfo.sessionsJoined || 24}
+                    {overview?.sessions_joined ?? userInfo.sessionsJoined}
                   </h3>
                   <p className="text-sm text-muted-foreground">Sessions Joined</p>
                 </div>
@@ -277,7 +279,7 @@ export default function HelperProfilePage() {
                 <div className="flex flex-col items-center">
                   <Clock className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-[#03624c]">
-                    {userInfo.ongoingSessions || 3}
+                    {overview?.ongoing_sessions ?? userInfo.ongoingSessions}
                   </h3>
                   <p className="text-sm text-muted-foreground">Ongoing Sessions</p>
                 </div>
@@ -289,7 +291,7 @@ export default function HelperProfilePage() {
                 <div className="flex flex-col items-center">
                   <TimerIcon className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-foreground">
-                    {userInfo.avargeResponseTime || 18}{' '}
+                    {overview?.average_response_minutes ?? userInfo.avargeResponseTime}{' '}
                     <span className="text-[.96rem]">min</span>
                   </h3>
                   <p className="text-sm text-muted-foreground">Avg. Respone</p>

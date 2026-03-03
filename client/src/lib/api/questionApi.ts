@@ -1,7 +1,10 @@
 import API from './axiosInstance';
 import {
+  HelperContributionsResponse,
   CreateQuestionPayload,
   HelperDashboardStatsResponse,
+  HelperProfileOverviewResponse,
+  HelperSessionsChartResponse,
   ModifyDescriptionPayload,
   ModifyDescriptionResponse,
   MyQuestionItem,
@@ -36,6 +39,36 @@ export const getMyQuestions = async () => {
 export const getHelperDashboardStats = async () => {
   const response = await API.get<HelperDashboardStatsResponse>(
     '/questions/helper-dashboard-stats/',
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data;
+};
+
+export const getHelperSessionsChart = async () => {
+  const response = await API.get<HelperSessionsChartResponse>(
+    '/questions/helper-sessions-chart/',
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data;
+};
+
+export const getHelperContributions = async () => {
+  const response = await API.get<HelperContributionsResponse>(
+    '/questions/helper-contributions/',
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data;
+};
+
+export const getHelperProfileOverview = async () => {
+  const response = await API.get<HelperProfileOverviewResponse>(
+    '/questions/helper-profile-overview/',
     {
       withCredentials: true,
     }

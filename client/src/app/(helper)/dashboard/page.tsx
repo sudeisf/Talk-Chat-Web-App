@@ -67,7 +67,7 @@ export default function HelperDashboard() {
             </p>
           </div>
 
-          <ContributionHeatmap userId="user123" />
+          <ContributionHeatmap />
 
           <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
             <span>Less</span>

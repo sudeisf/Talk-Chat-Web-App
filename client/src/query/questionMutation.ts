@@ -1,7 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   createQuestion,
+  getHelperContributions,
   getHelperDashboardStats,
+  getHelperProfileOverview,
+  getHelperSessionsChart,
   getMyQuestions,
   modifyQuestionDescription,
 } from '@/lib/api/questionApi';
@@ -37,5 +40,26 @@ export const useHelperDashboardStatsQuery = () => {
   return useQuery({
     queryKey: ['helper-dashboard-stats'],
     queryFn: getHelperDashboardStats,
+  });
+};
+
+export const useHelperSessionsChartQuery = () => {
+  return useQuery({
+    queryKey: ['helper-sessions-chart'],
+    queryFn: getHelperSessionsChart,
+  });
+};
+
+export const useHelperContributionsQuery = () => {
+  return useQuery({
+    queryKey: ['helper-contributions'],
+    queryFn: getHelperContributions,
+  });
+};
+
+export const useHelperProfileOverviewQuery = () => {
+  return useQuery({
+    queryKey: ['helper-profile-overview'],
+    queryFn: getHelperProfileOverview,
   });
 };

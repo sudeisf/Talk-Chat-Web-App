@@ -84,3 +84,30 @@ class HelperDashboardStatsSerializer(serializers.Serializer):
     sessions_joined = DashboardMetricSerializer()
     average_response_time = DashboardMetricSerializer()
     feedback_rating = DashboardMetricSerializer()
+
+
+class HelperMonthlySessionSerializer(serializers.Serializer):
+    month = serializers.CharField()
+    sessions = serializers.IntegerField()
+
+
+class HelperSessionsChartSerializer(serializers.Serializer):
+    period_label = serializers.CharField()
+    trend_percentage = serializers.FloatField()
+    sessions = HelperMonthlySessionSerializer(many=True)
+
+
+class ContributionDaySerializer(serializers.Serializer):
+    date = serializers.CharField()
+    count = serializers.IntegerField()
+
+
+class HelperContributionsSerializer(serializers.Serializer):
+    items = ContributionDaySerializer(many=True)
+
+
+class HelperProfileOverviewSerializer(serializers.Serializer):
+    helped_learners = serializers.IntegerField()
+    sessions_joined = serializers.IntegerField()
+    ongoing_sessions = serializers.IntegerField()
+    average_response_minutes = serializers.FloatField()

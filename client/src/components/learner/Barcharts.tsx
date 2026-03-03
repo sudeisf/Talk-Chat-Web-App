@@ -18,21 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useHelperSessionsChartQuery } from '@/query/questionMutation';
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-
-const sessionData = [
-  { month: 'January', sessions: 120 },
-  { month: 'February', sessions: 190 },
-  { month: 'March', sessions: 150 },
-  { month: 'April', sessions: 230 },
-  { month: 'May', sessions: 210 },
-  { month: 'June', sessions: 200 },
-];
 
 const chartConfig = {
   sessions: {
@@ -45,6 +37,13 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function TotalSessionsChart() {
+  const { data } = useHelperSessionsChartQuery();
+
+  const sessionData = data?.sessions ?? [];
+  const periodLabel = data?.period_label ?? 'Last 6 months';
+  const trendPercentage = data?.trend_percentage ?? 0;
+  const hasSessionData = sessionData.some((item) => item.sessions > 0);
+
   return (
     <Card className="w-full max-w-2xl *:font-sans border-0 shadow-none">
       <CardHeader>
@@ -52,57 +51,69 @@ export function TotalSessionsChart() {
           <MessageSquare className="h-5 w-5 text-[#03624C]" />
           Total Sessions
         </CardTitle>
-        <CardDescription>January – June 2024</CardDescription>
+        <CardDescription>{periodLabel}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart
-            accessibilityLayer
-            data={sessionData}
-            layout="vertical"
-            margin={{ right: 16 }}
-          >
-            <CartesianGrid horizontal={false} />
-            <YAxis
-              dataKey="month"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-              hide
-            />
-            <XAxis dataKey="sessions" type="number" hide />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Bar dataKey="sessions" fill="var(--color-sessions)" radius={4}>
-              <LabelList
+        {hasSessionData ? (
+          <ChartContainer config={chartConfig}>
+            <BarChart
+              accessibilityLayer
+              data={sessionData}
+              layout="vertical"
+              margin={{ right: 16 }}
+            >
+              <CartesianGrid horizontal={false} />
+              <YAxis
                 dataKey="month"
-                position="insideLeft"
-                offset={8}
-                className="fill-white"
-                fontSize={12}
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value) => value.slice(0, 3)}
+                hide
               />
-              <LabelList
-                dataKey="sessions"
-                position="right"
-                offset={8}
-                className="fill-foreground"
-                fontSize={12}
+              <XAxis dataKey="sessions" type="number" hide />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
               />
-            </Bar>
-          </BarChart>
-        </ChartContainer>
+              <Bar dataKey="sessions" fill="var(--color-sessions)" radius={4}>
+                <LabelList
+                  dataKey="month"
+                  position="insideLeft"
+                  offset={8}
+                  className="fill-white"
+                  fontSize={12}
+                />
+                <LabelList
+                  dataKey="sessions"
+                  position="right"
+                  offset={8}
+                  className="fill-foreground"
+                  fontSize={12}
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        ) : (
+          <div className="h-[280px] flex items-center justify-center text-muted-foreground text-sm">
+            No sessions yet.
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          Trending up by 8.6% this month
-          <TrendingUp className="h-4 w-4 text-[#03624C]" />
-        </div>
+        {hasSessionData ? (
+          <div className="flex gap-2 leading-none font-medium">
+            Trending by {Math.abs(trendPercentage).toFixed(2)}% this month
+            <TrendingUp className="h-4 w-4 text-[#03624C]" />
+          </div>
+        ) : (
+          <div className="leading-none font-medium text-muted-foreground">
+            No session activity yet.
+          </div>
+        )}
         <div className="text-muted-foreground leading-none">
-          Based on total chat sessions over the last 6 months
+          Based on total chat sessions over the latest months
         </div>
       </CardFooter>
     </Card>
