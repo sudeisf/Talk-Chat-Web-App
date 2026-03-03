@@ -30,3 +30,15 @@ export interface MyQuestionItem {
   upvotes: number;
   downvotes: number;
 }
+
+export interface DashboardMetric {
+  value: number;
+  change: number;
+}
+
+export interface HelperDashboardStatsResponse {
+  questions_answered: DashboardMetric;
+  sessions_joined: DashboardMetric;
+  average_response_time: DashboardMetric;
+  feedback_rating: DashboardMetric;
+}

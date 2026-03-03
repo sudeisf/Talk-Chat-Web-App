@@ -1,38 +1,55 @@
+'use client';
+
 import { TotalSessionsChart } from '@/components/learner/Barcharts';
 import GreetingCard from '@/components/learner/GreetingCard';
 import SummaryCard from '@/components/learner/SummeryCards';
 import { ContributionHeatmap } from '@/components/ui/contribution -heatmap';
+import { useHelperDashboardStatsQuery } from '@/query/questionMutation';
 import { Bookmark, CheckCircle, Clock, MessageSquare } from 'lucide-react';
 
 export default function HelperDashboard() {
+  const { data } = useHelperDashboardStatsQuery();
+
+  const questionsAnswered = data?.questions_answered.value ?? 0;
+  const questionsAnsweredChange = data?.questions_answered.change ?? 0;
+
+  const sessionsJoined = data?.sessions_joined.value ?? 0;
+  const sessionsJoinedChange = data?.sessions_joined.change ?? 0;
+
+  const averageResponseTime = data?.average_response_time.value ?? 0;
+  const averageResponseTimeChange = data?.average_response_time.change ?? 0;
+
+  const feedbackRating = data?.feedback_rating.value ?? 0;
+  const feedbackRatingChange = data?.feedback_rating.change ?? 0;
+
   return (
     <div className="w-full max-w-7xl mx-auto min-h-screen bg-background text-foreground p-4">
       <GreetingCard btnName={'Start Helping'} name={'sudeis'} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
         <SummaryCard
-          percentage="6.45"
-          title="Questions Answerd"
-          value={124}
+          percentage={questionsAnsweredChange.toFixed(2)}
+          title="Questions Answered"
+          value={Math.round(questionsAnswered)}
           icon={<MessageSquare size={20} />}
         />
         <SummaryCard
-          percentage="3.56"
+          percentage={sessionsJoinedChange.toFixed(2)}
           title="Sessions Joined"
-          value={8}
+          value={Math.round(sessionsJoined)}
           icon={<Bookmark size={20} />}
           color="text-purple-600"
         />
         <SummaryCard
-          percentage="6.6"
-          title="Avarage Response Time"
-          value={97}
+          percentage={averageResponseTimeChange.toFixed(2)}
+          title="Average Response Time"
+          value={Math.round(averageResponseTime)}
           icon={<CheckCircle size={20} />}
           color="text-green-600"
         />
         <SummaryCard
-          percentage="6.45"
+          percentage={feedbackRatingChange.toFixed(2)}
           title="Feedback Rating"
-          value={27}
+          value={Math.round(feedbackRating)}
           icon={<Clock size={20} />}
           color="text-yellow-600"
         />

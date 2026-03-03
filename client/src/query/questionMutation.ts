@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   createQuestion,
+  getHelperDashboardStats,
   getMyQuestions,
   modifyQuestionDescription,
 } from '@/lib/api/questionApi';
@@ -29,5 +30,12 @@ export const useMyQuestionsQuery = () => {
   return useQuery({
     queryKey: ['my-questions'],
     queryFn: getMyQuestions,
+  });
+};
+
+export const useHelperDashboardStatsQuery = () => {
+  return useQuery({
+    queryKey: ['helper-dashboard-stats'],
+    queryFn: getHelperDashboardStats,
   });
 };

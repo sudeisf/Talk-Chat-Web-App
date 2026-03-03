@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Question
 from users.models import Tag  # Assuming you have a Tag model
+from notifications.models import Notification
+from celery import chain
 
 class QuestionSerializer(serializers.ModelSerializer):
    
@@ -24,6 +26,21 @@ class QuestionSerializer(serializers.ModelSerializer):
         for tag_name in tags_data:
             tag, created = Tag.objects.get_or_create(name=tag_name.lower())
             question.tags.add(tag) 
+
+        Notification.objects.create(
+            user=user,
+            notification_type=Notification.NotificationType.QUESTION_ANNOUNCEMENT,
+            title='Question posted successfully',
+            message=f'Your question "{question.title}" is now being matched with helpers.',
+            question=question,
+        )
+
+        from .tasks import find_and_invite_experts, vectorize_question
+
+        chain(
+            vectorize_question.s(question.id),
+            find_and_invite_experts.s(),
+        ).delay()
             
         return question
 
@@ -55,3 +72,15 @@ class MyQuestionListSerializer(serializers.ModelSerializer):
 
     def get_tags(self, obj):
         return list(obj.tags.values_list('name', flat=True))
+
+
+class DashboardMetricSerializer(serializers.Serializer):
+    value = serializers.FloatField()
+    change = serializers.FloatField()
+
+
+class HelperDashboardStatsSerializer(serializers.Serializer):
+    questions_answered = DashboardMetricSerializer()
+    sessions_joined = DashboardMetricSerializer()
+    average_response_time = DashboardMetricSerializer()
+    feedback_rating = DashboardMetricSerializer()

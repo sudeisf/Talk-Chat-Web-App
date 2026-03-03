@@ -6,6 +6,8 @@ from users.models import User
 from chat.models import ChatSession, ChatMessage
 from pgvector.django import L2Distance
 import json
+from django.db import IntegrityError
+from notifications.models import Notification
 
 # Configure the SDK once
 genai.configure(api_key=settings.GOOGLE_API_KEY)
@@ -26,26 +28,37 @@ def vectorize_question(question_id):
         
         question.embedding = results['embedding']
         question.save()
-        
+
     except Exception as e:
         print(f"Error vectorizing question {question_id}: {str(e)}")
+
+    return question_id
         
 @shared_task 
 def find_and_invite_experts(question_id):
     try:
         question = Question.objects.get(id=question_id)
-        
-        if not question.embedding:
-            print(f"Question {question_id} does not have an embedding. Skipping expert search.")
-            return
-        
-        matched_experts = User.objects.exclude(id=question.asked_by.id).annotate(
-                distance=L2Distance('profile_embedding', question.embedding)
-            ).order_by('distance')[:5]
+
+        if question.embedding:
+            matched_experts = User.objects.filter(role='helper').exclude(id=question.asked_by.id).annotate(
+                    distance=L2Distance('profile_embedding', question.embedding)
+                ).order_by('distance')[:5]
+        else:
+            matched_experts = User.objects.filter(role='helper').exclude(id=question.asked_by.id)[:5]
 
         
         for expert in matched_experts:
-            QuestionInvite.objects.create(question=question, expert=expert)
+            try:
+                QuestionInvite.objects.create(question=question, expert=expert)
+                Notification.objects.create(
+                    user=expert,
+                    notification_type=Notification.NotificationType.HELPER_ANNOUNCEMENT,
+                    title='New question match',
+                    message=f'You were invited to help with: "{question.title}"',
+                    question=question,
+                )
+            except IntegrityError:
+                continue
             
     except Exception as e:
         print(f"Error finding/inviting experts for question {question_id}: {str(e)}")

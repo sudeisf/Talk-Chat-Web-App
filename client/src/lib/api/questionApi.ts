@@ -1,6 +1,7 @@
 import API from './axiosInstance';
 import {
   CreateQuestionPayload,
+  HelperDashboardStatsResponse,
   ModifyDescriptionPayload,
   ModifyDescriptionResponse,
   MyQuestionItem,
@@ -29,5 +30,15 @@ export const getMyQuestions = async () => {
   const response = await API.get<MyQuestionItem[]>('/questions/my/', {
     withCredentials: true,
   });
+  return response.data;
+};
+
+export const getHelperDashboardStats = async () => {
+  const response = await API.get<HelperDashboardStatsResponse>(
+    '/questions/helper-dashboard-stats/',
+    {
+      withCredentials: true,
+    }
+  );
   return response.data;
 };

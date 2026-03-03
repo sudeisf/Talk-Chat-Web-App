@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timesince import timesince
 from django.conf import settings
+from datetime import timedelta
 import logging
 import re
 from rest_framework.permissions import AllowAny
@@ -17,11 +18,14 @@ from .serializers import (
 	ModifyQuestionDescriptionSerializer,
 	ModifiedQuestionDescriptionResponseSerializer,
 	MyQuestionListSerializer,
+	HelperDashboardStatsSerializer,
 	QuestionSerializer,
 )
 from rest_framework import generics, permissions
 
 from .models import Question , QuestionInvite
+from notifications.models import Notification
+from chat.models import ChatSession, MessageReaction
 
 
 logger = logging.getLogger(__name__)
@@ -109,6 +113,14 @@ class AcceptInvitation(APIView):
          
         invite.status = 'ACCEPTED'
         invite.save()
+
+		Notification.objects.create(
+			user=invite.question.asked_by,
+			notification_type=Notification.NotificationType.HELPER_JOINED,
+			title='A helper joined your question',
+			message=f'{request.user.username} joined your question: "{invite.question.title}"',
+			question=invite.question,
+		)
         
         chat_session.participants.add(request.user)
         
@@ -221,3 +233,119 @@ class ModifyQuestionDescriptionView(APIView):
 			)
 			response_serializer.is_valid(raise_exception=True)
 			return Response(response_serializer.validated_data)
+
+
+class HelperDashboardStatsView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	@staticmethod
+	def _percentage_change(current_value: float, previous_value: float) -> float:
+		if previous_value == 0:
+			return 100.0 if current_value > 0 else 0.0
+		return round(((current_value - previous_value) / previous_value) * 100, 2)
+
+	@staticmethod
+	def _average_response_time_minutes(user, start=None, end=None) -> float:
+		sessions = ChatSession.objects.filter(participants=user).select_related('question__asked_by').prefetch_related('messages')
+
+		if start:
+			sessions = sessions.filter(created_at__gte=start)
+		if end:
+			sessions = sessions.filter(created_at__lt=end)
+
+		delays_in_seconds = []
+
+		for session in sessions:
+			messages = list(session.messages.all().order_by('created_at'))
+			if not messages:
+				continue
+
+			learner_id = session.question.asked_by_id
+			helper_reply_times = [m.created_at for m in messages if m.sender_id == user.id]
+			if not helper_reply_times:
+				continue
+
+			reply_index = 0
+			for message in messages:
+				if message.sender_id != learner_id:
+					continue
+
+				while reply_index < len(helper_reply_times) and helper_reply_times[reply_index] <= message.created_at:
+					reply_index += 1
+
+				if reply_index < len(helper_reply_times):
+					delay = (helper_reply_times[reply_index] - message.created_at).total_seconds()
+					if delay >= 0:
+						delays_in_seconds.append(delay)
+
+		if not delays_in_seconds:
+			return 0.0
+
+		average_seconds = sum(delays_in_seconds) / len(delays_in_seconds)
+		return round(average_seconds / 60, 2)
+
+	def get(self, request):
+		now = timezone.now()
+		period_start = now - timedelta(days=30)
+		previous_period_start = period_start - timedelta(days=30)
+
+		questions_answered_current = QuestionInvite.objects.filter(
+			expert=request.user,
+			status='ACCEPTED',
+			question__status__in=['answered', 'closed'],
+			created_at__gte=period_start,
+		).count()
+		questions_answered_previous = QuestionInvite.objects.filter(
+			expert=request.user,
+			status='ACCEPTED',
+			question__status__in=['answered', 'closed'],
+			created_at__gte=previous_period_start,
+			created_at__lt=period_start,
+		).count()
+
+		sessions_joined_current = ChatSession.objects.filter(
+			participants=request.user,
+			created_at__gte=period_start,
+		).count()
+		sessions_joined_previous = ChatSession.objects.filter(
+			participants=request.user,
+			created_at__gte=previous_period_start,
+			created_at__lt=period_start,
+		).count()
+
+		avg_response_current = self._average_response_time_minutes(request.user, start=period_start)
+		avg_response_previous = self._average_response_time_minutes(request.user, start=previous_period_start, end=period_start)
+
+		feedback_rating_value = MessageReaction.objects.filter(message__sender=request.user).count()
+		feedback_current = MessageReaction.objects.filter(
+			message__sender=request.user,
+			created_at__gte=period_start,
+		).count()
+		feedback_previous = MessageReaction.objects.filter(
+			message__sender=request.user,
+			created_at__gte=previous_period_start,
+			created_at__lt=period_start,
+		).count()
+
+		payload = {
+			'questions_answered': {
+				'value': questions_answered_current,
+				'change': self._percentage_change(questions_answered_current, questions_answered_previous),
+			},
+			'sessions_joined': {
+				'value': sessions_joined_current,
+				'change': self._percentage_change(sessions_joined_current, sessions_joined_previous),
+			},
+			'average_response_time': {
+				'value': avg_response_current,
+				'change': self._percentage_change(avg_response_current, avg_response_previous),
+			},
+			'feedback_rating': {
+				'value': feedback_rating_value,
+				'change': self._percentage_change(feedback_current, feedback_previous),
+			},
+		}
+
+		serializer = HelperDashboardStatsSerializer(data=payload)
+		serializer.is_valid(raise_exception=True)
+		return Response(serializer.validated_data)
