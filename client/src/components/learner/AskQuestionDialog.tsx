@@ -24,8 +24,10 @@ import {
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
-import { PlusCircle } from 'lucide-react';
 import { QuestionTags } from './QuestionTags';
+import { useCreateQuestionMutation } from '@/query/questionMutation';
+import { toast } from 'sonner';
+import { parseDjangoError } from '@/lib/utils';
 
 const questionFormSchema = z.object({
   title: z
@@ -49,6 +51,7 @@ type ASkQuestionProps = {
 
 export default function AskQuestion({ btnChild }: ASkQuestionProps) {
   const [open, setOpen] = useState(false);
+  const createQuestionMutation = useCreateQuestionMutation();
   const form = useForm<QuestionFormData>({
     resolver: zodResolver(questionFormSchema),
     defaultValues: {
@@ -58,10 +61,30 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
     },
   });
 
-  const onSubmit = (data: QuestionFormData) => {
-    console.log('Question submitted:', data);
-    setOpen(false);
-    form.reset();
+  const onSubmit = async (data: QuestionFormData) => {
+    form.clearErrors();
+
+    try {
+      await createQuestionMutation.mutateAsync(data);
+      toast.success('Question submitted successfully');
+      setOpen(false);
+      form.reset();
+    } catch (error) {
+      const parsedError = parseDjangoError(error);
+
+      Object.entries(parsedError.fieldErrors ?? {}).forEach(([field, messages]) => {
+        if (field === 'title' || field === 'description' || field === 'tags') {
+          form.setError(field, {
+            type: 'server',
+            message: messages[0],
+          });
+        }
+      });
+
+      const fallbackMessage =
+        parsedError.global?.[0] ?? 'Failed to submit question. Please try again.';
+      toast.error(fallbackMessage);
+    }
   };
 
   return (
@@ -149,6 +172,7 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
                 type="button"
                 variant="outline"
                 className="rounded-lg"
+                disabled={createQuestionMutation.isPending}
                 onClick={() => {
                   setOpen(false);
                   form.reset();
@@ -159,9 +183,9 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
               <Button
                 type="submit"
                 className="bg-[#03624c] hover:bg-[#03624c] text-white rounded-lg"
-                disabled={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting || createQuestionMutation.isPending}
               >
-                {form.formState.isSubmitting
+                {form.formState.isSubmitting || createQuestionMutation.isPending
                   ? 'Submitting...'
                   : 'Submit Question'}
               </Button>
