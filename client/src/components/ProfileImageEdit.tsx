@@ -52,6 +52,8 @@ interface UploadProfileImageProps {
 }
 
 export default function UploadProfileImage({ onUploaded }: UploadProfileImageProps) {
+  const [open, setOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -114,49 +116,53 @@ export default function UploadProfileImage({ onUploaded }: UploadProfileImagePro
     [form]
   );
 
-  const onSubmit = (data: FormData) => {
-    uploadProfileImage(data.coverImage)
-      .then((response) => {
-        const uploadedUrl =
-          response?.profile_image_url ||
-          response?.profile_image?.secure_url ||
-          response?.profile_image?.url ||
-          (typeof response?.profile_image === 'string'
-            ? response.profile_image
-            : null);
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsUploading(true);
+      const response = await uploadProfileImage(data.coverImage);
 
-        if (uploadedUrl && onUploaded) {
-          const cacheBustedUrl = uploadedUrl.includes('?')
-            ? `${uploadedUrl}&t=${Date.now()}`
-            : `${uploadedUrl}?t=${Date.now()}`;
-          onUploaded(cacheBustedUrl);
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(
-              new CustomEvent('profile-image-updated', {
-                detail: { url: cacheBustedUrl },
-              })
-            );
-          }
+      const uploadedUrl =
+        response?.profile_image_url ||
+        response?.profile_image?.secure_url ||
+        response?.profile_image?.url ||
+        (typeof response?.profile_image === 'string'
+          ? response.profile_image
+          : null);
+
+      if (uploadedUrl && onUploaded) {
+        const cacheBustedUrl = uploadedUrl.includes('?')
+          ? `${uploadedUrl}&t=${Date.now()}`
+          : `${uploadedUrl}?t=${Date.now()}`;
+        onUploaded(cacheBustedUrl);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('profile-image-updated', {
+              detail: { url: cacheBustedUrl },
+            })
+          );
         }
+      }
 
-        if (!uploadedUrl) {
-          toast.error('Uploaded, but image URL was not returned by API');
-          return;
-        }
+      if (!uploadedUrl) {
+        toast.error('Uploaded, but image URL was not returned by API');
+        return;
+      }
 
-        toast.success('Profile image uploaded successfully');
-        form.reset();
-        setDroppedFile(null);
-        setPreviewUrl(null);
-      })
-      .catch((error) => {
-        toast.error('Failed to upload profile image');
-        console.error(error?.response?.data || error);
-      });
+      toast.success('Profile image uploaded successfully');
+      form.reset();
+      setDroppedFile(null);
+      setPreviewUrl(null);
+      setOpen(false);
+    } catch (error) {
+      toast.error('Failed to upload profile image');
+      console.error((error as any)?.response?.data || error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger 
         className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 bg-white shadow-md hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600 flex items-center justify-center"
       >
@@ -248,15 +254,16 @@ export default function UploadProfileImage({ onUploaded }: UploadProfileImagePro
                   setPreviewUrl(null);
                   form.reset();
                 }}
+                disabled={isUploading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className=" bg-[#03624C] text-white rounded-md hover:bg-[#03624C]/90 disabled:opacity-50 dark:bg-[#03624C] dark:hover:bg-[#03624C]/80"
-                disabled={!droppedFile || !form.formState.isValid}
+                disabled={!droppedFile || !form.formState.isValid || isUploading}
               >
-                Save Changes
+                {isUploading ? 'Uploading...' : 'Save Changes'}
               </Button>
             </div>
           </form>

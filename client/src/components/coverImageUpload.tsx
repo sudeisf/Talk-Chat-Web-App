@@ -51,6 +51,8 @@ interface UploadCoverImageProps {
 }
 
 export default function UploadCoverImage({ onUploaded }: UploadCoverImageProps) {
+  const [open, setOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -113,40 +115,44 @@ export default function UploadCoverImage({ onUploaded }: UploadCoverImageProps) 
     [form]
   );
 
-  const onSubmit = (data: FormData) => {
-    uploadCoverImage(data.coverImage)
-      .then((response) => {
-        const uploadedUrl =
-          response?.cover_image_url ||
-          response?.cover_image?.secure_url ||
-          response?.cover_image?.url ||
-          (typeof response?.cover_image === 'string' ? response.cover_image : null);
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsUploading(true);
+      const response = await uploadCoverImage(data.coverImage);
 
-        if (uploadedUrl && onUploaded) {
-          const cacheBustedUrl = uploadedUrl.includes('?')
-            ? `${uploadedUrl}&t=${Date.now()}`
-            : `${uploadedUrl}?t=${Date.now()}`;
-          onUploaded(cacheBustedUrl);
-        }
+      const uploadedUrl =
+        response?.cover_image_url ||
+        response?.cover_image?.secure_url ||
+        response?.cover_image?.url ||
+        (typeof response?.cover_image === 'string' ? response.cover_image : null);
 
-        if (!uploadedUrl) {
-          toast.error('Uploaded, but image URL was not returned by API');
-          return;
-        }
+      if (uploadedUrl && onUploaded) {
+        const cacheBustedUrl = uploadedUrl.includes('?')
+          ? `${uploadedUrl}&t=${Date.now()}`
+          : `${uploadedUrl}?t=${Date.now()}`;
+        onUploaded(cacheBustedUrl);
+      }
 
-        toast.success('Cover image uploaded successfully');
-        form.reset();
-        setDroppedFile(null);
-        setPreviewUrl(null);
-      })
-      .catch((error) => {
-        toast.error('Failed to upload cover image');
-        console.error(error?.response?.data || error);
-      });
+      if (!uploadedUrl) {
+        toast.error('Uploaded, but image URL was not returned by API');
+        return;
+      }
+
+      toast.success('Cover image uploaded successfully');
+      form.reset();
+      setDroppedFile(null);
+      setPreviewUrl(null);
+      setOpen(false);
+    } catch (error) {
+      toast.error('Failed to upload cover image');
+      console.error((error as any)?.response?.data || error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="flex itesm-center">
         <div className="flex items-center justify-center bg-white hover:bg-gray-100 rounded-full w-10 h-10">
           <Edit className="w-4 h-4 text-black" />
@@ -242,6 +248,7 @@ export default function UploadCoverImage({ onUploaded }: UploadCoverImageProps) 
                       form.reset();
                     }}
                     variant={'ghost'}
+                    disabled={isUploading}
                   >
                     <X className="w-2 h-2" />
                   </Button>
@@ -251,9 +258,9 @@ export default function UploadCoverImage({ onUploaded }: UploadCoverImageProps) 
             <button
               type="submit"
               className="w-full bg-[#03624C] text-white py-2 px-4 rounded hover:bg-[#03624C]/90 disabled:opacity-50"
-              disabled={!droppedFile || !form.formState.isValid}
+              disabled={!droppedFile || !form.formState.isValid || isUploading}
             >
-              Upload
+              {isUploading ? 'Uploading...' : 'Upload'}
             </button>
           </form>
         </Form>
