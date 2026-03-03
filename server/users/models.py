@@ -53,7 +53,7 @@ class User(AbstractUser):
       profile_image =  CloudinaryField('image', null=True, blank=True)
       profile_completed = models.BooleanField(default=False)
       
-      profile_embedding = VectorField(dimensions=1536, null=True, blank=True)
+      profile_embedding = VectorField(dimensions=768, null=True, blank=True)
       expert_score = models.IntegerField(default=0)
 
       google_id = models.CharField(max_length=255, null=True, blank=True)

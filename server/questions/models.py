@@ -20,7 +20,7 @@ class Question(models.Model):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='searching')
     
-    embedding = VectorField(dimensions=1536, null=True, blank=True)
+    embedding = VectorField(dimensions=768, null=True, blank=True)
     bounty_points = models.IntegerField(default=10)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
