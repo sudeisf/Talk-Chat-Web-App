@@ -8,8 +8,8 @@ import { PaginationDemo } from '@/components/learner/QuestionsPaginations';
 import { RecentQuestionsTimeline } from '@/components/learner/RecentQuestionsTimeline';
 import { SelectedTagsDisplay } from '@/components/learner/selected-tag-display';
 import { Tag, TagsFilterSelect } from '@/components/learner/tags-filter-select';
-import { Pagination } from '@/components/ui/pagination';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useMyQuestionsQuery } from '@/query/questionMutation';
 
 import { useState } from 'react';
 
@@ -26,86 +26,6 @@ const sampleTags: Tag[] = [
   { id: '10', label: 'Frontend', color: '#9B59B6' },
   { id: '11', label: 'Backend', color: '#E67E22' },
   { id: '12', label: 'Database', color: '#2ECC71' },
-];
-
-const sampleQuestions = [
-  {
-    id: '1',
-    title:
-      'How to implement server-side rendering with Next.js 14 and TypeScript?',
-    description:
-      "I'm trying to set up SSR in my Next.js 14 project with TypeScript but running into hydration issues. The components render differently on server and client, causing mismatches and console warnings.",
-    contributors: [
-      { name: 'Mike Johnson', avatar: '/generic-user-avatar.png' },
-      { name: 'Lisa Wang', avatar: '/database-expert.png' },
-      { name: 'Tom Brown' },
-    ],
-    additionalContributors: 24,
-    tags: ['Next.js', 'TypeScript', 'SSR'],
-    status: 'ongoing' as const,
-    createdDate: '2 days ago',
-    lastActivity: '1 hour ago',
-    answerCount: 3,
-    upvotes: 15,
-    downvotes: 2,
-    userVote: 'up' as const,
-    isBookmarked: true,
-    user: {
-      name: 'Sarah Chen',
-      avatar: '/generic-user-avatar.png',
-      reputation: 2847,
-    },
-  },
-  {
-    id: '2',
-    title: 'Best practices for state management in React applications',
-    description:
-      'Looking for guidance on choosing between Redux, Zustand, and Context API for a medium-sized React app. Need to understand performance implications and when to use each approach.',
-    contributors: [
-      { name: 'David Lee', avatar: '/database-expert.png' },
-      { name: 'Emma Davis' },
-      { name: 'Chris Wilson', avatar: '/generic-user-avatar.png' },
-    ],
-    additionalContributors: 18,
-    tags: ['React', 'State Management', 'Redux'],
-    status: 'answered' as const,
-    createdDate: '1 week ago',
-    lastActivity: '3 days ago',
-    answerCount: 7,
-    upvotes: 28,
-    downvotes: 1,
-    userVote: null,
-    isBookmarked: false,
-    user: {
-      name: 'Alex Rodriguez',
-      avatar: '/database-expert.png',
-      reputation: 5432,
-    },
-  },
-  {
-    id: '3',
-    title: 'Database design patterns for scalable web applications',
-    description:
-      'Working on a high-traffic web application and need advice on database architecture patterns. Considering microservices with separate databases vs monolithic approach with proper indexing strategies.',
-    contributors: [
-      { name: 'Rachel Green' },
-      { name: 'Kevin Park', avatar: '/generic-user-avatar.png' },
-    ],
-    additionalContributors: 31,
-    tags: ['Database', 'Architecture', 'Performance'],
-    status: 'closed' as const,
-    createdDate: '2 weeks ago',
-    lastActivity: '1 week ago',
-    answerCount: 12,
-    upvotes: 42,
-    downvotes: 5,
-    userVote: 'down' as const,
-    isBookmarked: true,
-    user: {
-      name: 'Jordan Kim',
-      reputation: 1205,
-    },
-  },
 ];
 
 const timelineQuestions = [
@@ -137,7 +57,57 @@ const timelineQuestions = [
 
 export default function MyQuestionPage() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [sortBy, setSortBy] = useState<string>('newest'); // Added missing state
+  const [sortBy, setSortBy] = useState<string>('newest');
+  const { data: myQuestions = [], isLoading } = useMyQuestionsQuery();
+
+  const toRelative = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Just now';
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 5) return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+  };
+
+  const filteredQuestions = myQuestions.filter((question) => {
+    if (!selectedTags.length) return true;
+    return selectedTags.every((selectedTag) =>
+      question.tags.some(
+        (questionTag) =>
+          questionTag.toLowerCase() === selectedTag.label.toLowerCase()
+      )
+    );
+  });
+
+  const sortedQuestions = [...filteredQuestions].sort((a, b) => {
+    if (sortBy === 'oldest') {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
+  const mappedQuestions = sortedQuestions.map((question) => ({
+    id: String(question.id),
+    title: question.title,
+    description: question.description,
+    tags: question.tags,
+    status: question.status === 'searching' ? 'ongoing' : question.status,
+    createdDate: toRelative(question.created_at),
+    lastActivity: toRelative(question.updated_at),
+    answerCount: 0,
+    upvotes: question.upvotes,
+    downvotes: question.downvotes,
+    user: {
+      name: 'you',
+    },
+  }));
 
   const handleTitleClick = (id: string) => {
     console.log('Navigate to question:', id);
@@ -194,13 +164,17 @@ export default function MyQuestionPage() {
         <div className="flex gap-4">
           <div className="space-y-4 w-3/4">
             <QuestionCounterSorter
-              questionCount={sampleQuestions.length}
+              questionCount={mappedQuestions.length}
               onSortChange={handleSortChange}
             />
             <ScrollArea className="h-fit w-full p-2">
               <div className="space-y-4">
-                {sampleQuestions.length > 0 ? (
-                  sampleQuestions.map((question) => (
+                {isLoading ? (
+                  <div className="text-center py-8 text-gray-500">
+                    Loading your questions...
+                  </div>
+                ) : mappedQuestions.length > 0 ? (
+                  mappedQuestions.map((question) => (
                     <QuestionCard
                       key={question.id}
                       {...question}
@@ -213,7 +187,7 @@ export default function MyQuestionPage() {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    No questions found. Try adjusting your filters.
+                    No questions found. Ask your first question.
                   </div>
                 )}
               </div>

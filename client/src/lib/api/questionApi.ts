@@ -3,6 +3,7 @@ import {
   CreateQuestionPayload,
   ModifyDescriptionPayload,
   ModifyDescriptionResponse,
+  MyQuestionItem,
   QuestionResponse,
 } from '@/types/question';
 
@@ -21,5 +22,12 @@ export const modifyQuestionDescription = async (payload: ModifyDescriptionPayloa
       withCredentials: true,
     }
   );
+  return response.data;
+};
+
+export const getMyQuestions = async () => {
+  const response = await API.get<MyQuestionItem[]>('/questions/my/', {
+    withCredentials: true,
+  });
   return response.data;
 };

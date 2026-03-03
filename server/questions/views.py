@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.timesince import timesince
 from django.conf import settings
 import logging
+import re
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +16,7 @@ import google.generativeai as genai
 from .serializers import (
 	ModifyQuestionDescriptionSerializer,
 	ModifiedQuestionDescriptionResponseSerializer,
+	MyQuestionListSerializer,
 	QuestionSerializer,
 )
 from rest_framework import generics, permissions
@@ -23,6 +25,43 @@ from .models import Question , QuestionInvite
 
 
 logger = logging.getLogger(__name__)
+
+
+def _is_quota_error(error: Exception | None) -> bool:
+	if not error:
+		return False
+	message = str(error).lower()
+	return (
+		"resource_exhausted" in message
+		or "quota" in message
+		or "429" in message
+		or "rate limit" in message
+	)
+
+
+def _fallback_improve_description(description: str) -> str:
+	cleaned = re.sub(r"\s+", " ", (description or "")).strip()
+	if not cleaned:
+		return ""
+
+	if cleaned and cleaned[-1] not in ".!?":
+		cleaned = f"{cleaned}."
+
+	sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", cleaned) if part.strip()]
+
+	if len(sentences) >= 3:
+		issue = " ".join(sentences[:2]).strip()
+		context = " ".join(sentences[2:]).strip()
+		return (
+			f"Issue: {issue}\n\n"
+			f"Additional context: {context}\n\n"
+			"Looking for practical optimization steps and best practices to improve performance."
+		)
+
+	return (
+		f"Issue: {cleaned}\n\n"
+		"I would like guidance on the most effective optimizations, including performance improvements and better project structure where relevant."
+	)
 
 
 class RecentActivityView(APIView):
@@ -91,21 +130,34 @@ class CreateQuestionView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class MyQuestionsListView(generics.ListAPIView):
+	serializer_class = MyQuestionListSerializer
+	permission_classes = [permissions.IsAuthenticated]
+
+	def get_queryset(self):
+		return (
+			Question.objects.filter(asked_by=self.request.user)
+			.prefetch_related('tags')
+			.order_by('-created_at')
+		)
+
+
 class ModifyQuestionDescriptionView(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def post(self, request):
 		serializer = ModifyQuestionDescriptionSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
+		description = serializer.validated_data["description"]
 
 		api_key = getattr(settings, "GOOGLE_API_KEY", None)
 		if not api_key:
-			return Response(
-				{"detail": "AI service is not configured."},
-				status=503,
+			fallback_text = _fallback_improve_description(description)
+			response_serializer = ModifiedQuestionDescriptionResponseSerializer(
+				data={"improved_description": fallback_text}
 			)
-
-		description = serializer.validated_data["description"]
+			response_serializer.is_valid(raise_exception=True)
+			return Response(response_serializer.validated_data)
 
 		try:
 			genai.configure(api_key=api_key)
@@ -140,17 +192,20 @@ class ModifyQuestionDescriptionView(APIView):
 					continue
 
 			if not improved_text:
-				logger.exception(
-					"Gemini response empty or all model attempts failed",
-					exc_info=last_error,
+				fallback_text = _fallback_improve_description(description)
+				if _is_quota_error(last_error):
+					logger.warning("Gemini quota exceeded. Using local description fallback.")
+				else:
+					logger.exception(
+						"Gemini response empty or all model attempts failed; using fallback.",
+						exc_info=last_error,
+					)
+
+				response_serializer = ModifiedQuestionDescriptionResponseSerializer(
+					data={"improved_description": fallback_text}
 				)
-				debug_suffix = (
-					f" Provider error: {last_error}" if settings.DEBUG and last_error else ""
-				)
-				return Response(
-					{"detail": f"AI service returned an empty response.{debug_suffix}"},
-					status=502,
-				)
+				response_serializer.is_valid(raise_exception=True)
+				return Response(response_serializer.validated_data)
 
 			response_serializer = ModifiedQuestionDescriptionResponseSerializer(
 				data={"improved_description": improved_text}
@@ -159,14 +214,10 @@ class ModifyQuestionDescriptionView(APIView):
 			return Response(response_serializer.validated_data)
 
 		except Exception as error:
-			logger.exception("Failed to modify question description with AI")
-			debug_suffix = f" Provider error: {error}" if settings.DEBUG else ""
-			return Response(
-				{
-					"detail": (
-						"Failed to improve description right now. Please try again."
-						f"{debug_suffix}"
-					)
-				},
-				status=502,
+			logger.exception("Failed to modify question description with AI, using fallback")
+			fallback_text = _fallback_improve_description(description)
+			response_serializer = ModifiedQuestionDescriptionResponseSerializer(
+				data={"improved_description": fallback_text}
 			)
+			response_serializer.is_valid(raise_exception=True)
+			return Response(response_serializer.validated_data)

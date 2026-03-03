@@ -11,7 +11,6 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select';
 
 export interface Tag {
@@ -20,8 +19,8 @@ export interface Tag {
 }
 
 interface QuestionTagsProps {
-  value?: Tag[];
-  onChange?: (tags: Tag[]) => void;
+  value?: string[];
+  onChange?: (tags: string[]) => void;
 }
 
 const sampleTags: Tag[] = [
@@ -35,13 +34,13 @@ const sampleTags: Tag[] = [
 export function QuestionTags({ value = [], onChange }: QuestionTagsProps) {
   const handleAdd = (id: string) => {
     const tag = sampleTags.find((t) => t.id === id);
-    if (tag && !value.some((t) => t.id === id)) {
-      onChange?.([...value, tag]);
+    if (tag && !value.includes(tag.label)) {
+      onChange?.([...value, tag.label]);
     }
   };
 
-  const handleRemove = (id: string) => {
-    onChange?.(value.filter((t) => t.id !== id));
+  const handleRemove = (label: string) => {
+    onChange?.(value.filter((tagLabel) => tagLabel !== label));
   };
 
   return (
@@ -58,7 +57,7 @@ export function QuestionTags({ value = [], onChange }: QuestionTagsProps) {
           <SelectGroup>
             <SelectLabel>Available Tags</SelectLabel>
             {sampleTags
-              .filter((tag) => !value.some((t) => t.id === tag.id)) // hide selected ones
+              .filter((tag) => !value.includes(tag.label))
               .map((tag) => (
                 <SelectItem key={tag.id} value={tag.id}>
                   {tag.label}
@@ -69,16 +68,16 @@ export function QuestionTags({ value = [], onChange }: QuestionTagsProps) {
       </Select>
 
       <div className="flex flex-wrap gap-2">
-        {value.map((tag) => (
+        {value.map((tagLabel) => (
           <Badge
-            key={tag.id}
+            key={tagLabel}
             variant="secondary"
             className="flex items-center gap-1 py-1 rounded-full shadow-2xs text-sm"
           >
-            {tag.label}
+            {tagLabel}
             <X
               className="h-3 w-3 cursor-pointer"
-              onClick={() => handleRemove(tag.id)}
+              onClick={() => handleRemove(tagLabel)}
             />
           </Badge>
         ))}

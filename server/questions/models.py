@@ -30,6 +30,8 @@ class Question(models.Model):
     upvotes = models.IntegerField(default=0)
     downvotes = models.IntegerField(default=0)
 
+    tags = models.ManyToManyField('users.Tag', related_name='questions', blank=True)
+
     helpers_joined = models.ManyToManyField(User, related_name='questions_joined', blank=True)
 
     class Meta:

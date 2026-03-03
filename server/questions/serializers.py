@@ -34,3 +34,24 @@ class ModifyQuestionDescriptionSerializer(serializers.Serializer):
 
 class ModifiedQuestionDescriptionResponseSerializer(serializers.Serializer):
     improved_description = serializers.CharField()
+
+
+class MyQuestionListSerializer(serializers.ModelSerializer):
+    tags = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Question
+        fields = [
+            'id',
+            'title',
+            'description',
+            'tags',
+            'status',
+            'created_at',
+            'updated_at',
+            'upvotes',
+            'downvotes',
+        ]
+
+    def get_tags(self, obj):
+        return list(obj.tags.values_list('name', flat=True))
