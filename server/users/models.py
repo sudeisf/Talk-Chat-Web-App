@@ -5,6 +5,7 @@ from cloudinary.models import CloudinaryField
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
+from pgvector.django import VectorField
 
 class User(AbstractUser):
       class Gender(models.TextChoices):
@@ -51,6 +52,9 @@ class User(AbstractUser):
       cover_image =  CloudinaryField('image', null=True, blank=True)
       profile_image =  CloudinaryField('image', null=True, blank=True)
       profile_completed = models.BooleanField(default=False)
+      
+      profile_embedding = VectorField(dimensions=1536, null=True, blank=True)
+      expert_score = models.IntegerField(default=0)
 
       google_id = models.CharField(max_length=255, null=True, blank=True)
       github_id = models.CharField(max_length=255, null=True, blank=True)

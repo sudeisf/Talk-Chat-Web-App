@@ -38,7 +38,7 @@ services:
 
   
   postgres:
-    image: postgres:17
+    image: pgvector/pgvector:pg18
     container_name: postgres_db
     environment:
       POSTGRES_DB: talkit_db
@@ -48,6 +48,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./server/db/init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sudeis -d talkit_db"]
       interval: 5s

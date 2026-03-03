@@ -12,6 +12,9 @@ class ChatSession(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    max_participants = models.IntegerField(default=3) # 1 Learner + 2 Experts
+    is_active = models.BooleanField(default=True)
+    
     users_online = models.ManyToManyField(User, related_name='active_chats', blank=True)
     users_typing = models.ManyToManyField(User, related_name='typing_in_chats', blank=True)
 
