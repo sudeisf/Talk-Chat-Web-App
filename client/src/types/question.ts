@@ -10,3 +10,11 @@ export interface QuestionResponse {
   description: string;
   created_at: string;
 }
+
+export interface ModifyDescriptionPayload {
+  description: string;
+}
+
+export interface ModifyDescriptionResponse {
+  improved_description: string;
+}

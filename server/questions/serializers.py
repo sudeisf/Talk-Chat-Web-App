@@ -26,3 +26,11 @@ class QuestionSerializer(serializers.ModelSerializer):
             question.tags.add(tag) 
             
         return question
+
+
+class ModifyQuestionDescriptionSerializer(serializers.Serializer):
+    description = serializers.CharField(min_length=10, max_length=3000)
+
+
+class ModifiedQuestionDescriptionResponseSerializer(serializers.Serializer):
+    improved_description = serializers.CharField()

@@ -25,9 +25,13 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { QuestionTags } from './QuestionTags';
-import { useCreateQuestionMutation } from '@/query/questionMutation';
+import {
+  useCreateQuestionMutation,
+  useModifyQuestionDescriptionMutation,
+} from '@/query/questionMutation';
 import { toast } from 'sonner';
 import { parseDjangoError } from '@/lib/utils';
+import { WandSparkles } from 'lucide-react';
 
 const questionFormSchema = z.object({
   title: z
@@ -52,6 +56,7 @@ type ASkQuestionProps = {
 export default function AskQuestion({ btnChild }: ASkQuestionProps) {
   const [open, setOpen] = useState(false);
   const createQuestionMutation = useCreateQuestionMutation();
+  const modifyDescriptionMutation = useModifyQuestionDescriptionMutation();
   const form = useForm<QuestionFormData>({
     resolver: zodResolver(questionFormSchema),
     defaultValues: {
@@ -84,6 +89,36 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
       const fallbackMessage =
         parsedError.global?.[0] ?? 'Failed to submit question. Please try again.';
       toast.error(fallbackMessage);
+    }
+  };
+
+  const handleImproveDescription = async () => {
+    const currentDescription = form.getValues('description')?.trim();
+
+    if (!currentDescription || currentDescription.length < 10) {
+      form.setError('description', {
+        type: 'manual',
+        message: 'Please write at least 10 characters before using AI.',
+      });
+      return;
+    }
+
+    try {
+      const result = await modifyDescriptionMutation.mutateAsync({
+        description: currentDescription,
+      });
+      form.setValue('description', result.improved_description, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      form.clearErrors('description');
+      toast.success('Description improved with AI');
+    } catch (error) {
+      const parsedError = parseDjangoError(error);
+      const message =
+        parsedError.global?.[0] ??
+        'Unable to improve description right now. Please try again.';
+      toast.error(message);
     }
   };
 
@@ -148,9 +183,26 @@ export default function AskQuestion({ btnChild }: ASkQuestionProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-md font-medium text-gray-700">
-                    Description
-                  </FormLabel>
+                  <div className="flex items-center justify-between gap-2">
+                    <FormLabel className="text-md font-medium text-gray-700">
+                      Description
+                    </FormLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleImproveDescription}
+                      disabled={
+                        modifyDescriptionMutation.isPending ||
+                        createQuestionMutation.isPending
+                      }
+                    >
+                      <WandSparkles className="h-4 w-4" />
+                      {modifyDescriptionMutation.isPending
+                        ? 'Improving...'
+                        : 'Improve with AI'}
+                    </Button>
+                  </div>
                   <FormControl>
                     <Textarea
                       placeholder="Explain your question in detail..."
