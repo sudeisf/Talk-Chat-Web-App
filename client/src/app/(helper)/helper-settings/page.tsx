@@ -21,8 +21,8 @@ export default function SettingsPage() {
           <Settings className="h-6 w-6 text-foreground" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground">Customize your learning experience</p>
+          <h1 className="text-3xl font-bold text-foreground">Helper Settings</h1>
+          <p className="text-muted-foreground">Customize your helper workspace and preferences</p>
         </div>
       </div>
 

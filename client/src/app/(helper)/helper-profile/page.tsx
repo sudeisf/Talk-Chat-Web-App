@@ -129,12 +129,12 @@ export default function HelperProfilePage() {
     : [];
 
   return (
-    <div className=" max-w-6xl mx-auto p-4 mb-4 ">
+    <div className="max-w-6xl mx-auto p-4 mb-4 bg-background text-foreground">
       {/* cover image section */}
-      <div className="relative h-[200px]  ">
-        <div className="w-full h-full ">
+      <div className="relative h-[200px]">
+        <div className="w-full h-full">
           {coverImage ? (
-            <div className="relative w-full h-full rounded-t-md overflow-hidden bg-gray-100">
+            <div className="relative w-full h-full rounded-t-md overflow-hidden bg-muted">
               <img
                 src={coverImage}
                 alt="cover image"
@@ -153,9 +153,9 @@ export default function HelperProfilePage() {
         </div>
 
         {/* profile Card */}
-        <div className="  rounded-lg px-4 py-6 w-full border-b ">
-          <div className="absolute bottom-0  top-22 z-10 left-10 ">
-            <Avatar className="w-[150px] h-[150px] border-8 border-white">
+        <div className="rounded-lg px-4 py-6 w-full border-x border-b border-border bg-card text-card-foreground">
+          <div className="absolute bottom-0 top-20 z-10 left-10">
+            <Avatar className="w-[150px] h-[150px] border-8 border-background">
               <AvatarImage src={profileImage || userInfo.avatar} />
               <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
             </Avatar>
@@ -164,15 +164,15 @@ export default function HelperProfilePage() {
           </div>
 
           <div className="flex justify-between">
-            <div className="pt-5  space-y-2">
+            <div className="pt-5 space-y-2">
               <h1 className="text-2xl font-pt font-bold">{displayName}</h1>
-              <p className="text-md text-gray-500">{displayRole}</p>
-              <p className="text-md text-gray-500">{displayLocation}</p>
+              <p className="text-md text-muted-foreground">{displayRole}</p>
+              <p className="text-md text-muted-foreground">{displayLocation}</p>
               <div>
-                <h1 className="text-md py-2 font-medium flex items-center gap-2 text-gray-700">
+                <h1 className="text-md py-2 font-medium flex items-center gap-2 text-foreground">
                   Bio <Pen className="w-4 h-4" />
                 </h1>
-                <p className="text-md text-gray-500 max-w-md leading-relaxed">
+                <p className="text-md text-muted-foreground max-w-md leading-relaxed">
                   {displayBio}
                 </p>
               </div>
@@ -190,28 +190,28 @@ export default function HelperProfilePage() {
             </div>
             <div className="flex flex-col gap-2 justify-between">
               <div className="flex flex-col items-end gap-2">
-                <h1 className="font-pt text-md flex text-gray-500 gap-2 w-fit">
+                <h1 className="font-pt text-md flex text-muted-foreground gap-2 w-fit">
                   Current role <Briefcase className="w-4 h-4" />
                 </h1>
-                <h2 className="rounded-full bg-gray-100 text-sm p-2 font-pt capitalize font-medium px-2">
+                <h2 className="rounded-full bg-muted text-sm p-2 font-pt capitalize font-medium px-2">
                   {currentRole}
                 </h2>
               </div>
               <div className=" flex flex-col items-end gap-2">
-                <h1 className="capitalize flex gap-2 items-center text-gray-500">
+                <h1 className="capitalize flex gap-2 items-center text-muted-foreground">
                   skills <Star className="w-4 h-4" />
                 </h1>
-                <div className="flex flex-wrap gap-2 items-">
+                <div className="flex flex-wrap gap-2 items-center">
                   {displaySkills.length > 0 ? (
                     displaySkills.map((skill: string, index: number) => (
                       <div key={index}>
-                        <p className="bg-gray-100 p-2 text-sm w-fit rounded-full font-pt font-medium">
+                        <p className="bg-muted p-2 text-sm w-fit rounded-full font-pt font-medium text-foreground">
                           {skill}
                         </p>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">No skills added yet</p>
+                    <p className="text-sm text-muted-foreground">No skills added yet</p>
                   )}
                 </div>
               </div>
@@ -247,58 +247,58 @@ export default function HelperProfilePage() {
             </Card>
             */}
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t p-4">
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-border p-4">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
                   <BookOpen className="h-8 w-8 text-[#03624c] mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-bold text-foreground">
                     {userInfo.HelpedLearners}
                   </h3>
-                  <p className="text-sm text-gray-600">Helped Learners</p>
+                  <p className="text-sm text-muted-foreground">Helped Learners</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
                   <User className="h-8 w-8 text-[#03624c] mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-bold text-foreground">
                     {userInfo.sessionsJoined || 24}
                   </h3>
-                  <p className="text-sm text-gray-600">Sessions Joined</p>
+                  <p className="text-sm text-muted-foreground">Sessions Joined</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
-                  <Clock className="h-8 w-8 text-[text-[#03624c]] mb-2" />
+                  <Clock className="h-8 w-8 text-[#03624c] mb-2" />
                   <h3 className="text-2xl font-bold text-[#03624c]">
                     {userInfo.ongoingSessions || 3}
                   </h3>
-                  <p className="text-sm text-gray-600">Ongoing Sessions</p>
+                  <p className="text-sm text-muted-foreground">Ongoing Sessions</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-xs border rounded-xl bg-white/95 backdrop-blur-sm hover:shadow-xl transition-shadow">
+            <Card className="shadow-xs border border-border rounded-xl bg-card hover:shadow-xl transition-shadow">
               <CardContent className="p-6 text-center">
                 <div className="flex flex-col items-center">
                   <TimerIcon className="h-8 w-8 text-[#03624c] mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-bold text-foreground">
                     {userInfo.avargeResponseTime || 18}{' '}
                     <span className="text-[.96rem]">min</span>
                   </h3>
-                  <p className="text-sm text-gray-600">Avg. Respone</p>
+                  <p className="text-sm text-muted-foreground">Avg. Respone</p>
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
-        <div className="flex flex-row-reverse gap-4 w-full pt-4 mx-auto border-t  max-w-6xl">
+        <div className="flex flex-row-reverse gap-4 w-full pt-4 mx-auto border-t border-border max-w-6xl">
           <HistoryOfQuestions />
           <RecentQuestionsTimelineProfile questions={timelineQuestions} />
         </div>

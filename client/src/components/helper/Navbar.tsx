@@ -3,11 +3,13 @@ import Link from 'next/link';
 import Logo from '../../../public/svg/logo.svg';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
+import { Bell, LogOut, Moon, Search, Settings, Sun, User } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useEffect, useState } from 'react';
 import { getCurrentUser, logoutUser } from '@/lib/api/authApi';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setTheme } from '@/redux/slice/appearanceSlice';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,12 +31,28 @@ const Pages = [
     name: 'sessions',
     url: '/sessions',
   },
+  {
+    name: 'settings',
+    url: '/helper-settings',
+  },
 ];
 
 export default function Navbar() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const themePreference = useAppSelector((state) => state.appearance.theme);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('U');
+
+  const isDarkMode =
+    themePreference === 'dark' ||
+    (themePreference === 'system' &&
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const handleThemeToggle = () => {
+    dispatch(setTheme(isDarkMode ? 'light' : 'dark'));
+  };
 
   const handleLogout = async () => {
     try {
@@ -103,6 +121,19 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-4 items-center">
+          <button
+            type="button"
+            onClick={handleThemeToggle}
+            className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-border bg-background hover:bg-accent transition-colors"
+            aria-label="Toggle theme"
+            title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDarkMode ? (
+              <Sun className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <Moon className="w-4 h-4 text-muted-foreground" />
+            )}
+          </button>
           <Link href={'/helper-notfications'}>
             <Bell className="w-5 h-5 text-gray-500" />
           </Link>
@@ -123,7 +154,7 @@ export default function Navbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings" className="cursor-pointer">
+                <Link href="/helper-settings" className="cursor-pointer">
                   <Settings className="w-4 h-4" />
                   Settings
                 </Link>
