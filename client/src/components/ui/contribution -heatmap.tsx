@@ -14,6 +14,26 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const updateTheme = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     // Set current year on client side only
     setCurrentYear(new Date().getFullYear());
@@ -101,6 +121,22 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
     0
   );
 
+  const panelColors = isDarkMode
+    ? {
+        0: '#161b22',
+        2: '#0e4429',
+        8: '#006d32',
+        16: '#26a641',
+        24: '#39d353',
+      }
+    : {
+        0: '#ebedf0',
+        2: '#9be9a8',
+        8: '#40c463',
+        16: '#30a14e',
+        24: '#216e39',
+      };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -159,13 +195,7 @@ export function ContributionHeatmap({ userId }: { userId: string }) {
               rx: 2,
             }}
             legendCellSize={0}
-            panelColors={{
-              0: '#ebedf0',
-              2: '#9be9a8',
-              8: '#40c463',
-              16: '#30a14e',
-              24: '#216e39',
-            }}
+            panelColors={panelColors}
             weekLabels={['', 'Mon', '', 'Wed', '', 'Fri', '']}
             monthLabels={[
               'Jan',

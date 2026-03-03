@@ -55,26 +55,11 @@ export default function HelperDashboard() {
           <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
             <span>Less</span>
             <div className="flex gap-1">
-              <div
-                className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: '#ebedf0' }}
-              />
-              <div
-                className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: '#9be9a8' }}
-              />
-              <div
-                className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: '#40c463' }}
-              />
-              <div
-                className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: '#30a14e' }}
-              />
-              <div
-                className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: '#216e39' }}
-              />
+              <div className="w-3 h-3 rounded-sm bg-[#ebedf0] dark:bg-[#161b22]" />
+              <div className="w-3 h-3 rounded-sm bg-[#9be9a8] dark:bg-[#0e4429]" />
+              <div className="w-3 h-3 rounded-sm bg-[#40c463] dark:bg-[#006d32]" />
+              <div className="w-3 h-3 rounded-sm bg-[#30a14e] dark:bg-[#26a641]" />
+              <div className="w-3 h-3 rounded-sm bg-[#216e39] dark:bg-[#39d353]" />
             </div>
             <span>More</span>
           </div>
