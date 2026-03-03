@@ -6,7 +6,7 @@ import { Bookmark, CheckCircle, Clock, MessageSquare } from 'lucide-react';
 
 export default function HelperDashboard() {
   return (
-    <div className="w-full max-w-7xl mx-auto min-h-screen bg-white p-4">
+    <div className="w-full max-w-7xl mx-auto min-h-screen bg-background text-foreground p-4">
       <GreetingCard btnName={'Start Helping'} name={'sudeis'} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
         <SummaryCard
@@ -40,9 +40,9 @@ export default function HelperDashboard() {
 
       <div className="flex w-full">
         <TotalSessionsChart />
-        <div className="rounded-lg w-full  bg-card p-6">
+        <div className="rounded-lg w-full bg-card text-card-foreground p-6 border border-border">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold text-[#03624C]  mb-1">
+            <h2 className="text-xl font-semibold text-foreground mb-1">
               Sudeis
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -78,7 +78,7 @@ export default function HelperDashboard() {
             </div>
             <span>More</span>
           </div>
-          <div className="mt-2 text-md text-muted-foreground">
+          <div className="mt-2 text-sm text-muted-foreground">
             Tip: Select a year to filter the heat map. Hover a day to see the
             exact contribution count.
           </div>

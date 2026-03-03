@@ -25,10 +25,10 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
     <button
       onClick={onClick}
       className={cn(
-        "group relative overflow-hidden rounded-lg p-4 text-left",
-        "border-1 border-gray-600",
-        "bg-white shadow-sm hover:shadow-[0_8px_10px_rgba(3,98,76,0.25)]",
-        isSelected ? "border-[#03624C] bg-green-50" : "border-border",
+        "group relative overflow-hidden rounded-lg p-5 text-left",
+        "border border-border",
+        "bg-card text-card-foreground shadow-sm hover:shadow-[0_8px_10px_rgba(3,98,76,0.25)]",
+        isSelected ? "border-[#03624C] bg-[#03624C]/8" : "border-border",
          "transition-all duration-200"
       )}
     >
@@ -44,7 +44,7 @@ function RoleCard({ title, description, isSelected, onClick, illustration, accen
 
         {/* Text Content */}
         <h3 className="text-xl font-semibold text-foreground mb-1 font-sans">{title}</h3>
-        <p className="text-sm text-muted-foreground mb-4 leading-relaxed font-sans">{description}</p>
+        <p className="text-sm text-foreground/75 mb-4 leading-relaxed font-sans">{description}</p>
 
         {/* Selection indicator */}
         <div className="flex items-center gap-2">
@@ -103,14 +103,14 @@ export default function CompleteProfile() {
   }
 
   return (
-    <div className="flex items-center mt-10 justify-center bg-white px-4 font-sans">
+    <div className="flex items-center justify-center px-6 py-12 bg-background font-sans min-h-[calc(100vh-6rem)]">
       <div className="w-full max-w-2xl">
         {/* Header Section */}
-        <div className="text-center mb-15">
+        <div className="text-center mb-10">
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-2">
             <span className="text-balance font-sans">Complete your profile</span>
           </h1>
-          <p className="text-md text-muted-foreground">Choose your role to personalize your learning experience</p>
+          <p className="text-md text-foreground/70">Choose your role to personalize your learning experience</p>
         </div>
 
         {/* Cards Section */}
@@ -169,8 +169,8 @@ export default function CompleteProfile() {
         </div>
 
         {/* Footer Section */}
-        <div className="flex flex-col font-sans font-semibold sm:flex-row gap-3 justify-between items-center">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col font-sans font-semibold sm:flex-row gap-3 justify-between items-center pt-2">
+          <p className="text-sm text-foreground/70">
             {selectedRole
               ? `You selected -> ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
               : "Select a role to continue"}
