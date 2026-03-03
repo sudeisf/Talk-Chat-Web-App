@@ -6,8 +6,13 @@ import { BookOpen, MoreVertical, Mic, Play, Square } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageInput } from '@/components/helper/inputBox';
+import {
+  MessageInput,
+  type OutgoingChatMessage,
+} from '@/components/helper/inputBox';
 import Memebers from '@/components/learner/Memebers';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const userInfo = {
   name: 'Sudeis Fedlu',
@@ -66,12 +71,14 @@ const currentSession = {
 interface Message {
   id: string;
   text?: string;
-  type: 'text' | 'voice';
+  type: 'text' | 'voice' | 'code';
   sender: 'user' | 'other';
   timestamp: Date;
   avatar?: string;
   name: string;
   audioUrl?: string;
+  codeSnippet?: string;
+  codeLanguage?: string;
 }
 
 // simple emoji-only check
@@ -137,17 +144,21 @@ export default function sessionBox() {
     ]);
   }, []);
 
-  const handleSendTextMessage = (text: string) => {
-    if (!text.trim()) return;
+  const handleSendTextMessage = (payload: OutgoingChatMessage) => {
+    if (!payload.message.trim() && !payload.code_snippet?.trim()) return;
+
+    const isCode = payload.message_type === 'code';
     setMessages((prev) => [
       ...prev,
       {
         id: (prev.length + 1).toString(),
-        text,
-        type: 'text',
+        text: isCode ? 'Code snippet' : payload.message,
+        type: isCode ? 'code' : 'text',
         sender: 'user',
         timestamp: new Date(),
         name: 'Instructor',
+        codeSnippet: payload.code_snippet,
+        codeLanguage: payload.code_language,
       },
     ]);
   };
@@ -246,7 +257,7 @@ export default function sessionBox() {
       {/* Input Area */}
       <MessageInput
         onVoiceMessage={handleVoiceMessage}
-        onSendText={handleSendTextMessage}
+        onSendMessage={handleSendTextMessage}
       />
     </div>
   );
@@ -328,6 +339,29 @@ function ChatMessageRow({
               <p className="text-sm leading-relaxed">{message.text}</p>
             </div>
           )
+        )}
+
+        {/* code bubble */}
+        {message.type === 'code' && message.codeSnippet && (
+          <div className="w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <div className="px-3 py-1 text-[11px] text-gray-500 border-b border-gray-200">
+              {message.codeLanguage || 'code'}
+            </div>
+            <SyntaxHighlighter
+              language={message.codeLanguage || 'javascript'}
+              style={oneDark}
+              customStyle={{
+                margin: 0,
+                borderRadius: 0,
+                background: 'transparent',
+                fontSize: '0.8rem',
+              }}
+              showLineNumbers
+              wrapLongLines
+            >
+              {message.codeSnippet}
+            </SyntaxHighlighter>
+          </div>
         )}
 
         {/* voice bubble */}

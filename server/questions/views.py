@@ -79,5 +79,3 @@ class AcceptInvitation(APIView):
 class CreateQuestionView(generics.CreateAPIView):
     serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-    # DRF passes 'request' context to serializer automatically

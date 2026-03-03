@@ -316,10 +316,81 @@ const VoiceRecorder = forwardRef(function VoiceRecorder(
 
 type MessageInputProps = {
   onVoiceMessage?: (audioBlob: Blob) => void;
+  onSendMessage?: (payload: OutgoingChatMessage) => void;
   onSendText?: (text: string) => void;
 };
 
-export function MessageInput({ onVoiceMessage, onSendText }: MessageInputProps) {
+export type OutgoingChatMessage = {
+  type: 'message';
+  message: string;
+  message_type: 'text' | 'code';
+  code_snippet?: string;
+  code_language?: string;
+};
+
+const CODE_FENCE_REGEX = /```([\w#+.-]*)\n([\s\S]*?)```/m;
+
+function detectCodePayload(rawMessage: string): OutgoingChatMessage {
+  const trimmed = rawMessage.trim();
+  const fenced = trimmed.match(CODE_FENCE_REGEX);
+
+  if (fenced) {
+    const language = fenced[1]?.trim() || undefined;
+    const snippet = fenced[2]?.trim();
+    if (snippet) {
+      return {
+        type: 'message',
+        message: 'Code snippet',
+        message_type: 'code',
+        code_snippet: snippet,
+        code_language: language,
+      };
+    }
+  }
+
+  const looksMultiline = trimmed.includes('\n');
+  const codeIndicators = [
+    '=>',
+    'function ',
+    'const ',
+    'let ',
+    'var ',
+    'class ',
+    'def ',
+    'import ',
+    'return ',
+    '{',
+    '}',
+    ';',
+    '</',
+  ];
+
+  const indicatorCount = codeIndicators.reduce(
+    (count, indicator) => count + (trimmed.includes(indicator) ? 1 : 0),
+    0
+  );
+
+  if (looksMultiline && indicatorCount >= 2) {
+    return {
+      type: 'message',
+      message: 'Code snippet',
+      message_type: 'code',
+      code_snippet: trimmed,
+    };
+  }
+
+  return {
+    type: 'message',
+    message: trimmed,
+    message_type: 'text',
+  };
+}
+
+export function MessageInput({
+  onVoiceMessage,
+  onSendMessage,
+  onSendText,
+}: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -335,7 +406,11 @@ export function MessageInput({ onVoiceMessage, onSendText }: MessageInputProps) 
   const handleSendText = () => {
     const trimmed = message.trim();
     if (!trimmed) return;
+
+    const payload = detectCodePayload(trimmed);
+    onSendMessage?.(payload);
     onSendText?.(trimmed);
+
     setMessage('');
   };
 
