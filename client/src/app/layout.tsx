@@ -5,7 +5,6 @@ import ReduxProvider from '@/providers/ReduxProvider';
 import QueryProvider from '@/providers/QueryProvider';
 import { Toaster } from 'sonner';
 import GoogleProvider from '@/providers/GoogleProvider';
-import { fontVariables, inter } from '@/lib/fonts';
 import PrelineScriptWrapper from '@/components/PrelineScriptWrapper';
 
 export const metadata: Metadata = {
@@ -19,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={fontVariables}>
-      <body suppressHydrationWarning className={`antialiased  ${inter.className}`}>
+    <html lang="en">
+      <body suppressHydrationWarning className="antialiased">
         <ReduxProvider>
           <QueryProvider>
             <GoogleProvider>
