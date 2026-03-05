@@ -21,7 +21,7 @@ from django.conf import settings
 import requests
 from django.contrib.auth import get_user_model
 from django.middleware.csrf import get_token
-from django.db import IntegrityError
+from django.db import IntegrityError, OperationalError
 
 
 
@@ -169,16 +169,28 @@ class GoogleLoginAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        google_client_id = settings.GOOGLE_CLIENT_ID or os.environ.get("NEXT_PUBLIC_GOOGLE_CLIENT_ID")
+        if not google_client_id:
+            return Response(
+                {"error": "Google OAuth is not configured on server"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         try:
             idinfo = id_token.verify_oauth2_token(
                 id_token_str,
                 google_requests.Request(),
-                settings.GOOGLE_CLIENT_ID 
+                google_client_id
             )
         except ValueError as e:
             return Response(
                 {"error": "Invalid token", "details": str(e)},
                 status=status.HTTP_401_UNAUTHORIZED
+            )
+        except Exception as e:
+            return Response(
+                {"error": "Could not verify Google token", "details": str(e)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
         try:
@@ -196,6 +208,12 @@ class GoogleLoginAPIView(APIView):
                 )
 
             google_sub = idinfo.get("sub")
+            if not google_sub:
+                return Response(
+                    {"error": "Google subject (sub) not provided"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             first_name = idinfo.get("given_name", "")
             last_name = idinfo.get("family_name", "")
 
@@ -208,6 +226,14 @@ class GoogleLoginAPIView(APIView):
                 )
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except OperationalError:
+                return Response(
+                    {
+                        "error": "Database unavailable",
+                        "details": "Could not connect to the database. Check PostgreSQL service and DATABASE_URL.",
+                    },
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
 
             login(request, user)
             needs_profile_completion = _needs_profile_completion(user)
@@ -228,6 +254,14 @@ class GoogleLoginAPIView(APIView):
                 response.set_cookie("role", user.role, max_age=60 * 60 * 24)
             return response
 
+        except OperationalError:
+            return Response(
+                {
+                    "error": "Database unavailable",
+                    "details": "Could not connect to the database. Check PostgreSQL service and DATABASE_URL.",
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         except Exception as e:
             return Response(
                 {"error": "Authentication failed", "details": str(e)},
