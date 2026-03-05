@@ -52,10 +52,10 @@ def find_and_invite_experts(question_id):
                 QuestionInvite.objects.create(question=question, expert=expert)
                 Notification.objects.create(
                     user=expert,
-                    notification_type=Notification.NotificationType.HELPER_ANNOUNCEMENT,
-                    title='New question match',
-                    message=f'You were invited to help with: "{question.title}"',
-                    question=question,
+                    notification_type='question_announcement', 
+                    title="New Gig Available!",
+                    message=f"Topic: {question.title}. Reward: {question.bounty_points} pts.",
+                    question=question 
                 )
             except IntegrityError:
                 continue
