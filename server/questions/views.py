@@ -495,3 +495,33 @@ class HelperProfileOverviewView(APIView):
 		serializer = HelperProfileOverviewSerializer(data=payload)
 		serializer.is_valid(raise_exception=True)
 		return Response(serializer.validated_data)
+
+class JoinQuestionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, question_id):
+        question = get_object_or_404(Question, id=question_id)
+        user = request.user
+
+        # 1. Security Check: Was this user actually invited?
+        # (Optional: Depending on how strict you want to be)
+        invite = QuestionInvite.objects.filter(question=question, expert=user).first()
+        if not invite:
+            return Response({"error": "You were not invited."}, status=403)
+
+        # 2. Get Chat Session
+        session, created = ChatSession.objects.get_or_create(question=question)
+
+        # 3. Check Capacity
+        if session.participants.count() >= 2: # Limit to 2 experts + 1 learner
+            return Response({"error": "Room is full."}, status=400)
+
+        # 4. Add User to Session
+        session.participants.add(user)
+        
+        # 5. Update Status
+        if question.status == 'searching':
+            question.status = 'ongoing'
+            question.save()
+
+        return Response({"message": "Joined successfully", "session_id": session.id})

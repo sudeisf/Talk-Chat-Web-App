@@ -9,6 +9,7 @@ from .views import (
     ModifyQuestionDescriptionView,
     MyQuestionsListView,
     RecentActivityView,
+    JoinQuestionView
 )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path("helper-contributions/", HelperContributionsView.as_view(), name="helper-contributions"),
     path("modify-description/", ModifyQuestionDescriptionView.as_view(), name="modify-question-description"),
     path("recent-activity/", RecentActivityView.as_view(), name="recent-activity"),
+    path('<int:question_id>/join/', JoinQuestionView.as_view(), name='join-question'),
 ]
