@@ -34,21 +34,20 @@ export default function GitHubCallback() {
     API.post('/users/auth/github/', { code }, { withCredentials: true })
       .then((res) => {
         toast.success('Logged in via GitHub');
-        const mustCompleteProfile =
-          res.data?.created === true ||
-          res.data?.next === '/complete-profile' ||
-          res.data?.profile_completed === false ||
-          res.data?.user?.role == null;
         const role = res.data?.user?.role;
         const roleDashboardMap: Record<string, string> = {
           learner: '/learner-dashboard',
           helper: '/dashboard',
         };
 
-        if (mustCompleteProfile) {
-          router.replace('/complete-profile');
-        } else if (role && roleDashboardMap[role]) {
+        // Role is the source of truth for completion in OAuth flows.
+        if (role && roleDashboardMap[role]) {
           router.replace(roleDashboardMap[role]);
+        } else if (
+          res.data?.next === '/complete-profile' ||
+          res.data?.profile_completed === false
+        ) {
+          router.replace('/complete-profile');
         } else {
           router.replace('/');
         }

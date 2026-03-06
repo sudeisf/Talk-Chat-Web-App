@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import {
   clearReadNotifications,
   deleteNotificationById,
@@ -98,6 +99,34 @@ const mapApiNotification = (item: NotificationApiItem): Notification => ({
   priority: mapPriority(item.notification_type),
 });
 
+const mapSocketNotification = (raw: {
+  id: number;
+  notification_type: string;
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}): Notification => ({
+  id: String(raw.id),
+  type: mapNotificationType(raw.notification_type),
+  title: raw.title,
+  message: raw.message,
+  timestamp: toRelativeTime(raw.created_at),
+  isRead: raw.is_read,
+  priority: mapPriority(raw.notification_type),
+});
+
+const getNotificationWebSocketUrl = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  try {
+    const parsed = new URL(apiUrl);
+    const wsProtocol = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${wsProtocol}//${parsed.host}/ws/notifications/`;
+  } catch {
+    return 'ws://localhost:8000/ws/notifications/';
+  }
+};
+
 export function NotificationProvider({
   children,
 }: {
@@ -132,10 +161,28 @@ export function NotificationProvider({
     const connect = () => {
       if (disposed) return;
 
-      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-      websocket = new WebSocket(`${protocol}://${window.location.host}/ws/notifications/`);
+      websocket = new WebSocket(getNotificationWebSocketUrl());
 
-      websocket.onmessage = () => {
+      websocket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          const socketData = payload?.data;
+
+          if (socketData?.id && socketData?.notification_type) {
+            const incoming = mapSocketNotification(socketData);
+            setNotifications((prev) => {
+              const deduped = prev.filter((item) => item.id !== incoming.id);
+              return [incoming, ...deduped];
+            });
+            toast.success(incoming.title, {
+              description: incoming.message,
+            });
+            return;
+          }
+        } catch {
+          // Fall back to API refresh when payload is not in expected format.
+        }
+
         loadNotifications();
       };
 
@@ -154,7 +201,7 @@ export function NotificationProvider({
       }
       websocket?.close();
     };
-  }, []);
+  }, [loadNotifications]);
 
   const addNotification = (
     notification: Omit<Notification, 'id' | 'timestamp'>

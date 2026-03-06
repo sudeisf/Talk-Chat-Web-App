@@ -10,6 +10,7 @@ import { getCurrentUser, logoutUser } from '@/lib/api/authApi';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setTheme } from '@/redux/slice/appearanceSlice';
+import { useNotifications } from '@/contexts/NotificationContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +41,7 @@ const Pages = [
 export default function Navbar() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { unreadCount } = useNotifications();
   const themePreference = useAppSelector((state) => state.appearance.theme);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('U');
@@ -134,8 +136,13 @@ export default function Navbar() {
               <Moon className="w-4 h-4 text-muted-foreground" />
             )}
           </button>
-          <Link href={'/helper-notfications'}>
+          <Link href={'/helper-notfications'} className="relative">
             <Bell className="w-5 h-5 text-gray-500" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center leading-none">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

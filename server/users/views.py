@@ -35,8 +35,20 @@ User = get_user_model()
 
 
 def _needs_profile_completion(user):
-    required_fields = ["first_name", "last_name", "role"]
-    return any(not getattr(user, field, None) for field in required_fields)
+    # Respect explicit completion state set by the profile/role flow.
+    if getattr(user, "profile_completed", False):
+        return False
+
+    # Role is mandatory for all users.
+    if not getattr(user, "role", None):
+        return True
+
+    # For email/password users keep strict name requirement.
+    if getattr(user, "login_method", None) == User.LoginMethod.EMAIL:
+        return not bool(getattr(user, "first_name", None) and getattr(user, "last_name", None))
+
+    # OAuth users may not provide names reliably; role is enough.
+    return False
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
@@ -435,8 +447,7 @@ class GithubLoginAPIView(APIView):
 
         login(request, user)
         needs_profile_completion = _needs_profile_completion(user)
-        role_missing = not bool(getattr(user, "role", None))
-        must_complete_profile = needs_profile_completion or role_missing
+        must_complete_profile = needs_profile_completion
         response = Response({
             "status": "success",
             "user": {
