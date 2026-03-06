@@ -27,9 +27,9 @@ from .serializers import (
 	HelperProfileOverviewSerializer,
 	QuestionSerializer,
 )
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 
-from .models import Question , QuestionInvite
+from .models import Question, QuestionInvite, QuestionVote
 from notifications.models import Notification
 from chat.models import ChatMessage, ChatSession, MessageReaction
 from .serializers import QuestionListSerializer
@@ -531,6 +531,60 @@ class JoinQuestionView(APIView):
             question.save()
 
         return Response({"message": "Joined successfully", "session_id": session.id})
+
+
+class VoteQuestionView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	def post(self, request, question_id):
+		question = get_object_or_404(Question, id=question_id)
+		vote_type = request.data.get('vote_type')
+
+		if vote_type not in ['UP', 'DOWN']:
+			return Response({"error": "Invalid vote type"}, status=status.HTTP_400_BAD_REQUEST)
+
+		existing_vote = QuestionVote.objects.filter(
+			user=request.user,
+			question=question,
+		).first()
+
+		if existing_vote:
+			if existing_vote.vote_type == vote_type:
+				existing_vote.delete()
+				message = "Vote removed"
+			else:
+				existing_vote.vote_type = vote_type
+				existing_vote.save()
+				message = "Vote switched"
+		else:
+			QuestionVote.objects.create(
+				user=request.user,
+				question=question,
+				vote_type=vote_type,
+			)
+			message = "Voted successfully"
+
+		upvotes_count = QuestionVote.objects.filter(question=question, vote_type='UP').count()
+		downvotes_count = QuestionVote.objects.filter(question=question, vote_type='DOWN').count()
+		Question.objects.filter(id=question.id).update(
+			upvotes=upvotes_count,
+			downvotes=downvotes_count,
+		)
+
+		my_vote = QuestionVote.objects.filter(
+			user=request.user,
+			question=question,
+		).values_list('vote_type', flat=True).first()
+
+		return Response(
+			{
+				"message": message,
+				"upvotes": upvotes_count,
+				"downvotes": downvotes_count,
+				"my_vote": my_vote,
+			},
+			status=status.HTTP_200_OK,
+		)
     
 class PublicQuestionListView(generics.ListAPIView):
     queryset = Question.objects.all().order_by('-created_at')

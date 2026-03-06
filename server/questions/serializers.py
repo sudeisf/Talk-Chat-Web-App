@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Question
+from .models import Question, QuestionVote
 from users.models import Tag  # Assuming you have a Tag model
 from notifications.models import Notification
 from celery import chain
@@ -10,10 +10,21 @@ class QuestionSerializer(serializers.ModelSerializer):
         child=serializers.CharField(max_length=50), 
         write_only=True
     )
+    my_vote = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
-        fields = ['id', 'title', 'description', 'tags', 'created_at']
+        fields = ['id', 'title', 'description', 'tags', 'created_at', 'upvotes', 'downvotes', 'my_vote'] 
+        
+    def get_my_vote(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            try:
+                vote = obj.votes.get(user=user)
+                return vote.vote_type 
+            except QuestionVote.DoesNotExist:
+                return None
+        return None
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
@@ -120,13 +131,15 @@ class QuestionListSerializer(serializers.ModelSerializer):
     has_summary = serializers.SerializerMethodField()
     participant_count = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    my_vote = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
         fields = [
             'id', 'title', 'description', 'status', 'bounty_points', 
             'created_at', 'asked_by_username', 'is_full', 
-            'am_i_joined', 'has_summary', 'participant_count', 'tags'
+            'am_i_joined', 'has_summary', 'participant_count', 'tags',
+            'upvotes', 'downvotes', 'my_vote'
         ]
 
     def get_tags(self, obj):
@@ -159,3 +172,14 @@ class QuestionListSerializer(serializers.ModelSerializer):
 
     def get_has_summary(self, obj):
         return hasattr(obj, 'solution_summary')
+
+    def get_my_vote(self, obj):
+        user = self.context.get('request').user
+        if not user or not user.is_authenticated:
+            return None
+        try:
+            vote = obj.votes.get(user=user)
+            return vote.vote_type
+        except QuestionVote.DoesNotExist:
+            return None
+    

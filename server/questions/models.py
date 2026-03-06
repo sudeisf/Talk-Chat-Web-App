@@ -80,3 +80,19 @@ class SolutionSummary(models.Model):
     
     def __str__(self):
         return f"Summary for {self.question.title}"
+    
+    
+class QuestionVote(models.Model):
+    VOTE_CHOICES = (
+        ('UP', 'Upvote'),
+        ('DOWN', 'Downvote'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_votes')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='votes')
+    vote_type = models.CharField(max_length=4, choices=VOTE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Crucial: Ensures one user = one vote per question
+        unique_together = ('user', 'question')

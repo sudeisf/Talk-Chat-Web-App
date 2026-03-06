@@ -13,6 +13,7 @@ import {
   useJoinQuestionMutation,
   useQuestionFeedQuery,
   useRecentActivityQuery,
+  useVoteQuestionMutation,
 } from '@/query/questionMutation';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -33,6 +34,7 @@ export default function QuestionsPage() {
   const { data: recentActivity, isLoading: isRecentLoading } =
     useRecentActivityQuery(8);
   const { mutateAsync: joinQuestion } = useJoinQuestionMutation();
+  const { mutateAsync: voteQuestion } = useVoteQuestionMutation();
 
   const toRelative = (value: string) => {
     const date = new Date(value);
@@ -70,8 +72,14 @@ export default function QuestionsPage() {
         createdDate: toRelative(question.created_at),
         lastActivity: toRelative(question.created_at),
         answerCount: question.participant_count || 0,
-        upvotes: question.bounty_points || 0,
-        downvotes: 0,
+        upvotes: question.upvotes || 0,
+        downvotes: question.downvotes || 0,
+        userVote:
+          question.my_vote === 'UP'
+            ? ('up' as const)
+            : question.my_vote === 'DOWN'
+              ? ('down' as const)
+              : null,
         user: {
           name: question.asked_by_username || 'Learner',
         },
@@ -165,12 +173,22 @@ export default function QuestionsPage() {
     console.log('Bookmark toggled:', id, bookmarked);
   };
 
-  const handleUpvote = (id: string) => {
-    console.log('Upvote question:', id);
+  const handleUpvote = async (id: string) => {
+    try {
+      await voteQuestion({ questionId: Number(id), voteType: 'UP' });
+    } catch (error: any) {
+      const apiMessage = error?.response?.data?.error;
+      toast.error(apiMessage || 'Unable to apply upvote right now.');
+    }
   };
 
-  const handleDownvote = (id: string) => {
-    console.log('Downvote question:', id);
+  const handleDownvote = async (id: string) => {
+    try {
+      await voteQuestion({ questionId: Number(id), voteType: 'DOWN' });
+    } catch (error: any) {
+      const apiMessage = error?.response?.data?.error;
+      toast.error(apiMessage || 'Unable to apply downvote right now.');
+    }
   };
 
   const handleSortChange = (newSortBy: string) => {

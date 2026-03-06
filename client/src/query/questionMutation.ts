@@ -10,6 +10,7 @@ import {
   getRecentActivity,
   joinQuestion,
   modifyQuestionDescription,
+  voteQuestion,
 } from '@/lib/api/questionApi';
 import { CreateQuestionPayload, ModifyDescriptionPayload } from '@/types/question';
 import { queryClient } from './queryClient';
@@ -85,6 +86,17 @@ export const useJoinQuestionMutation = () => {
   return useMutation({
     mutationKey: ['join-question'],
     mutationFn: (questionId: number) => joinQuestion(questionId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['question-feed'] });
+    },
+  });
+};
+
+export const useVoteQuestionMutation = () => {
+  return useMutation({
+    mutationKey: ['vote-question'],
+    mutationFn: ({ questionId, voteType }: { questionId: number; voteType: 'UP' | 'DOWN' }) =>
+      voteQuestion(questionId, voteType),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['question-feed'] });
     },

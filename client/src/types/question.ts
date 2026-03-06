@@ -83,6 +83,9 @@ export interface QuestionFeedItem {
   has_summary: boolean;
   participant_count: number;
   tags: Array<string | number | { id?: number; name?: string }>;
+  upvotes: number;
+  downvotes: number;
+  my_vote: 'UP' | 'DOWN' | null;
 }
 
 export interface RecentActivityItem {
@@ -101,4 +104,15 @@ export interface RecentActivityResponse {
 export interface JoinQuestionResponse {
   message: string;
   session_id: number;
+}
+
+export interface VoteQuestionPayload {
+  vote_type: 'UP' | 'DOWN';
+}
+
+export interface VoteQuestionResponse {
+  message: string;
+  upvotes: number;
+  downvotes: number;
+  my_vote: 'UP' | 'DOWN' | null;
 }

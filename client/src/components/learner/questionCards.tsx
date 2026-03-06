@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -89,6 +89,11 @@ export function QuestionCard({
     userVote
   );
   const [voteCount, setVoteCount] = useState(upvotes - downvotes);
+
+  useEffect(() => {
+    setCurrentVote(userVote);
+    setVoteCount(upvotes - downvotes);
+  }, [userVote, upvotes, downvotes]);
 
   const handleBookmarkClick = () => {
     const newBookmarked = !bookmarked;

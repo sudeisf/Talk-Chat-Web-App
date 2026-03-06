@@ -12,6 +12,7 @@ import {
   QuestionFeedItem,
   QuestionResponse,
   RecentActivityResponse,
+  VoteQuestionResponse,
 } from '@/types/question';
 
 export const createQuestion = async (payload: CreateQuestionPayload) => {
@@ -106,6 +107,19 @@ export const joinQuestion = async (questionId: number) => {
   const response = await API.post<JoinQuestionResponse>(
     `/questions/${questionId}/join/`,
     {},
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data;
+};
+
+export const voteQuestion = async (questionId: number, voteType: 'UP' | 'DOWN') => {
+  const response = await API.post<VoteQuestionResponse>(
+    `/questions/${questionId}/vote/`,
+    {
+      vote_type: voteType,
+    },
     {
       withCredentials: true,
     }
