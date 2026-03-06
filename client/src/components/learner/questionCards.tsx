@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -100,7 +100,10 @@ export function QuestionCard({
     onTitleClick?.(id);
   };
 
-  const handleContinueClick = () => {
+  const handleContinueClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (onContinueClick) {
+      event.preventDefault();
+    }
     onContinueClick?.(id);
   };
 

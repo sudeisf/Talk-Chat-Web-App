@@ -6,6 +6,9 @@ import {
   getHelperProfileOverview,
   getHelperSessionsChart,
   getMyQuestions,
+  getQuestionFeed,
+  getRecentActivity,
+  joinQuestion,
   modifyQuestionDescription,
 } from '@/lib/api/questionApi';
 import { CreateQuestionPayload, ModifyDescriptionPayload } from '@/types/question';
@@ -61,5 +64,29 @@ export const useHelperProfileOverviewQuery = () => {
   return useQuery({
     queryKey: ['helper-profile-overview'],
     queryFn: getHelperProfileOverview,
+  });
+};
+
+export const useQuestionFeedQuery = () => {
+  return useQuery({
+    queryKey: ['question-feed'],
+    queryFn: getQuestionFeed,
+  });
+};
+
+export const useRecentActivityQuery = (limit = 8) => {
+  return useQuery({
+    queryKey: ['recent-activity', limit],
+    queryFn: () => getRecentActivity(limit),
+  });
+};
+
+export const useJoinQuestionMutation = () => {
+  return useMutation({
+    mutationKey: ['join-question'],
+    mutationFn: (questionId: number) => joinQuestion(questionId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['question-feed'] });
+    },
   });
 };

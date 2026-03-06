@@ -8,6 +8,7 @@ from .views import (
     HelperSessionsChartView,
     ModifyQuestionDescriptionView,
     MyQuestionsListView,
+    PublicQuestionListView,
     RecentActivityView,
     JoinQuestionView
 )
@@ -22,4 +23,5 @@ urlpatterns = [
     path("modify-description/", ModifyQuestionDescriptionView.as_view(), name="modify-question-description"),
     path("recent-activity/", RecentActivityView.as_view(), name="recent-activity"),
     path('<int:question_id>/join/', JoinQuestionView.as_view(), name='join-question'),
+    path('feed/', PublicQuestionListView.as_view(), name='question-feed'),
 ]

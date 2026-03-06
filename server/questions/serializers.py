@@ -111,3 +111,51 @@ class HelperProfileOverviewSerializer(serializers.Serializer):
     sessions_joined = serializers.IntegerField()
     ongoing_sessions = serializers.IntegerField()
     average_response_minutes = serializers.FloatField()
+    
+    
+class QuestionListSerializer(serializers.ModelSerializer):
+    asked_by_username = serializers.CharField(source='asked_by.username', read_only=True)
+    is_full = serializers.SerializerMethodField()
+    am_i_joined = serializers.SerializerMethodField()
+    has_summary = serializers.SerializerMethodField()
+    participant_count = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Question
+        fields = [
+            'id', 'title', 'description', 'status', 'bounty_points', 
+            'created_at', 'asked_by_username', 'is_full', 
+            'am_i_joined', 'has_summary', 'participant_count', 'tags'
+        ]
+
+    def get_tags(self, obj):
+        return list(obj.tags.values_list('name', flat=True))
+
+    def get_is_full(self, obj):
+        # Check if the associated chat session is at capacity
+        if hasattr(obj, 'chat_session'):
+            current = obj.chat_session.participants.count()
+            # Assuming max is 2 experts + 1 learner = 3
+            # Or use obj.chat_session.max_participants if you added that field
+            return current >= 2 
+        return False
+
+    def get_participant_count(self, obj):
+        if hasattr(obj, 'chat_session'):
+            return obj.chat_session.participants.count()
+        return 0
+
+    def get_am_i_joined(self, obj):
+        # Check if the requesting user is already in the chat
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        if obj.asked_by == user:
+            return True # The asker is always "joined"
+        if hasattr(obj, 'chat_session'):
+             return obj.chat_session.participants.filter(id=user.id).exists()
+        return False
+
+    def get_has_summary(self, obj):
+        return hasattr(obj, 'solution_summary')

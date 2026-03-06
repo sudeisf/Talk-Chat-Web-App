@@ -69,3 +69,36 @@ export interface HelperProfileOverviewResponse {
   ongoing_sessions: number;
   average_response_minutes: number;
 }
+
+export interface QuestionFeedItem {
+  id: number;
+  title: string;
+  description: string;
+  status: 'searching' | 'ongoing' | 'answered' | 'closed';
+  bounty_points: number;
+  created_at: string;
+  asked_by_username: string;
+  is_full: boolean;
+  am_i_joined: boolean;
+  has_summary: boolean;
+  participant_count: number;
+  tags: Array<string | number | { id?: number; name?: string }>;
+}
+
+export interface RecentActivityItem {
+  id: number;
+  title: string;
+  status: 'searching' | 'ongoing' | 'answered' | 'closed';
+  timeAgo: string;
+  answerCount: number;
+  upvotes: number;
+}
+
+export interface RecentActivityResponse {
+  items: RecentActivityItem[];
+}
+
+export interface JoinQuestionResponse {
+  message: string;
+  session_id: number;
+}

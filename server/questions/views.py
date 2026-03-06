@@ -1,3 +1,5 @@
+from warnings import filters
+
 from django.db.models import Count
 from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404
@@ -30,6 +32,10 @@ from rest_framework import generics, permissions
 from .models import Question , QuestionInvite
 from notifications.models import Notification
 from chat.models import ChatMessage, ChatSession, MessageReaction
+from .serializers import QuestionListSerializer
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import QuestionFilter
 
 
 logger = logging.getLogger(__name__)
@@ -525,3 +531,24 @@ class JoinQuestionView(APIView):
             question.save()
 
         return Response({"message": "Joined successfully", "session_id": session.id})
+    
+class PublicQuestionListView(generics.ListAPIView):
+    queryset = Question.objects.all().order_by('-created_at')
+    serializer_class = QuestionListSerializer
+    permission_classes = [permissions.AllowAny]
+
+    # 1. Activate the Backends
+    filter_backends = [
+        DjangoFilterBackend, # Handles Tags & Dates
+        filters.SearchFilter, # Handles Text Search (Title/Desc)
+        filters.OrderingFilter # Handles Sorting
+    ]
+
+    # 2. Connect the Custom Filter Class
+    filterset_class = QuestionFilter
+
+    # 3. Configure Text Search
+    search_fields = ['title', 'description']
+    
+    # 4. Configure Sorting
+    ordering_fields = ['created_at', 'bounty_points']

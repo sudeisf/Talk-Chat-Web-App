@@ -3,147 +3,162 @@
 import { DateRangePicker } from '@/components/learner/date-range-picker';
 import { QuestionCard } from '@/components/learner/questionCards';
 import { QuestionCounterSorter } from '@/components/learner/questionCount';
-import QuestionSearchBar from '@/components/learner/QuestionSearchBar';
 import { PaginationDemo } from '@/components/learner/QuestionsPaginations';
 import { RecentQuestionsTimeline } from '@/components/learner/RecentQuestionsTimeline';
 import { SelectedTagsDisplay } from '@/components/learner/selected-tag-display';
 import { Tag, TagsFilterSelect } from '@/components/learner/tags-filter-select';
-import { Pagination } from '@/components/ui/pagination';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-import { useState } from 'react';
-
-const sampleTags: Tag[] = [
-  { id: '1', label: 'React', color: '#61DAFB' },
-  { id: '2', label: 'TypeScript', color: '#3178C6' },
-  { id: '3', label: 'Next.js', color: '#000000' },
-  { id: '4', label: 'Tailwind CSS', color: '#06B6D4' },
-  { id: '5', label: 'JavaScript', color: '#F7DF1E' },
-  { id: '6', label: 'Node.js', color: '#339933' },
-  { id: '7', label: 'Python', color: '#3776AB' },
-  { id: '8', label: 'Design', color: '#FF6B6B' },
-  { id: '9', label: 'UI/UX', color: '#4ECDC4' },
-  { id: '10', label: 'Frontend', color: '#9B59B6' },
-  { id: '11', label: 'Backend', color: '#E67E22' },
-  { id: '12', label: 'Database', color: '#2ECC71' },
-];
-
-const sampleQuestions = [
-  {
-    id: '1',
-    title:
-      'How to implement server-side rendering with Next.js 14 and TypeScript?',
-    description:
-      "I'm trying to set up SSR in my Next.js 14 project with TypeScript but running into hydration issues. The components render differently on server and client, causing mismatches and console warnings.",
-    contributors: [
-      { name: 'Mike Johnson', avatar: '/generic-user-avatar.png' },
-      { name: 'Lisa Wang', avatar: '/database-expert.png' },
-      { name: 'Tom Brown' },
-    ],
-    additionalContributors: 24,
-    tags: ['Next.js', 'TypeScript', 'SSR'],
-    status: 'ongoing' as const,
-    createdDate: '2 days ago',
-    lastActivity: '1 hour ago',
-    answerCount: 3,
-    upvotes: 15,
-    downvotes: 2,
-    userVote: 'up' as const,
-    isBookmarked: true,
-    user: {
-      name: 'Sarah Chen',
-      avatar: '/generic-user-avatar.png',
-      reputation: 2847,
-    },
-  },
-  {
-    id: '2',
-    title: 'Best practices for state management in React applications',
-    description:
-      'Looking for guidance on choosing between Redux, Zustand, and Context API for a medium-sized React app. Need to understand performance implications and when to use each approach.',
-    contributors: [
-      { name: 'David Lee', avatar: '/database-expert.png' },
-      { name: 'Emma Davis' },
-      { name: 'Chris Wilson', avatar: '/generic-user-avatar.png' },
-    ],
-    additionalContributors: 18,
-    tags: ['React', 'State Management', 'Redux'],
-    status: 'answered' as const,
-    createdDate: '1 week ago',
-    lastActivity: '3 days ago',
-    answerCount: 7,
-    upvotes: 28,
-    downvotes: 1,
-    userVote: null,
-    isBookmarked: false,
-    user: {
-      name: 'Alex Rodriguez',
-      avatar: '/database-expert.png',
-      reputation: 5432,
-    },
-  },
-  {
-    id: '3',
-    title: 'Database design patterns for scalable web applications',
-    description:
-      'Working on a high-traffic web application and need advice on database architecture patterns. Considering microservices with separate databases vs monolithic approach with proper indexing strategies.',
-    contributors: [
-      { name: 'Rachel Green' },
-      { name: 'Kevin Park', avatar: '/generic-user-avatar.png' },
-    ],
-    additionalContributors: 31,
-    tags: ['Database', 'Architecture', 'Performance'],
-    status: 'closed' as const,
-    createdDate: '2 weeks ago',
-    lastActivity: '1 week ago',
-    answerCount: 12,
-    upvotes: 42,
-    downvotes: 5,
-    userVote: 'down' as const,
-    isBookmarked: true,
-    user: {
-      name: 'Jordan Kim',
-      reputation: 1205,
-    },
-  },
-];
-
-const timelineQuestions = [
-  {
-    id: 't1',
-    title: 'How to optimize React performance with useMemo?',
-    status: 'ongoing' as const,
-    timeAgo: '2 min ago',
-    answerCount: 1,
-    upvotes: 5,
-  },
-  {
-    id: 't2',
-    title: 'Best practices for API error handling in Next.js',
-    status: 'answered' as const,
-    timeAgo: '15 min ago',
-    answerCount: 3,
-    upvotes: 12,
-  },
-  {
-    id: 't3',
-    title: 'TypeScript generic constraints explained',
-    status: 'closed' as const,
-    timeAgo: '1 hour ago',
-    answerCount: 8,
-    upvotes: 24,
-  },
-];
+import {
+  useJoinQuestionMutation,
+  useQuestionFeedQuery,
+  useRecentActivityQuery,
+} from '@/query/questionMutation';
+import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function QuestionsPage() {
-  const [sortBy, setSortBy] = useState<string>('newest'); // Added missing state
+  const router = useRouter();
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [sortBy, setSortBy] = useState<string>('newest');
+
+  const {
+    data: feed = [],
+    isLoading: isFeedLoading,
+    isError: isFeedError,
+  } = useQuestionFeedQuery();
+  const { data: recentActivity, isLoading: isRecentLoading } =
+    useRecentActivityQuery(8);
+  const { mutateAsync: joinQuestion } = useJoinQuestionMutation();
+
+  const toRelative = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Just now';
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 5) return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+  };
+
+  const normalizedQuestions = useMemo(() => {
+    return feed.map((question) => {
+      const tags = (question.tags || [])
+        .map((tag) => {
+          if (typeof tag === 'string') return tag;
+          if (typeof tag === 'number') return `tag-${tag}`;
+          return tag?.name || (tag?.id ? `tag-${tag.id}` : '');
+        })
+        .filter(Boolean);
+
+      return {
+        id: String(question.id),
+        title: question.title,
+        description: question.description,
+        tags,
+        status: question.status === 'searching' ? 'ongoing' : question.status,
+        createdAt: question.created_at,
+        createdDate: toRelative(question.created_at),
+        lastActivity: toRelative(question.created_at),
+        answerCount: question.participant_count || 0,
+        upvotes: question.bounty_points || 0,
+        downvotes: 0,
+        user: {
+          name: question.asked_by_username || 'Learner',
+        },
+      } as const;
+    });
+  }, [feed]);
+
+  const availableTags = useMemo<Tag[]>(() => {
+    const tagSet = new Set<string>();
+    normalizedQuestions.forEach((question) => {
+      question.tags.forEach((tag) => tagSet.add(tag));
+    });
+
+    return Array.from(tagSet)
+      .sort((a, b) => a.localeCompare(b))
+      .map((label) => ({ id: label.toLowerCase(), label }));
+  }, [normalizedQuestions]);
+
+  const filteredQuestions = useMemo(() => {
+    const searched = normalizedQuestions.filter((question) => {
+      if (!searchValue.trim()) return true;
+      const search = searchValue.toLowerCase();
+      return (
+        question.title.toLowerCase().includes(search) ||
+        question.description.toLowerCase().includes(search)
+      );
+    });
+
+    if (!selectedTags.length) return searched;
+
+    return searched.filter((question) =>
+      selectedTags.every((selectedTag) =>
+        question.tags.some((questionTag) =>
+          questionTag.toLowerCase().includes(selectedTag.label.toLowerCase())
+        )
+      )
+    );
+  }, [normalizedQuestions, searchValue, selectedTags]);
+
+  const sortedQuestions = useMemo(() => {
+    const questions = [...filteredQuestions];
+    switch (sortBy) {
+      case 'oldest':
+        return questions.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      case 'most-upvoted':
+        return questions.sort((a, b) => b.upvotes - a.upvotes);
+      case 'most-answered':
+      case 'most-active':
+        return questions.sort((a, b) => b.answerCount - a.answerCount);
+      case 'unanswered':
+        return questions.filter((item) => item.answerCount === 0);
+      case 'newest':
+      default:
+        return questions.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+    }
+  }, [filteredQuestions, sortBy]);
+
+  const timelineQuestions = useMemo(() => {
+    return (recentActivity?.items || []).map((item) => ({
+      id: String(item.id),
+      title: item.title,
+      status: item.status === 'searching' ? 'ongoing' : item.status,
+      timeAgo: item.timeAgo,
+      answerCount: item.answerCount,
+      upvotes: item.upvotes,
+    }));
+  }, [recentActivity]);
 
   const handleTitleClick = (id: string) => {
     console.log('Navigate to question:', id);
   };
 
-  const handleContinueClick = (id: string) => {
-    console.log('Continue question:', id);
+  const handleContinueClick = async (id: string) => {
+    try {
+      const payload = await joinQuestion(Number(id));
+      toast.success('Session joined successfully');
+      router.push(`/sessions/${payload.session_id}`);
+    } catch (error: any) {
+      const apiMessage = error?.response?.data?.error;
+      toast.error(apiMessage || 'Unable to join this question right now.');
+    }
   };
 
   const handleBookmarkToggle = (id: string, bookmarked: boolean) => {
@@ -160,8 +175,6 @@ export default function QuestionsPage() {
 
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
-    console.log('Sort changed to:', newSortBy);
-    // Here you would implement the actual sorting logic
   };
 
   return (
@@ -171,27 +184,52 @@ export default function QuestionsPage() {
           Questions
         </h1>
         <div className="flex justify-evenly gap-4">
-          <QuestionSearchBar />
+          <div className="w-full max-w-md relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              value={searchValue}
+              onChange={(event) => setSearchValue(event.target.value)}
+              placeholder="Search questions..."
+              className="pl-10"
+            />
+          </div>
           <TagsFilterSelect
-            tags={sampleTags}
+            tags={availableTags}
+            selectedTags={selectedTags}
+            onChange={setSelectedTags}
             placeholder="Choose your tech stack..."
             selectedTagsContainerId="questions-page"
           />
           <DateRangePicker />
         </div>
         <div>
-          <SelectedTagsDisplay containerId="questions-page" />
+          <SelectedTagsDisplay
+            containerId="questions-page"
+            selectedTags={selectedTags}
+            onTagRemove={(tagId) =>
+              setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId))
+            }
+          />
         </div>
         <div className="flex gap-4">
           <div className="space-y-4 w-3/4">
             <QuestionCounterSorter
-              questionCount={sampleQuestions.length}
+              questionCount={sortedQuestions.length}
               onSortChange={handleSortChange}
             />
             <ScrollArea className="h-fit w-full p-2">
               <div className="space-y-4">
-                {sampleQuestions.length > 0 ? (
-                  sampleQuestions.map((question) => (
+                {isFeedLoading ? (
+                  <div className="text-center py-8 text-gray-500">
+                    Loading questions...
+                  </div>
+                ) : isFeedError ? (
+                  <div className="text-center py-8 text-red-500">
+                    Could not load question feed. Please refresh or restart backend.
+                  </div>
+                ) : sortedQuestions.length > 0 ? (
+                  sortedQuestions.map((question) => (
                     <QuestionCard
                       key={question.id}
                       {...question}
@@ -204,7 +242,7 @@ export default function QuestionsPage() {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    No questions found. Try adjusting your filters.
+                    No questions found. Try adjusting your filters or search.
                   </div>
                 )}
               </div>
@@ -212,7 +250,11 @@ export default function QuestionsPage() {
             <PaginationDemo />
           </div>
           <div>
-            <RecentQuestionsTimeline questions={timelineQuestions} />
+            {isRecentLoading ? (
+              <div className="text-sm text-gray-500">Loading activity...</div>
+            ) : (
+              <RecentQuestionsTimeline questions={timelineQuestions} />
+            )}
           </div>
         </div>
       </div>
