@@ -1,6 +1,6 @@
 from warnings import filters
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -79,7 +79,7 @@ def _fallback_improve_description(description: str) -> str:
 
 
 class RecentActivityView(APIView):
-	permission_classes = [AllowAny]
+	permission_classes = [permissions.IsAuthenticated]
 
 	def get(self, request):
 		try:
@@ -88,14 +88,21 @@ class RecentActivityView(APIView):
 			limit = 10
 
 		questions = (
-			Question.objects.annotate(answer_count=Count("chat_session__messages"))
-			.order_by("-created_at")[:limit]
+			Question.objects.filter(
+				Q(asked_by=request.user)
+				| Q(invites__expert=request.user, invites__status='ACCEPTED')
+				| Q(chat_session__participants=request.user)
+				| Q(votes__user=request.user)
+			)
+			.annotate(answer_count=Count("chat_session__messages", distinct=True))
+			.order_by("-updated_at")
+			.distinct()[:limit]
 		)
 
 		now = timezone.now()
 		data = []
 		for question in questions:
-			time_ago = timesince(question.created_at, now).split(",")[0] + " ago"
+			time_ago = timesince(question.updated_at, now).split(",")[0] + " ago"
 			data.append(
 				{
 					"id": question.id,

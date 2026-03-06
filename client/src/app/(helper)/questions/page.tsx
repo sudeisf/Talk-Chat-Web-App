@@ -32,7 +32,7 @@ export default function QuestionsPage() {
     isError: isFeedError,
   } = useQuestionFeedQuery();
   const { data: recentActivity, isLoading: isRecentLoading } =
-    useRecentActivityQuery(8);
+    useRecentActivityQuery(100);
   const { mutateAsync: joinQuestion } = useJoinQuestionMutation();
   const { mutateAsync: voteQuestion } = useVoteQuestionMutation();
 
@@ -143,7 +143,7 @@ export default function QuestionsPage() {
     }
   }, [filteredQuestions, sortBy]);
 
-  const timelineQuestions = useMemo(() => {
+  const allTimelineQuestions = useMemo(() => {
     return (recentActivity?.items || []).map((item) => ({
       id: String(item.id),
       title: item.title,
@@ -153,6 +153,11 @@ export default function QuestionsPage() {
       upvotes: item.upvotes,
     }));
   }, [recentActivity]);
+
+  const timelineQuestions = useMemo(
+    () => allTimelineQuestions.slice(0, 8),
+    [allTimelineQuestions]
+  );
 
   const handleTitleClick = (id: string) => {
     console.log('Navigate to question:', id);
@@ -271,7 +276,10 @@ export default function QuestionsPage() {
             {isRecentLoading ? (
               <div className="text-sm text-gray-500">Loading activity...</div>
             ) : (
-              <RecentQuestionsTimeline questions={timelineQuestions} />
+              <RecentQuestionsTimeline
+                questions={timelineQuestions}
+                allQuestions={allTimelineQuestions}
+              />
             )}
           </div>
         </div>
