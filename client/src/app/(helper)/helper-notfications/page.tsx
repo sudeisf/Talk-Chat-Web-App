@@ -6,16 +6,13 @@ import {
   Check,
   X,
   Clock,
-  AlertCircle,
   Info,
   MessageSquare,
   BookOpen,
-  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import {
   useNotifications,
   type Notification,
@@ -41,13 +38,13 @@ const getNotificationIcon = (type: Notification['type']) => {
 const getPriorityColor = (priority: Notification['priority']) => {
   switch (priority) {
     case 'high':
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-500/15 dark:text-red-300 dark:border-red-500/30';
     case 'medium':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-500/15 dark:text-yellow-300 dark:border-yellow-500/30';
     case 'low':
-      return 'bg-green-100 text-green-800 border-green-200';
+      return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-500/15 dark:text-green-300 dark:border-green-500/30';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-muted text-muted-foreground border-border';
   }
 };
 
@@ -74,11 +71,11 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="p-2  rounded-md">
-            <Bell className="h-6 w-6 text-black" />
+            <Bell className="h-6 w-6 text-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
+            <p className="text-muted-foreground">
               Stay updated with your learning progress
             </p>
           </div>
@@ -138,11 +135,11 @@ export default function NotificationsPage() {
         {filteredNotifications.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Bell className="h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <Bell className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 No notifications
               </h3>
-              <p className="text-gray-600 text-center">
+              <p className="text-muted-foreground text-center">
                 {filter === 'all'
                   ? "You're all caught up! No notifications at the moment."
                   : filter === 'unread'
@@ -154,7 +151,7 @@ export default function NotificationsPage() {
         ) : (
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+            <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-border"></div>
 
             {filteredNotifications.map((notification, index) => (
               <Card
@@ -168,7 +165,7 @@ export default function NotificationsPage() {
                       <div className="size-7 flex justify-center items-center">
                         <div
                           className={`size-2 rounded-full ${
-                            !notification.isRead ? 'bg-blue-500' : 'bg-gray-400'
+                            !notification.isRead ? 'bg-blue-500' : 'bg-muted-foreground/70'
                           }`}
                         ></div>
                       </div>
@@ -183,16 +180,16 @@ export default function NotificationsPage() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3
-                              className={`font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}
+                              className={`font-medium ${!notification.isRead ? 'text-foreground' : 'text-muted-foreground'}`}
                             >
                               {notification.title}
                             </h3>
                           </div>
-                          <p className="text-gray-600 text-sm mb-2">
+                          <p className="text-muted-foreground text-sm mb-2">
                             {notification.message}
                           </p>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-muted-foreground">
                               {notification.timestamp}
                             </span>
                             <Badge
@@ -219,7 +216,7 @@ export default function NotificationsPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => deleteNotification(notification.id)}
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -235,7 +232,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Notification Types Legend */}
-      <Card className="mt-8 border rounded-sm shadow-sm">
+      <Card className="mt-8 border border-border rounded-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Notification Types</CardTitle>
         </CardHeader>
@@ -243,27 +240,27 @@ export default function NotificationsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3">
               <MessageSquare className="h-5 w-5 text-blue-500" />
-              <span className="text-sm text-gray-600">Messages & Updates</span>
+              <span className="text-sm text-muted-foreground">Messages & Updates</span>
             </div>
             <div className="flex items-center gap-3">
               <Check className="h-5 w-5 text-green-500" />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-muted-foreground">
                 Achievements & Milestones
               </span>
             </div>
             <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-orange-500" />
-              <span className="text-sm text-gray-600">Reminders & Alerts</span>
+              <span className="text-sm text-muted-foreground">Reminders & Alerts</span>
             </div>
             <div className="flex items-center gap-3">
               <Info className="h-5 w-5 text-purple-500" />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-muted-foreground">
                 System Notifications
               </span>
             </div>
             <div className="flex items-center gap-3">
               <BookOpen className="h-5 w-5 text-indigo-500" />
-              <span className="text-sm text-gray-600">Study Progress</span>
+              <span className="text-sm text-muted-foreground">Study Progress</span>
             </div>
           </div>
         </CardContent>
