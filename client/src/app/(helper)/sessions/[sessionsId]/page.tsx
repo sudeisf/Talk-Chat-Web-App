@@ -183,9 +183,9 @@ export default function sessionBox() {
   }, [messages]);
 
   return (
-    <div className="flex rounded-lg border mt-4 mx-4 shadow-xs flex-col h-[calc(100vh-100px)]">
+    <div className="flex rounded-lg border border-border mt-4 mx-4 shadow-xs flex-col h-[calc(100vh-100px)] bg-background">
       {/* Message Header */}
-      <div className="px-4 py-2 border-b rounded-t-lg border-gray-200 bg-white shrink-0">
+      <div className="px-4 py-2 border-b rounded-t-lg border-border bg-card shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div className="flex jus items-center gap-2">
             <Avatar className="w-15 h-15 border-8 border-white">
@@ -193,7 +193,7 @@ export default function sessionBox() {
               <AvatarFallback>{userInfo.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="space-y-2">
-              <h2 className="font-medium text-md font-sans text-black">
+              <h2 className="font-medium text-md font-sans text-foreground">
                 {currentSession?.title ||
                   'How to integrate payment gateway in React?'}
               </h2>
@@ -201,7 +201,7 @@ export default function sessionBox() {
                 {currentSession?.category.map((cat, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs rounded-full"
+                    className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-full"
                   >
                     {cat}
                   </span>
@@ -210,8 +210,8 @@ export default function sessionBox() {
           </div>
             </div>
             <div className="flex flex-col justify-end items-end">
-                      <Button variant="ghost" size="icon" className="hover:bg-gray-100">
-                        <MoreVertical className="h-5 w-5 text-black" />
+                      <Button variant="ghost" size="icon" className="hover:bg-accent">
+                        <MoreVertical className="h-5 w-5 text-foreground" />
                       </Button>
                       <div className="space-y-3">
                         <Memebers participants={currentSession?.participants} />
@@ -224,20 +224,20 @@ export default function sessionBox() {
       {/* Message Area */}
       <ScrollArea className="flex-1 min-h-[400px] max-h-[calc(100vh-212px)]">
         <div
-          className="flex-1 p-4 space-y-4 bg-gray-50 overflow-y-auto"
+          className="flex-1 p-4 space-y-4 bg-muted/30 overflow-y-auto"
           style={{ scrollBehavior: 'smooth' }}
         >
           {currentSession?.description && (
-            <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+            <div className="bg-card border border-border rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#03624C] flex items-center justify-center flex-shrink-0">
                   <BookOpen className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-black mb-2">
+                  <h4 className="font-medium text-foreground mb-2">
                     Question Description
                   </h4>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {currentSession.description}
                   </p>
                 </div>
@@ -310,7 +310,7 @@ function ChatMessageRow({
               : '/placeholder.svg?height=32&width=32&query=professional woman avatar'
           }
         />
-        <AvatarFallback className="bg-gray-200 text-black text-xs">
+        <AvatarFallback className="bg-muted text-foreground text-xs">
           {message.sender === 'user' ? 'YU' : 'SC'}
         </AvatarFallback>
       </Avatar>
@@ -333,7 +333,7 @@ function ChatMessageRow({
                 'rounded-lg px-4 py-2 max-w-md break-words',
                 message.sender === 'user'
                   ? 'bg-[#03624C] text-white'
-                  : 'bg-white text-black border border-gray-200'
+                  : 'bg-card text-foreground border border-border'
               )}
             >
               <p className="text-sm leading-relaxed">{message.text}</p>
@@ -343,8 +343,8 @@ function ChatMessageRow({
 
         {/* code bubble */}
         {message.type === 'code' && message.codeSnippet && (
-          <div className="w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white">
-            <div className="px-3 py-1 text-[11px] text-gray-500 border-b border-gray-200">
+          <div className="w-full max-w-md overflow-hidden rounded-lg border border-border bg-card">
+            <div className="px-3 py-1 text-[11px] text-muted-foreground border-b border-border">
               {message.codeLanguage || 'code'}
             </div>
             <SyntaxHighlighter
@@ -372,7 +372,7 @@ function ChatMessageRow({
           />
         )}
 
-        <span className="text-xs text-gray-500 px-1">
+        <span className="text-xs text-muted-foreground px-1">
           {formatTime(message.timestamp)}
         </span>
       </div>
@@ -440,12 +440,12 @@ function VoiceMessageBubble({
   return (
     <div className="flex items-end gap-2 max-w-md w-full">
       {/* small gray mic circle */}
-      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-1">
-        <Mic className="w-4 h-4 text-gray-700" />
+      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center mr-1">
+        <Mic className="w-4 h-4 text-muted-foreground" />
       </div>
 
       {/* main pill */}
-      <div className="flex items-center w-[280px] bg-white rounded-full shadow-xs border border-gray-200 px-4 py-3">
+      <div className="flex items-center w-[280px] bg-card rounded-full shadow-xs border border-border px-4 py-3">
         {/* play button */}
         <button
           onClick={togglePlayback}
@@ -485,7 +485,7 @@ function VoiceMessageBubble({
         </div>
 
         {/* optional time label on the very right; remove if you don't want it */}
-        <span className="ml-3 text-[11px] text-gray-500">{timeLabel}</span>
+        <span className="ml-3 text-[11px] text-muted-foreground">{timeLabel}</span>
       </div>
 
       <audio

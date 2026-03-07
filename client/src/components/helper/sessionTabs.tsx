@@ -33,7 +33,7 @@ const tabs = [
 export default function SessionTabs() {
   return (
     <div
-      className="flex border rounded-lg mt-4 overflow-x-auto items-center gap-4 border-b px-2"
+      className="flex border border-border rounded-lg mt-4 overflow-x-auto items-center gap-4 px-2 bg-background"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
@@ -54,7 +54,7 @@ export default function SessionTabs() {
               ${
                 tab.active
                   ? 'border-[#03624C] text-[#03624C]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
           >
             <Icon className="w-5 h-5" />
@@ -64,7 +64,7 @@ export default function SessionTabs() {
                 className={`ml-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                   tab.active
                     ? 'bg-[#03624C]/10 text-[#03624C]'
-                    : 'bg-gray-200 text-gray-700'
+                    : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {tab.count}

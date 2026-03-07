@@ -55,31 +55,35 @@ export default function SessionsList() {
         <SearchSessions />
       </div>
       <SessionTabs />
-      <ScrollArea className="h-[calc(100vh-195px)] border rounded-lg mt-4">
+      <ScrollArea className="h-[calc(100vh-195px)] border border-border rounded-lg mt-4 bg-background">
         {ConvoList.map((convo, index) => {
           return (
             <div
               onClick={() => router.push('/sessions/1')}
               key={`convo-${index}`}
-              className={`p-4 flex flex-col gap-2 border-b ${convo.Active ? 'bg-gray-50' : ''}`}
+              className={`p-4 flex cursor-pointer flex-col gap-2 border-b border-border transition-colors ${
+                convo.Active
+                  ? 'bg-card dark:bg-neutral-900/90 border-l-2 border-l-[#03624C]'
+                  : 'bg-background hover:bg-muted/40'
+              }`}
             >
               <div className="flex justify-between">
                 <div className="flex gap-2">
                   {convo.tags.slice(0, 2).map((tag, index) => (
                     <span
                       key={`tag-${index}`}
-                      className="bg-orange-500/5 text-[#03624C] text-sm px-2 rounded-sm"
+                      className="bg-[#03624C]/12 text-[#03624C] text-sm px-2 rounded-sm"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500">{convo.Date}</p>
+                <p className="text-xs text-muted-foreground">{convo.Date}</p>
               </div>
-              <h1 className="text-md">{convo.title}</h1>
-              <div className="truncate text-sm w-full flex items-center justify-between text-gray-600">
+              <h1 className="text-md text-foreground">{convo.title}</h1>
+              <div className="truncate text-sm w-full flex items-center justify-between text-muted-foreground">
                 {convo.lastMessage}{' '}
-                <Dot className="w-10 h-10 strock-orange-500" />
+                <Dot className="w-8 h-8 text-muted-foreground" />
               </div>
             </div>
           );

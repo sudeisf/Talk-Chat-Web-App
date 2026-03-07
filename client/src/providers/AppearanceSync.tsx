@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { selectFontSizePreference, selectThemePreference, setTheme } from '@/redux/slice/appearanceSlice';
 
 const fontSizeMap = {
   small: '14px',
@@ -10,29 +11,21 @@ const fontSizeMap = {
 } as const;
 
 export default function AppearanceSync() {
-  const theme = useAppSelector((state) => state.appearance.theme);
-  const fontSize = useAppSelector((state) => state.appearance.fontSize);
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector(selectThemePreference);
+  const fontSize = useAppSelector(selectFontSizePreference);
+
+  useEffect(() => {
+    // Migrate legacy persisted `system` values into a fixed mode.
+    if ((theme as unknown as string) === 'system') {
+      dispatch(setTheme('dark'));
+    }
+  }, [dispatch, theme]);
 
   useEffect(() => {
     const root = document.documentElement;
-
-    const applyTheme = (resolvedTheme: 'light' | 'dark') => {
-      root.classList.toggle('dark', resolvedTheme === 'dark');
-    };
-
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      applyTheme(mediaQuery.matches ? 'dark' : 'light');
-
-      const onChange = (event: MediaQueryListEvent) => {
-        applyTheme(event.matches ? 'dark' : 'light');
-      };
-
-      mediaQuery.addEventListener('change', onChange);
-      return () => mediaQuery.removeEventListener('change', onChange);
-    }
-
-    applyTheme(theme);
+    const resolvedTheme = (theme as unknown as string) === 'system' ? 'dark' : theme;
+    root.classList.toggle('dark', resolvedTheme === 'dark');
   }, [theme]);
 
   useEffect(() => {

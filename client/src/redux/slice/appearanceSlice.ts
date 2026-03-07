@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
-export type ThemePreference = 'light' | 'dark' | 'system';
+export type ThemePreference = 'light' | 'dark';
 export type FontSizePreference = 'small' | 'medium' | 'large';
 
 interface AppearanceState {
@@ -10,7 +10,7 @@ interface AppearanceState {
 }
 
 const initialState: AppearanceState = {
-  theme: 'system',
+  theme: 'dark',
   fontSize: 'medium',
 };
 

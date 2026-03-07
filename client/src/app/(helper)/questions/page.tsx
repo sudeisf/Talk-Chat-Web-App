@@ -16,15 +16,36 @@ import {
   useVoteQuestionMutation,
 } from '@/query/questionMutation';
 import { Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function QuestionsPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [sortBy, setSortBy] = useState<string>('newest');
+  const queryFromUrl = (searchParams.get('q') || '').trim();
+
+  useEffect(() => {
+    setSearchValue(queryFromUrl);
+  }, [queryFromUrl]);
+
+  const updateSearchQuery = (nextValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const normalized = nextValue.trim();
+
+    if (normalized) {
+      params.set('q', normalized);
+    } else {
+      params.delete('q');
+    }
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  };
 
   const {
     data: feed = [],
@@ -213,6 +234,12 @@ export default function QuestionsPage() {
               type="text"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  updateSearchQuery(searchValue);
+                }
+              }}
               placeholder="Search questions..."
               className="pl-10"
             />

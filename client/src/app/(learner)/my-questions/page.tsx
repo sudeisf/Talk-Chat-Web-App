@@ -11,7 +11,8 @@ import { Tag, TagsFilterSelect } from '@/components/learner/tags-filter-select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useMyQuestionsQuery } from '@/query/questionMutation';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const sampleTags: Tag[] = [
   { id: '1', label: 'React', color: '#61DAFB' },
@@ -58,7 +59,31 @@ const timelineQuestions = [
 export default function MyQuestionPage() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [sortBy, setSortBy] = useState<string>('newest');
+  const [searchValue, setSearchValue] = useState('');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: myQuestions = [], isLoading } = useMyQuestionsQuery();
+
+  const queryFromUrl = (searchParams.get('q') || '').trim();
+
+  useEffect(() => {
+    setSearchValue(queryFromUrl);
+  }, [queryFromUrl]);
+
+  const updateSearchQuery = (nextValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const normalized = nextValue.trim();
+
+    if (normalized) {
+      params.set('q', normalized);
+    } else {
+      params.delete('q');
+    }
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  };
 
   const toRelative = (value: string) => {
     const date = new Date(value);
@@ -77,13 +102,30 @@ export default function MyQuestionPage() {
   };
 
   const filteredQuestions = myQuestions.filter((question) => {
-    if (!selectedTags.length) return true;
-    return selectedTags.every((selectedTag) =>
-      question.tags.some(
-        (questionTag) =>
-          questionTag.toLowerCase() === selectedTag.label.toLowerCase()
-      )
-    );
+    const matchesTags =
+      !selectedTags.length ||
+      selectedTags.every((selectedTag) =>
+        question.tags.some(
+          (questionTag) =>
+            questionTag.toLowerCase() === selectedTag.label.toLowerCase()
+        )
+      );
+
+    if (!matchesTags) return false;
+
+    if (!queryFromUrl) return true;
+
+    const normalizedQuery = queryFromUrl.toLowerCase();
+    const searchableText = [
+      question.title,
+      question.description,
+      ...question.tags,
+      question.status,
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return searchableText.includes(normalizedQuery);
   });
 
   const sortedQuestions = [...filteredQuestions].sort((a, b) => {
@@ -142,7 +184,11 @@ export default function MyQuestionPage() {
           My Questions
         </h1>
         <div className="flex justify-evenly gap-4">
-          <QuestionSearchBar />
+          <QuestionSearchBar
+            value={searchValue}
+            onChange={setSearchValue}
+            onSubmit={updateSearchQuery}
+          />
           <TagsFilterSelect
             tags={sampleTags}
             selectedTags={selectedTags}

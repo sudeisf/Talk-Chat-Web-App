@@ -24,29 +24,7 @@ export function AppNavbar() {
   const { unreadCount } = useNotifications();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('U');
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    const resolveTheme = () => {
-      if (theme === 'system') {
-        setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-        return;
-      }
-      setIsDarkMode(theme === 'dark');
-    };
-
-    resolveTheme();
-
-    if (theme !== 'system') return;
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = (event: MediaQueryListEvent) => {
-      setIsDarkMode(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', onChange);
-    return () => mediaQuery.removeEventListener('change', onChange);
-  }, [theme]);
+  const isDarkMode = theme === 'dark';
 
   const toggleTheme = () => {
     const nextTheme: ThemePreference = isDarkMode ? 'light' : 'dark';

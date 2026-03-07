@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Palette, Sun, Moon, Monitor, Text } from 'lucide-react';
+import { Palette, Sun, Moon, Text } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import {
@@ -17,7 +17,6 @@ import {
 const themeOptions = [
   { value: 'light', label: 'Light', icon: Sun },
   { value: 'dark', label: 'Dark', icon: Moon },
-  { value: 'system', label: 'System', icon: Monitor },
 ];
 
 const fontSizeOptions = [
@@ -43,7 +42,7 @@ export default function AppearanceSettings() {
         {/* Theme Selection */}
         <div className="space-y-3">
           <Label>Theme</Label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {themeOptions.map((option) => {
               const Icon = option.icon;
               return (

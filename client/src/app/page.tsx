@@ -80,33 +80,11 @@ export default function Home() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(selectThemePreference);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const isDarkMode = theme === 'dark';
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
   }, []);
-
-  useEffect(() => {
-    const resolveTheme = () => {
-      if (theme === 'system') {
-        setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-        return;
-      }
-      setIsDarkMode(theme === 'dark');
-    };
-
-    resolveTheme();
-
-    if (theme !== 'system') return;
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = (event: MediaQueryListEvent) => {
-      setIsDarkMode(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', onChange);
-    return () => mediaQuery.removeEventListener('change', onChange);
-  }, [theme]);
 
   const toggleTheme = () => {
     const nextTheme: ThemePreference = isDarkMode ? 'light' : 'dark';
