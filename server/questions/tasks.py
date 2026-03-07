@@ -38,13 +38,27 @@ def vectorize_question(question_id):
 def find_and_invite_experts(question_id):
     try:
         question = Question.objects.get(id=question_id)
+        helper_base_qs = User.objects.filter(role='helper').exclude(id=question.asked_by.id)
 
-        if question.embedding:
-            matched_experts = User.objects.filter(role='helper').exclude(id=question.asked_by.id).annotate(
+        tag_matched_experts = helper_base_qs.filter(
+            user_tags__tag__in=question.tags.all()
+        ).distinct()[:5]
+
+        matched_experts = list(tag_matched_experts)
+
+        if len(matched_experts) < 5:
+            remaining_slots = 5 - len(matched_experts)
+            excluded_ids = [expert.id for expert in matched_experts]
+            candidate_qs = helper_base_qs.exclude(id__in=excluded_ids)
+
+            if question.embedding:
+                candidates = candidate_qs.annotate(
                     distance=L2Distance('profile_embedding', question.embedding)
-                ).order_by('distance')[:5]
-        else:
-            matched_experts = User.objects.filter(role='helper').exclude(id=question.asked_by.id)[:5]
+                ).order_by('distance')[:remaining_slots]
+            else:
+                candidates = candidate_qs[:remaining_slots]
+
+            matched_experts.extend(list(candidates))
 
         
         for expert in matched_experts:

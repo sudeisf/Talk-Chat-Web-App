@@ -10,13 +10,23 @@ genai.configure(api_key=settings.GOOGLE_API_KEY)
 def update_user_embedding(user_id):
     try:
         user = User.objects.get(id=user_id)
-        
-        # Combine distinct fields to create a rich profile context
-        # Improvisation: Add 'profession' and 'tags' to the text
-        tags_str = ", ".join([t.name for t in user.user_tags.all()])
-        profile_text = f"{user.profession}. Skills: {tags_str}. Bio: {user.bio}"
-        
-        if not profile_text.strip(): return
+
+        tags_str = ", ".join(
+            [user_tag.tag.name for user_tag in user.user_tags.select_related('tag').all()]
+        )
+
+        profile_text = " ".join(
+            part
+            for part in [
+                user.profession or "",
+                f"Skills: {tags_str}" if tags_str else "",
+                f"Bio: {user.bio}" if user.bio else "",
+            ]
+            if part
+        ).strip()
+
+        if not profile_text:
+            return
 
         # Generate 768-dim vector using Gemini
         result = genai.embed_content(
@@ -26,7 +36,7 @@ def update_user_embedding(user_id):
         )
         
         user.profile_embedding = result['embedding']
-        user.save()
+        user.save(update_fields=['profile_embedding'])
         print(f"Updated vector for user: {user.username}")
         
     except Exception as e:

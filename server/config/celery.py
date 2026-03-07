@@ -3,11 +3,13 @@ from celery import Celery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
-app = Celery('config')
+app = Celery('config', include=['questions.tasks', 'users.tasks'])
 
-# Use actual settings module, not the literal string "DJANGO_SETTINGS_MODULE"
-app.config_from_object('config.settings', namespace='CELERY')
+# Load Celery settings through Django settings so installed apps are available.
+app.config_from_object('django.conf:settings', namespace='CELERY')
 
+# Make task registration robust across worker restarts and Windows environments.
+app.conf.imports = ('questions.tasks', 'users.tasks')
 app.autodiscover_tasks()
 
 @app.task(bind=True, ignore_result=True)

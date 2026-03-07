@@ -1,6 +1,6 @@
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import User
+from .models import User, UserTag
 from .tasks import update_user_embedding
 
 
@@ -10,7 +10,12 @@ def user_updated(sender, instance, created, **kwargs):
     if instance.bio or instance.profession:
         update_user_embedding.delay(instance.id)
         
-@receiver(m2m_changed, sender=User.user_tags.through)
-def tags_changed(sender, instance, action, **kwargs):
-    if action in ["post_add", "post_remove"]:
-        update_user_embedding.delay(instance.id)    
+@receiver(post_save, sender=UserTag)
+def user_tag_added(sender, instance, created, **kwargs):
+    if created:
+        update_user_embedding.delay(instance.user_id)
+
+
+@receiver(post_delete, sender=UserTag)
+def user_tag_removed(sender, instance, **kwargs):
+    update_user_embedding.delay(instance.user_id)

@@ -135,6 +135,7 @@ export function NotificationProvider({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notificationIdCounter, setNotificationIdCounter] = useState(1000);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasShownLoadErrorRef = useRef(false);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -142,9 +143,22 @@ export function NotificationProvider({
     getNotifications()
       .then((items) => {
         setNotifications(items.map(mapApiNotification));
+        hasShownLoadErrorRef.current = false;
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error('Failed to load notifications:', error);
+
+        if (hasShownLoadErrorRef.current) {
+          return;
+        }
+
+        const status = error?.response?.status;
+        if (status === 401 || status === 403) {
+          toast.error('Could not load notifications. Your session may have expired.');
+        } else {
+          toast.error('Could not load notifications right now.');
+        }
+        hasShownLoadErrorRef.current = true;
       });
   }, []);
 
