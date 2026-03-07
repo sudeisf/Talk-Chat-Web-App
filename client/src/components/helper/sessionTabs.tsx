@@ -3,34 +3,30 @@
 import { Archive, BookOpen, Star, User } from 'lucide-react';
 import { Button } from '../ui/button';
 
-const tabs = [
-  {
-    title: 'Active ',
-    icon: BookOpen,
-    count: 3,
-    active: true,
-  },
-  {
-    title: 'All ',
-    icon: User,
-    count: 5,
-    active: false,
-  },
-  {
-    title: 'Favorites',
-    icon: Star,
-    count: 0,
-    active: false,
-  },
-  {
-    title: 'Archived',
-    icon: Archive,
-    count: 0,
-    active: false,
-  },
+export type SessionTabKey = 'active' | 'all' | 'favorites' | 'archived';
+
+type SessionTabsProps = {
+  activeTab: SessionTabKey;
+  counts: Record<SessionTabKey, number>;
+  onTabChange: (tab: SessionTabKey) => void;
+};
+
+const tabs: Array<{
+  key: SessionTabKey;
+  title: string;
+  icon: typeof BookOpen;
+}> = [
+  { key: 'active', title: 'Active', icon: BookOpen },
+  { key: 'all', title: 'All', icon: User },
+  { key: 'favorites', title: 'Favorites', icon: Star },
+  { key: 'archived', title: 'Archived', icon: Archive },
 ];
 
-export default function SessionTabs() {
+export default function SessionTabs({
+  activeTab,
+  counts,
+  onTabChange,
+}: SessionTabsProps) {
   return (
     <div
       className="flex border border-border rounded-lg mt-4 overflow-x-auto items-center gap-4 px-2 bg-background"
@@ -46,28 +42,32 @@ export default function SessionTabs() {
       `}</style>
       {tabs.map((tab, index) => {
         const Icon = tab.icon;
+        const isActive = activeTab === tab.key;
+        const count = counts[tab.key] ?? 0;
+
         return (
           <Button
             key={`tab-${index}`}
             variant="ghost"
+            onClick={() => onTabChange(tab.key)}
             className={`relative flex items-center gap-2 rounded-none border-b-2 px-4 py-3 text-sm font-medium transition-colors
               ${
-                tab.active
+                isActive
                   ? 'border-[#03624C] text-[#03624C]'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
           >
             <Icon className="w-5 h-5" />
             {tab.title}
-            {tab.count > 0 && (
+            {count > 0 && (
               <span
                 className={`ml-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                  tab.active
+                  isActive
                     ? 'bg-[#03624C]/10 text-[#03624C]'
                     : 'bg-muted text-muted-foreground'
                 }`}
               >
-                {tab.count}
+                {count}
               </span>
             )}
           </Button>

@@ -116,3 +116,52 @@ export interface VoteQuestionResponse {
   downvotes: number;
   my_vote: 'UP' | 'DOWN' | null;
 }
+
+export interface ChatSessionListItem {
+  session_id: number;
+  question_id: number;
+  title: string;
+  description: string;
+  status: 'searching' | 'ongoing' | 'answered' | 'closed';
+  tags: string[];
+  participant_count: number;
+  is_active: boolean;
+  last_message: string | null;
+  last_message_at: string | null;
+  updated_at: string;
+}
+
+export interface ChatSessionMessageItem {
+  id: number;
+  message_content: string;
+  message_type: 'text' | 'image' | 'audio' | 'voice' | 'code' | 'link' | 'document' | 'other';
+  code_snippet: string | null;
+  file_url: string | null;
+  created_at: string;
+  sender: {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+  };
+  is_mine: boolean;
+}
+
+export interface ChatSessionParticipantItem {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+}
+
+export interface ChatSessionDetailResponse {
+  chat_session_id: number;
+  question_id: number;
+  title: string;
+  description: string;
+  status: 'searching' | 'ongoing' | 'answered' | 'closed';
+  tags: string[];
+  participants: ChatSessionParticipantItem[];
+  messages: ChatSessionMessageItem[];
+}

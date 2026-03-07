@@ -6,6 +6,7 @@ import { BookOpen, MoreVertical, Mic, Play, Square } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useParams } from 'next/navigation';
 import {
   MessageInput,
   type OutgoingChatMessage,
@@ -13,6 +14,7 @@ import {
 import Memebers from '@/components/learner/Memebers';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useChatSessionDetailQuery } from '@/query/questionMutation';
 
 const userInfo = {
   name: 'Sudeis Fedlu',
@@ -33,39 +35,6 @@ const userInfo = {
   level: 8,
   experience: 1250,
   correctAnswers: 200,
-};
-
-const currentSession = {
-  title: 'How to integrate payment gateway in React?',
-  category: ['Js', 'React', 'Typescript'],
-  description:
-    "I'm building an e-commerce application and need to implement secure payment processing. Looking for guidance on best practices for Stripe integration, handling payment flows, and managing transaction security in a React frontend.",
-  participants: [
-    {
-      avatar: 'https://github.com/shadcn.png',
-      initials: 'F',
-    },
-    {
-      avatar: 'https://github.com/adam-p.png',
-      initials: 'A',
-    },
-    {
-      avatar: 'https://github.com/mdo.png',
-      initials: 'M',
-    },
-    {
-      avatar: 'https://github.com/torvalds.png',
-      initials: 'L',
-    },
-    {
-      avatar: 'https://ui-avatars.com/api/?name=JS',
-      initials: 'J',
-    },
-    {
-      avatar: 'https://ui-avatars.com/api/?name=RK',
-      initials: 'R',
-    },
-  ],
 };
 
 interface Message {
@@ -94,6 +63,14 @@ const isEmojiOnly = (text?: string) => {
 };
 
 export default function sessionBox() {
+  const params = useParams<{ sessionsId: string }>();
+  const sessionId = Number(params?.sessionsId || 0);
+  const {
+    data: sessionDetail,
+    isLoading: isSessionLoading,
+    isError: isSessionError,
+  } = useChatSessionDetailQuery(sessionId);
+
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -103,46 +80,50 @@ export default function sessionBox() {
   };
 
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Set initial messages on client side only
-    setMessages([
-      {
-        id: '1',
-        text: "Hi! I'm trying to integrate Stripe payment gateway in my React app. Can you help me understand the best approach?",
-        type: 'text',
-        sender: 'other',
-        timestamp: new Date(Date.now() - 300000),
-        name: 'Alex Johnson',
-      },
-      {
-        id: '2',
-        text: "Let's start with the basics. First, you'll need to install the Stripe SDK and set up your API keys. Have you created a Stripe account yet?",
-        type: 'text',
-        sender: 'user',
-        timestamp: new Date(Date.now() - 240000),
-        name: 'Instructor',
-      },
-      {
-        id: '3',
-        text: "Yes, I have the account set up. I'm just not sure about the frontend implementation and how to handle the payment flow securely.",
-        type: 'text',
-        sender: 'other',
-        timestamp: new Date(Date.now() - 180000),
-        name: 'Alex Johnson',
-      },
-      {
-        id: '4',
-        text: 'Great! For the frontend, you\'ll want to use Stripe Elements for secure card input. Let me walk you through creating a payment form component...',
-        type: 'text',
-        sender: 'user',
-        timestamp: new Date(Date.now() - 120000),
-        name: 'Instructor',
-      },
-    ]);
-  }, []);
+    if (!sessionDetail) return;
+
+    const mappedMessages: Message[] = sessionDetail.messages.map((message) => {
+      const firstName = message.sender.first_name || '';
+      const lastName = message.sender.last_name || '';
+      const fallbackName = message.sender.username || 'User';
+      const resolvedName = `${firstName} ${lastName}`.trim() || fallbackName;
+      const isCode = message.message_type === 'code';
+      const isVoice = message.message_type === 'audio' || message.message_type === 'voice';
+
+      return {
+        id: String(message.id),
+        text: isCode ? 'Code snippet' : message.message_content,
+        type: isCode ? 'code' : isVoice ? 'voice' : 'text',
+        sender: message.is_mine ? 'user' : 'other',
+        timestamp: new Date(message.created_at),
+        name: resolvedName,
+        codeSnippet: message.code_snippet || undefined,
+        codeLanguage: isCode ? 'javascript' : undefined,
+        audioUrl: isVoice ? message.file_url || undefined : undefined,
+      };
+    });
+
+    setMessages(mappedMessages);
+  }, [sessionDetail]);
+
+  const memberParticipants =
+    sessionDetail?.participants.map((member) => {
+      const name = `${member.first_name || ''} ${member.last_name || ''}`.trim();
+      const display = name || member.username || 'U';
+      const initials = display
+        .split(' ')
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join('');
+
+      return {
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(display)}`,
+        initials: initials || 'U',
+      };
+    }) || [];
 
   const handleSendTextMessage = (payload: OutgoingChatMessage) => {
     if (!payload.message.trim() && !payload.code_snippet?.trim()) return;
@@ -184,6 +165,17 @@ export default function sessionBox() {
 
   return (
     <div className="flex rounded-lg border border-border mt-4 mx-4 shadow-xs flex-col h-[calc(100vh-100px)] bg-background">
+      {isSessionLoading && (
+        <div className="p-4 text-sm text-muted-foreground border-b border-border">
+          Loading session...
+        </div>
+      )}
+      {isSessionError && (
+        <div className="p-4 text-sm text-red-500 border-b border-border">
+          Could not load this session.
+        </div>
+      )}
+
       {/* Message Header */}
       <div className="px-4 py-2 border-b rounded-t-lg border-border bg-card shrink-0">
         <div className="flex items-center justify-between mb-3">
@@ -194,11 +186,11 @@ export default function sessionBox() {
             </Avatar>
             <div className="space-y-2">
               <h2 className="font-medium text-md font-sans text-foreground">
-                {currentSession?.title ||
+                {sessionDetail?.title ||
                   'How to integrate payment gateway in React?'}
               </h2>
               <div className="flex flex-wrap gap-2">
-                {currentSession?.category.map((cat, index) => (
+                {(sessionDetail?.tags || []).map((cat, index) => (
                   <span
                     key={index}
                     className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-full"
@@ -214,7 +206,7 @@ export default function sessionBox() {
                         <MoreVertical className="h-5 w-5 text-foreground" />
                       </Button>
                       <div className="space-y-3">
-                        <Memebers participants={currentSession?.participants} />
+                        <Memebers participants={memberParticipants} />
                       </div>
                   </div>
           </div>
@@ -227,7 +219,7 @@ export default function sessionBox() {
           className="flex-1 p-4 space-y-4 bg-muted/30 overflow-y-auto"
           style={{ scrollBehavior: 'smooth' }}
         >
-          {currentSession?.description && (
+          {sessionDetail?.description && (
             <div className="bg-card border border-border rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#03624C] flex items-center justify-center flex-shrink-0">
@@ -238,7 +230,7 @@ export default function sessionBox() {
                     Question Description
                   </h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {currentSession.description}
+                    {sessionDetail.description}
                   </p>
                 </div>
               </div>

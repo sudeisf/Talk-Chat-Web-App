@@ -1,4 +1,5 @@
 import API from './axiosInstance';
+import axios from 'axios';
 import {
   HelperContributionsResponse,
   CreateQuestionPayload,
@@ -9,6 +10,8 @@ import {
   ModifyDescriptionPayload,
   ModifyDescriptionResponse,
   MyQuestionItem,
+  ChatSessionListItem,
+  ChatSessionDetailResponse,
   QuestionFeedItem,
   QuestionResponse,
   RecentActivityResponse,
@@ -124,5 +127,31 @@ export const voteQuestion = async (questionId: number, voteType: 'UP' | 'DOWN') 
       withCredentials: true,
     }
   );
+  return response.data;
+};
+
+export const getChatSessions = async (searchQuery?: string) => {
+  try {
+    const response = await API.get<ChatSessionListItem[]>('/chat/sessions/', {
+      params: searchQuery ? { q: searchQuery } : undefined,
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const statusCode = error.response?.status;
+      // If backend route is unavailable or no list endpoint yet, show empty state.
+      if (statusCode === 404 || statusCode === 405) {
+        return [];
+      }
+    }
+    throw error;
+  }
+};
+
+export const getChatSessionDetail = async (sessionId: number) => {
+  const response = await API.get<ChatSessionDetailResponse>(`/chat/sessions/${sessionId}/`, {
+    withCredentials: true,
+  });
   return response.data;
 };

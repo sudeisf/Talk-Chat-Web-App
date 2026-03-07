@@ -5,6 +5,8 @@ import {
   getHelperDashboardStats,
   getHelperProfileOverview,
   getHelperSessionsChart,
+  getChatSessions,
+  getChatSessionDetail,
   getMyQuestions,
   getQuestionFeed,
   getRecentActivity,
@@ -100,5 +102,20 @@ export const useVoteQuestionMutation = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['question-feed'] });
     },
+  });
+};
+
+export const useChatSessionsQuery = (searchQuery: string) => {
+  return useQuery({
+    queryKey: ['chat-sessions', searchQuery],
+    queryFn: () => getChatSessions(searchQuery.trim() || undefined),
+  });
+};
+
+export const useChatSessionDetailQuery = (sessionId: number) => {
+  return useQuery({
+    queryKey: ['chat-session-detail', sessionId],
+    queryFn: () => getChatSessionDetail(sessionId),
+    enabled: Number.isFinite(sessionId) && sessionId > 0,
   });
 };
