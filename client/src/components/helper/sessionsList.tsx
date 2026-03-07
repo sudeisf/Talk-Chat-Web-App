@@ -1,6 +1,6 @@
 'use client';
 
-import { Dot, Star } from 'lucide-react';
+import { Dot, MessageCircle, Star } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import SearchSessions from './sessionsSearch';
 import { usePathname, useRouter } from 'next/navigation';
@@ -170,9 +170,14 @@ export default function SessionsList() {
         )}
 
         {!isLoading && !isError && searchedSessions.length === 0 && (
-          <div className="p-4 text-sm text-muted-foreground space-y-1">
-            <p className="text-foreground font-medium">{emptyState.title}</p>
-            <p>{emptyState.description}</p>
+          <div className="flex min-h-[250px] items-center justify-center p-6">
+            <div className="text-center space-y-2 max-w-[260px]">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#03624C]/12 text-[#03624C]">
+                <MessageCircle className="h-5 w-5" />
+              </div>
+              <p className="text-foreground font-medium">{emptyState.title}</p>
+              <p className="text-sm text-muted-foreground">{emptyState.description}</p>
+            </div>
           </div>
         )}
 

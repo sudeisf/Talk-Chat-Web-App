@@ -225,7 +225,7 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center justify-center gap-2">
-        <div ref={searchContainerRef} className="relative max-w-64">
+        <div ref={searchContainerRef} className="relative w-[20rem] md:w-[20rem] lg:w-[20rem]">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
