@@ -32,21 +32,21 @@ export default function SummaryCard({
       : 'bg-muted';
 
   return (
-    <div className="flex min-h-28 items-center border border-border p-5 gap-4 bg-card rounded-md">
-      <div className={`p-2.5 rounded-full bg-muted h-fit ${color}`}>
+    <div className="flex min-h-24 items-center border border-border p-4 gap-3 bg-card rounded-md">
+      <div className={`p-2 rounded-full bg-muted h-fit ${color}`}>
         {icon}
       </div>
-      <div className="space-y-1.5 min-w-0">
-        <p className="text-lg font-sans text-muted-foreground truncate">{title}</p>
+      <div className="space-y-1 min-w-0">
+        <p className="text-sm font-sans text-muted-foreground truncate">{title}</p>
         <div className="flex gap-2 items-center">
-          <h3 className={`text-4xl leading-none font-semibold ${color}`}>{value}</h3>
+          <h3 className={`text-2xl leading-none font-semibold ${color}`}>{value}</h3>
           <div
-            className={`flex ${trendColorClass} ${trendBgClass} min-w-[84px] rounded-full justify-center text-lg font-medium items-center px-2 py-1`}
+            className={`flex ${trendColorClass} ${trendBgClass} min-w-[72px] rounded-full justify-center text-sm font-medium items-center px-2 py-1`}
           >
             {isNegative ? (
-              <ArrowDown className="w-4 h-4" />
+              <ArrowDown className="w-3.5 h-3.5" />
             ) : (
-              <ArrowUp className="w-4 h-4" />
+              <ArrowUp className="w-3.5 h-3.5" />
             )}
             {Math.abs(percentage).toFixed(2)}%
           </div>
