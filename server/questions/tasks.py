@@ -1,5 +1,5 @@
 from celery import shared_task
-import google.generativeai as genai
+from google import genai
 from django.conf import settings
 from .models import Question, QuestionInvite, SolutionSummary
 from users.models import User
@@ -9,8 +9,35 @@ import json
 from django.db import IntegrityError
 from notifications.models import Notification
 
-# Configure the SDK once
-genai.configure(api_key=settings.GOOGLE_API_KEY)
+GENAI_CLIENT = (
+    genai.Client(api_key=settings.GOOGLE_API_KEY)
+    if getattr(settings, 'GOOGLE_API_KEY', None)
+    else None
+)
+
+
+def _extract_embedding_vector(result):
+    embeddings = getattr(result, 'embeddings', None)
+    if embeddings:
+        first = embeddings[0]
+        values = getattr(first, 'values', None)
+        if values:
+            return values
+
+    single_embedding = getattr(result, 'embedding', None)
+    if single_embedding:
+        values = getattr(single_embedding, 'values', None)
+        if values:
+            return values
+
+    if isinstance(result, dict):
+        if isinstance(result.get('embedding'), list):
+            return result['embedding']
+        dict_embeddings = result.get('embeddings')
+        if dict_embeddings and isinstance(dict_embeddings[0], dict):
+            return dict_embeddings[0].get('values')
+
+    return None
 
 
 @shared_task
@@ -20,14 +47,19 @@ def vectorize_question(question_id):
         question = Question.objects.get(id=question_id)
         text_to_embed = f"{question.title} {question.description}"
         
-        results = genai.embed_content(
-              model = "models/text-embedding-004",
-              content=text_to_embed,
-              task_type='retrieval_query'
+        if not GENAI_CLIENT:
+            return question_id
+
+        result = GENAI_CLIENT.models.embed_content(
+            model='text-embedding-004',
+            contents=text_to_embed,
+            config={'task_type': 'RETRIEVAL_QUERY'},
         )
-        
-        question.embedding = results['embedding']
-        question.save()
+
+        embedding_vector = _extract_embedding_vector(result)
+        if embedding_vector:
+            question.embedding = embedding_vector
+            question.save()
 
     except Exception as e:
         print(f"Error vectorizing question {question_id}: {str(e)}")
@@ -86,9 +118,6 @@ def summarize_chat_session(chat_session_id):
     
     chat_log = "\n".join([f"{msg.sender.username}: {msg.message_content}" for msg in messages])
     
-    # Configure Gemini 1.5 Flash (Fast & Free Tier available)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    
     prompt = f"""
     You are a technical documentation expert. Analyze this chat log.
     
@@ -104,7 +133,13 @@ def summarize_chat_session(chat_session_id):
     """
     
     try:
-        response = model.generate_content(prompt)
+        if not GENAI_CLIENT:
+            return
+
+        response = GENAI_CLIENT.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=prompt,
+        )
         clean_text = response.text.replace('```json', '').replace('```', '')
         data = json.loads(clean_text)
         

@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from urllib3 import request
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-import google.generativeai as genai
+from google import genai
 
 from .serializers import (
 	ModifyQuestionDescriptionSerializer,
@@ -190,7 +190,7 @@ class ModifyQuestionDescriptionView(APIView):
 			return Response(response_serializer.validated_data)
 
 		try:
-			genai.configure(api_key=api_key)
+			client = genai.Client(api_key=api_key)
 			prompt = (
 				"You are an assistant that improves technical question descriptions. "
 				"Rewrite the user's draft to be clearer, concise, and structured for helpers. "
@@ -211,8 +211,10 @@ class ModifyQuestionDescriptionView(APIView):
 
 			for model_name in model_names:
 				try:
-					model = genai.GenerativeModel(model_name)
-					result = model.generate_content(prompt)
+					result = client.models.generate_content(
+						model=model_name,
+						contents=prompt,
+					)
 					improved_text = (getattr(result, "text", "") or "").strip()
 
 					if improved_text:
