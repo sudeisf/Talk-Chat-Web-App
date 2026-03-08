@@ -3,6 +3,7 @@ import {
   createQuestion,
   getHelperContributions,
   getHelperDashboardStats,
+  getLearnerDashboardStats,
   getHelperProfileOverview,
   getHelperSessionsChart,
   getChatSessions,
@@ -46,6 +47,13 @@ export const useHelperDashboardStatsQuery = () => {
   return useQuery({
     queryKey: ['helper-dashboard-stats'],
     queryFn: getHelperDashboardStats,
+  });
+};
+
+export const useLearnerDashboardStatsQuery = () => {
+  return useQuery({
+    queryKey: ['learner-dashboard-stats'],
+    queryFn: getLearnerDashboardStats,
   });
 };
 

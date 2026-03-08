@@ -1,49 +1,102 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useMyQuestionsQuery } from '@/query/questionMutation';
+import { useRouter } from 'next/navigation';
 
 interface AskedTopic {
-  // "2025-08-07"
-  title: string; // "How to integrate Stripe webhooks?"
-  time: string; // "10:32 AM"
-  tags: string[]; // ["Stripe", "Backend", "Webhooks"]
+  id: number;
+  title: string;
+  time: string;
+  dateKey: string;
+  dateLabel: string;
+  tags: string[];
 }
 
-const topicsData: { date: string; topics: AskedTopic[] }[] = [
-  {
-    date: '7 Aug, 2025',
-    topics: [
-      {
-        title: 'How to integrate Stripe webhooks?',
-        time: '10:32 AM',
-        tags: ['Stripe', 'Backend', 'Webhooks'],
-      },
-      {
-        title: 'RBAC with Laravel Sanctum?',
-        time: '2:45 PM',
-        tags: ['Laravel', 'Auth', 'Sanctum'],
-      },
-    ],
-  },
-  {
-    date: '6 Aug, 2025',
-    topics: [
-      {
-        title: 'Next.js login form best practices?',
-        time: '11:12 AM',
-        tags: ['Next.js', 'Auth', 'React', 'TypeScript'],
-      },
-    ],
-  },
-];
+const DEFAULT_VISIBLE_ITEMS = 3;
 
 export default function AskedTopicsTimeline() {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: myQuestions = [], isLoading } = useMyQuestionsQuery();
+  const router = useRouter();
+
+  const toDateKey = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'unknown';
+    return date.toISOString().slice(0, 10);
+  };
+
+  const toDateLabel = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Unknown date';
+    return date
+      .toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+      .toUpperCase();
+  };
+
+  const toTimeLabel = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '--:--';
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
+  const mappedTopics = useMemo<AskedTopic[]>(() => {
+    return [...myQuestions]
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+      .map((question) => ({
+        id: question.id,
+        title: question.title,
+        time: toTimeLabel(question.created_at),
+        dateKey: toDateKey(question.created_at),
+        dateLabel: toDateLabel(question.created_at),
+        tags: question.tags || [],
+      }));
+  }, [myQuestions]);
+
+  const visibleTopics = isOpen
+    ? mappedTopics
+    : mappedTopics.slice(0, DEFAULT_VISIBLE_ITEMS);
+
+  const groupedTopics = useMemo(() => {
+    const byDate = new Map<string, { date: string; topics: AskedTopic[] }>();
+
+    visibleTopics.forEach((topic) => {
+      if (!byDate.has(topic.dateKey)) {
+        byDate.set(topic.dateKey, { date: topic.dateLabel, topics: [] });
+      }
+      byDate.get(topic.dateKey)?.topics.push(topic);
+    });
+
+    return Array.from(byDate.values());
+  }, [visibleTopics]);
+
+  const hasOlder = mappedTopics.length > DEFAULT_VISIBLE_ITEMS;
 
   return (
     <div className="w-full md:w-[40%] p-4">
-      {topicsData.map((section, i) => (
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading your sessions...</p>
+      )}
+
+      {!isLoading && groupedTopics.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          You have not created a question yet.
+        </p>
+      )}
+
+      {groupedTopics.map((section, i) => (
         <div key={i}>
           <div className="ps-2 my-2">
             <h3 className="text-xs font-medium uppercase text-muted-foreground">
@@ -51,12 +104,15 @@ export default function AskedTopicsTimeline() {
             </h3>
           </div>
 
-          {section.topics.map((topic, index) => (
-            <div key={index} className="flex gap-x-3">
+          {section.topics.map((topic, index) => {
+            const isLastInSection = index === section.topics.length - 1;
+            return (
+            <div key={topic.id} className="flex gap-x-3">
               <div className="relative after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-border">
                 <div className="z-10 size-7 flex justify-center items-center">
                   <div className="size-2 rounded-full bg-orange-500"></div>
                 </div>
+                {isLastInSection && <div className="absolute bottom-0 start-3.5 w-px h-0" />}
               </div>
 
               <div className="grow pb-8">
@@ -76,16 +132,22 @@ export default function AskedTopicsTimeline() {
                     </span>
                   ))}
                 </div>
-                <button className="flex items-center gap-1 mt-2 text-sm text-primary font-medium decoration-2 hover:underline focus:outline-none focus:underline font-sans">
-                  Continue Sessions <ArrowRight className="w-4 h-4" />
+                <button
+                  type="button"
+                  onClick={() => router.push(`/chat/${topic.id}`)}
+                  className="flex items-center gap-1 mt-2 text-sm text-primary font-medium decoration-2 hover:underline focus:outline-none focus:underline font-sans"
+                >
+                  Continue Sessions
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       ))}
 
       {/* Show older */}
+      {hasOlder && (
       <div className="ps-2 -ms-px flex gap-x-3">
         <button
           type="button"
@@ -109,34 +171,6 @@ export default function AskedTopicsTimeline() {
           {isOpen ? 'Hide older' : 'Show older'}
         </button>
       </div>
-
-      {isOpen && (
-        <div className="mt-4">
-          <h3 className="text-xs font-medium uppercase text-muted-foreground">
-            1 Aug, 2025
-          </h3>
-          <div className="flex gap-x-3 mt-2">
-            <div className="relative">
-              <div className="z-10 size-7 flex justify-center items-center">
-                <div className="size-2 rounded-full bg-blue-600"></div>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-foreground">
-                Using Prisma with PostgreSQL
-              </h3>
-              <p className="text-xs text-muted-foreground">4:15 PM</p>
-              <div className="flex gap-1 mt-1">
-                <span className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded">
-                  Prisma
-                </span>
-                <span className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded">
-                  SQL
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

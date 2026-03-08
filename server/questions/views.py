@@ -20,6 +20,7 @@ import google.generativeai as genai
 from .serializers import (
 	ModifyQuestionDescriptionSerializer,
 	ModifiedQuestionDescriptionResponseSerializer,
+	LearnerDashboardStatsSerializer,
 	MyQuestionListSerializer,
 	HelperDashboardStatsSerializer,
 	HelperSessionsChartSerializer,
@@ -29,7 +30,7 @@ from .serializers import (
 )
 from rest_framework import generics, permissions, status
 
-from .models import Question, QuestionInvite, QuestionVote
+from .models import Bookmark, Question, QuestionInvite, QuestionVote
 from notifications.models import Notification
 from chat.models import ChatMessage, ChatSession, MessageReaction
 from .serializers import QuestionListSerializer
@@ -364,6 +365,116 @@ class HelperDashboardStatsView(APIView):
 		}
 
 		serializer = HelperDashboardStatsSerializer(data=payload)
+		serializer.is_valid(raise_exception=True)
+		return Response(serializer.validated_data)
+
+
+class LearnerDashboardStatsView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	@staticmethod
+	def _percentage_change(current_value: float, previous_value: float) -> float:
+		if previous_value == 0:
+			return 100.0 if current_value > 0 else 0.0
+		return round(((current_value - previous_value) / previous_value) * 100, 2)
+
+	def get(self, request):
+		now = timezone.now()
+		period_start = now - timedelta(days=30)
+		previous_period_start = period_start - timedelta(days=30)
+
+		# 1) Questions Posted (total history + recent trend)
+		questions_posted_value = Question.objects.filter(asked_by=request.user).count()
+		questions_posted_current = Question.objects.filter(
+			asked_by=request.user,
+			created_at__gte=period_start,
+		).count()
+		questions_posted_previous = Question.objects.filter(
+			asked_by=request.user,
+			created_at__gte=previous_period_start,
+			created_at__lt=period_start,
+		).count()
+
+		# 2) Problems Solved (model has answered/closed instead of resolved)
+		solved_statuses = ['answered', 'closed']
+		problems_solved_value = Question.objects.filter(
+			asked_by=request.user,
+			status__in=solved_statuses,
+		).count()
+		problems_solved_current = Question.objects.filter(
+			asked_by=request.user,
+			status__in=solved_statuses,
+			updated_at__gte=period_start,
+		).count()
+		problems_solved_previous = Question.objects.filter(
+			asked_by=request.user,
+			status__in=solved_statuses,
+			updated_at__gte=previous_period_start,
+			updated_at__lt=period_start,
+		).count()
+
+		# 3) Active Sessions / Pending
+		active_statuses = ['searching', 'ongoing']
+		active_sessions_value = Question.objects.filter(
+			asked_by=request.user,
+			status__in=active_statuses,
+		).count()
+		active_sessions_current = Question.objects.filter(
+			asked_by=request.user,
+			status__in=active_statuses,
+			updated_at__gte=period_start,
+		).count()
+		active_sessions_previous = Question.objects.filter(
+			asked_by=request.user,
+			status__in=active_statuses,
+			updated_at__gte=previous_period_start,
+			updated_at__lt=period_start,
+		).count()
+
+		# 4) Saved Summaries / Knowledge Bank
+		saved_summaries_value = Bookmark.objects.filter(user=request.user).count()
+		saved_summaries_current = Bookmark.objects.filter(
+			user=request.user,
+			created_at__gte=period_start,
+		).count()
+		saved_summaries_previous = Bookmark.objects.filter(
+			user=request.user,
+			created_at__gte=previous_period_start,
+			created_at__lt=period_start,
+		).count()
+
+		payload = {
+			'questions_posted': {
+				'value': questions_posted_value,
+				'change': self._percentage_change(
+					questions_posted_current,
+					questions_posted_previous,
+				),
+			},
+			'problems_solved': {
+				'value': problems_solved_value,
+				'change': self._percentage_change(
+					problems_solved_current,
+					problems_solved_previous,
+				),
+			},
+			'active_sessions': {
+				'value': active_sessions_value,
+				'change': self._percentage_change(
+					active_sessions_current,
+					active_sessions_previous,
+				),
+			},
+			'saved_summaries': {
+				'value': saved_summaries_value,
+				'change': self._percentage_change(
+					saved_summaries_current,
+					saved_summaries_previous,
+				),
+			},
+		}
+
+		serializer = LearnerDashboardStatsSerializer(data=payload)
 		serializer.is_valid(raise_exception=True)
 		return Response(serializer.validated_data)
 

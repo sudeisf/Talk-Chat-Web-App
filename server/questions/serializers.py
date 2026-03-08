@@ -97,6 +97,13 @@ class HelperDashboardStatsSerializer(serializers.Serializer):
     feedback_rating = DashboardMetricSerializer()
 
 
+class LearnerDashboardStatsSerializer(serializers.Serializer):
+    questions_posted = DashboardMetricSerializer()
+    problems_solved = DashboardMetricSerializer()
+    active_sessions = DashboardMetricSerializer()
+    saved_summaries = DashboardMetricSerializer()
+
+
 class HelperMonthlySessionSerializer(serializers.Serializer):
     month = serializers.CharField()
     sessions = serializers.IntegerField()

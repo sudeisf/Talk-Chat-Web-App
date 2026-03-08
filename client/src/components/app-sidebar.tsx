@@ -18,6 +18,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from '@/components/ui/sidebar';
 import logo from './../../public/svg/logo.svg';
 import Image from 'next/image';
@@ -78,29 +79,35 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarContent className="bg-sidebar text-sidebar-foreground flex h-full flex-col justify-between">
         <SidebarGroup>
-          <div className="flex p-2 gap-2 pl-6">
+          <div className="flex p-3 gap-2 pl-6 group-data-[collapsible=icon]:p-3 group-data-[collapsible=icon]:pl-3 group-data-[collapsible=icon]:justify-center">
             <Image
               src={logo}
               alt=""
-              width={25}
-              height={25}
-              className="dark:brightness-0 dark:invert"
+              width={32}
+              height={32}
+              className="dark:brightness-0 dark:invert group-data-[collapsible=icon]:w-[2.15rem] group-data-[collapsible=icon]:h-[2.15rem]"
             />
-            <h1 className="text-lg font-pt text-sidebar-foreground rounded-full">
+            <h1 className="text-lg font-pt text-sidebar-foreground rounded-full group-data-[collapsible=icon]:hidden">
               Talkit
             </h1>
           </div>
           <SidebarGroupContent>
-            <SidebarMenu className="p-4 space-y-2 mt-4">
+            <SidebarMenu className="p-4 space-y-2 mt-4 group-data-[collapsible=icon]:px-2.5 group-data-[collapsible=icon]:py-3 group-data-[collapsible=icon]:space-y-3">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton className="font-pt space-x-2" asChild>
+                  <SidebarMenuButton
+                    className="font-pt space-x-2 group-data-[collapsible=icon]:h-[2.65rem] group-data-[collapsible=icon]:w-[2.65rem] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 [&>svg]:group-data-[collapsible=icon]:h-[1.35rem] [&>svg]:group-data-[collapsible=icon]:w-[1.35rem]"
+                    tooltip={item.title}
+                    asChild
+                  >
                     <Link href={item.url}>
                       <item.icon />
-                      <span className="font-normal">{item.title}</span>
+                      <span className="font-normal group-data-[collapsible=icon]:hidden">
+                        {item.title}
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -108,22 +115,28 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarFooter className="p-6 ml-2">
-          <Link className="flex items-center gap-2" href={'/settings'}>
-            <Settings className="w-4 h-4" />
-            Settings
+        <SidebarFooter className="p-6 ml-2 group-data-[collapsible=icon]:p-3 group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:space-y-3">
+          <Link
+            className="flex items-center gap-2 group-data-[collapsible=icon]:h-[2.65rem] group-data-[collapsible=icon]:w-[2.65rem] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 hover:bg-sidebar-accent"
+            href={'/settings'}
+          >
+            <Settings className="w-4 h-4 group-data-[collapsible=icon]:w-[1.3rem] group-data-[collapsible=icon]:h-[1.3rem]" />
+            <span className="group-data-[collapsible=icon]:hidden">Settings</span>
           </Link>
           <button
             type="button"
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="flex items-center font-pt font-medium gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex items-center font-pt font-medium gap-2 disabled:opacity-60 disabled:cursor-not-allowed group-data-[collapsible=icon]:h-[2.65rem] group-data-[collapsible=icon]:w-[2.65rem] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 hover:bg-sidebar-accent"
           >
-            <LogOut className="w-4 h-4" />
-            {isLoggingOut ? 'logging out...' : 'logout'}
+            <LogOut className="w-4 h-4 group-data-[collapsible=icon]:w-[1.3rem] group-data-[collapsible=icon]:h-[1.3rem]" />
+            <span className="group-data-[collapsible=icon]:hidden">
+              {isLoggingOut ? 'logging out...' : 'logout'}
+            </span>
           </button>
         </SidebarFooter>
       </SidebarContent>
+      <SidebarRail />
     </Sidebar>
   );
 }

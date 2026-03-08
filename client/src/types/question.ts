@@ -43,6 +43,13 @@ export interface HelperDashboardStatsResponse {
   feedback_rating: DashboardMetric;
 }
 
+export interface LearnerDashboardStatsResponse {
+  questions_posted: DashboardMetric;
+  problems_solved: DashboardMetric;
+  active_sessions: DashboardMetric;
+  saved_summaries: DashboardMetric;
+}
+
 export interface HelperMonthlySessionItem {
   month: string;
   sessions: number;

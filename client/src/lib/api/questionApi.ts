@@ -4,6 +4,7 @@ import {
   HelperContributionsResponse,
   CreateQuestionPayload,
   HelperDashboardStatsResponse,
+  LearnerDashboardStatsResponse,
   HelperProfileOverviewResponse,
   HelperSessionsChartResponse,
   JoinQuestionResponse,
@@ -46,6 +47,16 @@ export const getMyQuestions = async () => {
 export const getHelperDashboardStats = async () => {
   const response = await API.get<HelperDashboardStatsResponse>(
     '/questions/helper-dashboard-stats/',
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data;
+};
+
+export const getLearnerDashboardStats = async () => {
+  const response = await API.get<LearnerDashboardStatsResponse>(
+    '/questions/learner-dashboard-stats/',
     {
       withCredentials: true,
     }

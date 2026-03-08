@@ -27,27 +27,27 @@ export default function HelperDashboard() {
       <GreetingCard btnName={'Start Helping'} name={'sudeis'} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
         <SummaryCard
-          percentage={questionsAnsweredChange.toFixed(2)}
+          percentage={questionsAnsweredChange}
           title="Questions Answered"
           value={Math.round(questionsAnswered)}
           icon={<MessageSquare size={20} />}
         />
         <SummaryCard
-          percentage={sessionsJoinedChange.toFixed(2)}
+          percentage={sessionsJoinedChange}
           title="Sessions Joined"
           value={Math.round(sessionsJoined)}
           icon={<Bookmark size={20} />}
           color="text-purple-600"
         />
         <SummaryCard
-          percentage={averageResponseTimeChange.toFixed(2)}
+          percentage={averageResponseTimeChange}
           title="Average Response Time"
           value={Math.round(averageResponseTime)}
           icon={<CheckCircle size={20} />}
           color="text-green-600"
         />
         <SummaryCard
-          percentage={feedbackRatingChange.toFixed(2)}
+          percentage={feedbackRatingChange}
           title="Feedback Rating"
           value={Math.round(feedbackRating)}
           icon={<Clock size={20} />}
